@@ -25,6 +25,7 @@ const orderRoutes = require('./routes/order.routes');
 const reviewRoutes = require('./routes/review.routes');
 const couponRoutes = require('./routes/coupon.routes');
 const notificationRoutes = require('./routes/notification.routes');
+const paymentRoutes = require('./routes/payment.routes');
 
 const app = express();
 
@@ -75,6 +76,7 @@ app.use('/api/v1/orders', orderRoutes);
 app.use('/api/v1/reviews', reviewRoutes);
 app.use('/api/v1/coupons', couponRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
+app.use('/api/v1/payments', paymentRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
