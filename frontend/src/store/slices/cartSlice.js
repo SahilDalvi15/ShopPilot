@@ -1,4 +1,5 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { cartService } from '../../services/cart.service';
 
 const initialState = {
   items: [],
@@ -9,6 +10,91 @@ const initialState = {
   loading: false,
   error: null,
 };
+
+// Async thunks
+export const fetchCart = createAsyncThunk(
+  'cart/fetchCart',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await cartService.getCart();
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch cart');
+    }
+  }
+);
+
+export const addToCart = createAsyncThunk(
+  'cart/addToCart',
+  async (cartData, { rejectWithValue }) => {
+    try {
+      const response = await cartService.addToCart(cartData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to add item to cart');
+    }
+  }
+);
+
+export const updateCartItem = createAsyncThunk(
+  'cart/updateCartItem',
+  async ({ itemId, quantity }, { rejectWithValue }) => {
+    try {
+      const response = await cartService.updateCartItem(itemId, quantity);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to update cart item');
+    }
+  }
+);
+
+export const removeFromCart = createAsyncThunk(
+  'cart/removeFromCart',
+  async (itemId, { rejectWithValue }) => {
+    try {
+      const response = await cartService.removeFromCart(itemId);
+      return { itemId, ...response.data };
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to remove item from cart');
+    }
+  }
+);
+
+export const clearCartAsync = createAsyncThunk(
+  'cart/clearCart',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await cartService.clearCart();
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to clear cart');
+    }
+  }
+);
+
+export const applyCouponAsync = createAsyncThunk(
+  'cart/applyCoupon',
+  async (couponCode, { rejectWithValue }) => {
+    try {
+      const response = await cartService.applyCoupon(couponCode);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to apply coupon');
+    }
+  }
+);
+
+export const removeCouponAsync = createAsyncThunk(
+  'cart/removeCoupon',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await cartService.removeCoupon();
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to remove coupon');
+    }
+  }
+);
 
 const cartSlice = createSlice({
   name: 'cart',
@@ -92,6 +178,117 @@ const cartSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      // Fetch cart
+      .addCase(fetchCart.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchCart.fulfilled, (state, action) => {
+        state.loading = false;
+        state.items = action.payload.items || [];
+        state.subtotal = action.payload.subtotal || 0;
+        state.totalDiscount = action.payload.totalDiscount || 0;
+        state.totalAmount = action.payload.totalAmount || 0;
+        state.appliedCoupon = action.payload.appliedCoupon || null;
+      })
+      .addCase(fetchCart.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Add to cart
+      .addCase(addToCart.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(addToCart.fulfilled, (state, action) => {
+        state.loading = false;
+        state.items = action.payload.items || [];
+        state.subtotal = action.payload.subtotal || 0;
+        state.totalDiscount = action.payload.totalDiscount || 0;
+        state.totalAmount = action.payload.totalAmount || 0;
+        state.appliedCoupon = action.payload.appliedCoupon || null;
+      })
+      .addCase(addToCart.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Update cart item
+      .addCase(updateCartItem.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateCartItem.fulfilled, (state, action) => {
+        state.loading = false;
+        state.items = action.payload.items || [];
+        state.subtotal = action.payload.subtotal || 0;
+        state.totalDiscount = action.payload.totalDiscount || 0;
+        state.totalAmount = action.payload.totalAmount || 0;
+        state.appliedCoupon = action.payload.appliedCoupon || null;
+      })
+      .addCase(updateCartItem.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Remove from cart
+      .addCase(removeFromCart.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(removeFromCart.fulfilled, (state, action) => {
+        state.loading = false;
+        state.items = action.payload.items || [];
+        state.subtotal = action.payload.subtotal || 0;
+        state.totalDiscount = action.payload.totalDiscount || 0;
+        state.totalAmount = action.payload.totalAmount || 0;
+        state.appliedCoupon = action.payload.appliedCoupon || null;
+      })
+      .addCase(removeFromCart.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Clear cart
+      .addCase(clearCartAsync.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(clearCartAsync.fulfilled, (state) => {
+        state.loading = false;
+        state.items = [];
+        state.subtotal = 0;
+        state.totalDiscount = 0;
+        state.totalAmount = 0;
+        state.appliedCoupon = null;
+      })
+      .addCase(clearCartAsync.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Apply coupon
+      .addCase(applyCouponAsync.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(applyCouponAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        state.appliedCoupon = action.payload.coupon;
+        state.totalDiscount = action.payload.totalDiscount;
+        state.totalAmount = action.payload.totalAmount;
+      })
+      .addCase(applyCouponAsync.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Remove coupon
+      .addCase(removeCouponAsync.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(removeCouponAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        state.appliedCoupon = null;
+        state.totalDiscount = action.payload.totalDiscount;
+        state.totalAmount = action.payload.totalAmount;
+      })
+      .addCase(removeCouponAsync.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
