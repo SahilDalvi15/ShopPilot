@@ -1,46 +1,36 @@
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { MapPin, CreditCard, Truck, Shield, ArrowRight, Plus, Check } from 'lucide-react';
+import { fetchAddresses } from '../store/slices/addressSlice';
+import { createPaymentOrder, verifyPayment } from '../store/slices/paymentSlice';
+import { clearCart } from '../store/slices/cartSlice';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  
   const cartItems = useSelector((state) => state.cart.items);
   const cartTotal = useSelector((state) => state.cart.totalAmount);
   const cartDiscount = useSelector((state) => state.cart.totalDiscount);
   const appliedCoupon = useSelector((state) => state.cart.appliedCoupon);
+  const { addresses } = useSelector((state) => state.address);
 
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('razorpay');
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Mock addresses - will be replaced with API call
-  const [addresses] = useState([
-    {
-      _id: '1',
-      fullName: 'John Doe',
-      phoneNumber: '9876543210',
-      addressLine1: '123 Main Street',
-      addressLine2: 'Apartment 4B',
-      city: 'Mumbai',
-      state: 'Maharashtra',
-      postalCode: '400001',
-      addressType: 'home',
-      isDefault: true,
-    },
-    {
-      _id: '2',
-      fullName: 'John Doe',
-      phoneNumber: '9876543210',
-      addressLine1: '456 Business Park',
-      addressLine2: 'Floor 3',
-      city: 'Mumbai',
-      state: 'Maharashtra',
-      postalCode: '400002',
-      addressType: 'work',
-      isDefault: false,
-    },
-  ]);
+  useEffect(() => {
+    dispatch(fetchAddresses());
+  }, [dispatch]);
+
+  useEffect(() => {
+    // Set default address as selected
+    const defaultAddress = addresses.find((addr) => addr.isDefault);
+    if (defaultAddress) {
+      setSelectedAddress(defaultAddress._id);
+    }
+  }, [addresses]);
 
   const calculateSubtotal = () => {
     return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -67,39 +57,63 @@ const CheckoutPage = () => {
     setIsProcessing(true);
 
     try {
-      // TODO: Create order API call
-      // const orderData = {
-      //   shippingAddress: selectedAddress,
-      //   paymentMethod,
-      //   items: cartItems,
-      //   subtotal: calculateSubtotal(),
-      //   discount: cartDiscount,
-      //   shipping: calculateShipping(),
-      //   tax: calculateTax(),
-      //   total: calculateTotal(),
-      //   coupon: appliedCoupon,
-      // };
+      const orderData = {
+        shippingAddress: addresses.find((addr) => addr._id === selectedAddress),
+        paymentMethod,
+        items: cartItems,
+        subtotal: calculateSubtotal(),
+        discount: cartDiscount,
+        shipping: calculateShipping(),
+        tax: calculateTax(),
+        total: calculateTotal(),
+        coupon: appliedCoupon,
+      };
 
-      // const order = await createOrder(orderData);
-
-      // If Razorpay, initialize payment
       if (paymentMethod === 'razorpay') {
-        // TODO: Initialize Razorpay payment
-        // const options = {
-        //   key: 'YOUR_RAZORPAY_KEY',
-        //   amount: calculateTotal() * 100,
-        //   currency: 'INR',
-        //   name: 'ShopPilot',
-        //   description: 'Order Payment',
-        //   order_id: order.razorpayOrderId,
-        //   handler: function (response) {
-        //     verifyPayment(response);
-        //   },
-        // };
-        // const rzp = new window.Razorpay(options);
-        // rzp.open();
+        const result = await dispatch(createPaymentOrder({
+          amount: calculateTotal(),
+          currency: 'INR',
+        }));
+
+        if (createPaymentOrder.fulfilled.match(result)) {
+          const { orderId, keyId, amount } = result.payload;
+
+          const options = {
+            key: keyId,
+            amount: amount * 100,
+            currency: 'INR',
+            name: 'ShopPilot',
+            description: 'Order Payment',
+            order_id: orderId,
+            handler: async function (response) {
+              const verifyResult = await dispatch(verifyPayment({
+                orderId: response.razorpay_order_id,
+                paymentId: response.razorpay_payment_id,
+                signature: response.razorpay_signature,
+              }));
+
+              if (verifyPayment.fulfilled.match(verifyResult)) {
+                await dispatch(clearCart());
+                navigate('/orders');
+              } else {
+                alert('Payment verification failed');
+              }
+            },
+            prefill: {
+              name: addresses[0]?.fullName,
+              email: '',
+              contact: addresses[0]?.phoneNumber,
+            },
+            theme: {
+              color: '#9333ea',
+            },
+          };
+
+          const rzp = new window.Razorpay(options);
+          rzp.open();
+        }
       } else {
-        // Cash on delivery
+        // Cash on delivery - create order directly
         navigate('/orders');
       }
     } catch (error) {
