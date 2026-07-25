@@ -1,56 +1,24 @@
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Heart, Trash2, ShoppingCart, Star, ArrowRight } from 'lucide-react';
+import {
+  fetchWishlist,
+  removeFromWishlist,
+  clearWishlist,
+  addToCart,
+} from '../store/slices/wishlistSlice';
+import { addToCart as addToCartAction } from '../store/slices/cartSlice';
 
 const WishlistPage = () => {
   const [selectedItems, setSelectedItems] = useState([]);
 
-  // Mock wishlist items - will be replaced with API call
-  const [wishlistItems, setWishlistItems] = useState([
-    {
-      _id: '1',
-      title: 'Premium Wireless Headphones',
-      slug: 'premium-wireless-headphones',
-      brand: 'Sony',
-      images: ['https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400'],
-      price: 12999,
-      discount: 15,
-      discountedPrice: 11049,
-      rating: 4.5,
-      reviewCount: 234,
-      stock: 15,
-      addedAt: '2024-01-15',
-    },
-    {
-      _id: '2',
-      title: 'Smart Watch Series 5',
-      slug: 'smart-watch-series-5',
-      brand: 'Apple',
-      images: ['https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'],
-      price: 32999,
-      discount: 10,
-      discountedPrice: 29699,
-      rating: 4.8,
-      reviewCount: 567,
-      stock: 8,
-      addedAt: '2024-01-10',
-    },
-    {
-      _id: '3',
-      title: 'Mechanical Keyboard RGB',
-      slug: 'mechanical-keyboard-rgb',
-      brand: 'Logitech',
-      images: ['https://images.unsplash.com/photo-1587829741301-dc798b91add1?w=400'],
-      price: 8999,
-      discount: 20,
-      discountedPrice: 7199,
-      rating: 4.3,
-      reviewCount: 189,
-      stock: 25,
-      addedAt: '2024-01-05',
-    },
-  ]);
+  const dispatch = useDispatch();
+  const { items: wishlistItems, loading } = useSelector((state) => state.wishlist);
+
+  useEffect(() => {
+    dispatch(fetchWishlist());
+  }, [dispatch]);
 
   const handleSelectAll = (e) => {
     if (e.target.checked) {
@@ -68,39 +36,52 @@ const WishlistPage = () => {
     );
   };
 
-  const handleRemoveFromWishlist = (itemId) => {
+  const handleRemoveFromWishlist = async (itemId) => {
     if (window.confirm('Remove this item from wishlist?')) {
-      setWishlistItems(wishlistItems.filter((item) => item._id !== itemId));
+      await dispatch(removeFromWishlist(itemId));
       setSelectedItems(selectedItems.filter((id) => id !== itemId));
     }
   };
 
-  const handleRemoveSelected = () => {
+  const handleRemoveSelected = async () => {
     if (window.confirm(`Remove ${selectedItems.length} items from wishlist?`)) {
-      setWishlistItems(
-        wishlistItems.filter((item) => !selectedItems.includes(item._id))
-      );
+      for (const itemId of selectedItems) {
+        await dispatch(removeFromWishlist(itemId));
+      }
       setSelectedItems([]);
     }
   };
 
-  const handleMoveToCart = (item) => {
-    // TODO: Add to cart API call
+  const handleMoveToCart = async (item) => {
+    await dispatch(addToCartAction({
+      productId: item._id,
+      quantity: 1,
+      price: item.discountedPrice || item.price,
+    }));
     alert(`${item.title} added to cart!`);
   };
 
-  const handleMoveSelectedToCart = () => {
-    // TODO: Add multiple items to cart API call
+  const handleMoveSelectedToCart = async () => {
+    for (const itemId of selectedItems) {
+      const item = wishlistItems.find((i) => i._id === itemId);
+      if (item) {
+        await dispatch(addToCartAction({
+          productId: item._id,
+          quantity: 1,
+          price: item.discountedPrice || item.price,
+        }));
+      }
+    }
     alert(`${selectedItems.length} items added to cart!`);
   };
 
   const calculateTotal = () => {
-    return wishlistItems.reduce((total, item) => total + item.discountedPrice, 0);
+    return wishlistItems.reduce((total, item) => total + (item.discountedPrice || item.price), 0);
   };
 
   const calculateSavings = () => {
     return wishlistItems.reduce(
-      (total, item) => total + (item.price - item.discountedPrice),
+      (total, item) => total + (item.price - (item.discountedPrice || item.price)),
       0
     );
   };
