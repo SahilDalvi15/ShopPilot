@@ -17,7 +17,8 @@
     "@tanstack/react-query": "^5.40.0",
     "axios": "^1.7.2",
     "react-router-dom": "^6.23.1",
-    "lucide-react": "^0.378.0"
+    "lucide-react": "^0.378.0",
+    "razorpay": "^2.9.4"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
