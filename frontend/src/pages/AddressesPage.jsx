@@ -1,7 +1,15 @@
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { MapPin, Plus, Edit, Trash2, Check, Home, Building, Briefcase } from 'lucide-react';
+import {
+  fetchAddresses,
+  createAddress,
+  updateAddress,
+  deleteAddress,
+  setDefaultAddress,
+  clearError,
+} from '../store/slices/addressSlice';
 
 const AddressesPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,35 +27,12 @@ const AddressesPage = () => {
     isDefault: false,
   });
 
-  // Mock addresses - will be replaced with API call
-  const [addresses, setAddresses] = useState([
-    {
-      _id: '1',
-      fullName: 'John Doe',
-      phoneNumber: '9876543210',
-      addressLine1: '123 Main Street',
-      addressLine2: 'Apartment 4B',
-      city: 'Mumbai',
-      state: 'Maharashtra',
-      country: 'India',
-      postalCode: '400001',
-      addressType: 'home',
-      isDefault: true,
-    },
-    {
-      _id: '2',
-      fullName: 'John Doe',
-      phoneNumber: '9876543210',
-      addressLine1: '456 Business Park',
-      addressLine2: 'Floor 3',
-      city: 'Mumbai',
-      state: 'Maharashtra',
-      country: 'India',
-      postalCode: '400002',
-      addressType: 'work',
-      isDefault: false,
-    },
-  ]);
+  const dispatch = useDispatch();
+  const { addresses, loading, error } = useSelector((state) => state.address);
+
+  useEffect(() => {
+    dispatch(fetchAddresses());
+  }, [dispatch]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -55,28 +40,27 @@ const AddressesPage = () => {
       ...formData,
       [name]: type === 'checkbox' ? checked : value,
     });
+    if (error) {
+      dispatch(clearError());
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (editingAddress) {
-      // Update existing address
-      setAddresses(
-        addresses.map((addr) =>
-          addr._id === editingAddress._id ? { ...formData, _id: editingAddress._id } : addr
-        )
+      const result = await dispatch(
+        updateAddress({ addressId: editingAddress._id, addressData: formData })
       );
+      if (updateAddress.fulfilled.match(result)) {
+        closeModal();
+      }
     } else {
-      // Add new address
-      const newAddress = {
-        ...formData,
-        _id: Date.now().toString(),
-      };
-      setAddresses([...addresses, newAddress]);
+      const result = await dispatch(createAddress(formData));
+      if (createAddress.fulfilled.match(result)) {
+        closeModal();
+      }
     }
-
-    closeModal();
   };
 
   const handleEdit = (address) => {
@@ -85,19 +69,14 @@ const AddressesPage = () => {
     setIsModalOpen(true);
   };
 
-  const handleDelete = (addressId) => {
+  const handleDelete = async (addressId) => {
     if (window.confirm('Are you sure you want to delete this address?')) {
-      setAddresses(addresses.filter((addr) => addr._id !== addressId));
+      await dispatch(deleteAddress(addressId));
     }
   };
 
-  const handleSetDefault = (addressId) => {
-    setAddresses(
-      addresses.map((addr) => ({
-        ...addr,
-        isDefault: addr._id === addressId,
-      }))
-    );
+  const handleSetDefault = async (addressId) => {
+    await dispatch(setDefaultAddress(addressId));
   };
 
   const closeModal = () => {
