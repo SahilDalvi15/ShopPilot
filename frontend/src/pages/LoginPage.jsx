@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { setCredentials, setError } from '../store/slices/authSlice';
-import { authService } from '../services/authService';
+import { login, clearError } from '../store/slices/authSlice';
 import { LogIn, Mail, Lock, AlertCircle } from 'lucide-react';
 
 const LoginPage = () => {
@@ -10,11 +9,11 @@ const LoginPage = () => {
     email: '',
     password: '',
   });
-  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { loading, error } = useSelector((state) => state.auth);
 
   const handleChange = (e) => {
     setFormData({
@@ -27,6 +26,10 @@ const LoginPage = () => {
         ...errors,
         [e.target.name]: '',
       });
+    }
+    // Clear Redux error when user starts typing
+    if (error) {
+      dispatch(clearError());
     }
   };
 
@@ -54,31 +57,15 @@ const LoginPage = () => {
     
     if (!validateForm()) return;
 
-    setLoading(true);
-    dispatch(setError(null));
-
-    try {
-      const response = await authService.login(formData);
-      
-      // Store tokens
-      localStorage.setItem('accessToken', response.data.tokens.accessToken);
-      localStorage.setItem('refreshToken', response.data.tokens.refreshToken);
-      
-      // Update Redux store
-      dispatch(setCredentials({
-        user: response.data.user,
-        token: response.data.tokens.accessToken,
-      }));
-
-      navigate('/');
-    } catch (error) {
-      dispatch(setError(error.response?.data?.message || 'Login failed'));
+    const result = await dispatch(login(formData));
+    
+    if (login.fulfilled.match(result)) {
+      navigate('/products');
+    } else if (login.rejected.match(result)) {
       setErrors({
         ...errors,
-        submit: error.response?.data?.message || 'Login failed',
+        submit: result.payload || 'Login failed',
       });
-    } finally {
-      setLoading(false);
     }
   };
 
