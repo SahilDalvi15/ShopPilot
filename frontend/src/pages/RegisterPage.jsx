@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { register, clearError } from '../store/slices/authSlice';
+import { useToast } from '../contexts/ToastContext';
 import { UserPlus, Mail, Lock, User, Phone, AlertCircle } from 'lucide-react';
 
 const RegisterPage = () => {
@@ -18,6 +19,7 @@ const RegisterPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state) => state.auth);
+  const { success, error: toastError } = useToast();
 
   const handleChange = (e) => {
     setFormData({
@@ -85,12 +87,10 @@ const RegisterPage = () => {
     const result = await dispatch(register(registerData));
     
     if (register.fulfilled.match(result)) {
+      success('Account Created!', 'Welcome to ShopPilot. Your account has been created successfully.');
       navigate('/products');
     } else if (register.rejected.match(result)) {
-      setErrors({
-        ...errors,
-        submit: result.payload || 'Registration failed',
-      });
+      toastError('Registration Failed', result.payload || 'Please check your information and try again.');
     }
   };
 
