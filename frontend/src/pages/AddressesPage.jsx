@@ -10,6 +10,7 @@ import {
   setDefaultAddress,
   clearError,
 } from '../store/slices/addressSlice';
+import { useToast } from '../contexts/ToastContext';
 
 const AddressesPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,6 +30,7 @@ const AddressesPage = () => {
 
   const dispatch = useDispatch();
   const { addresses, loading, error } = useSelector((state) => state.address);
+  const { success, error: toastError } = useToast();
 
   useEffect(() => {
     dispatch(fetchAddresses());
@@ -53,12 +55,18 @@ const AddressesPage = () => {
         updateAddress({ addressId: editingAddress._id, addressData: formData })
       );
       if (updateAddress.fulfilled.match(result)) {
+        success('Address Updated', 'Your address has been updated successfully.');
         closeModal();
+      } else if (updateAddress.rejected.match(result)) {
+        toastError('Update Failed', result.payload || 'Failed to update address.');
       }
     } else {
       const result = await dispatch(createAddress(formData));
       if (createAddress.fulfilled.match(result)) {
+        success('Address Added', 'Your new address has been added successfully.');
         closeModal();
+      } else if (createAddress.rejected.match(result)) {
+        toastError('Add Failed', result.payload || 'Failed to add address.');
       }
     }
   };
@@ -71,12 +79,22 @@ const AddressesPage = () => {
 
   const handleDelete = async (addressId) => {
     if (window.confirm('Are you sure you want to delete this address?')) {
-      await dispatch(deleteAddress(addressId));
+      const result = await dispatch(deleteAddress(addressId));
+      if (deleteAddress.fulfilled.match(result)) {
+        success('Address Deleted', 'Address has been removed successfully.');
+      } else if (deleteAddress.rejected.match(result)) {
+        toastError('Delete Failed', result.payload || 'Failed to delete address.');
+      }
     }
   };
 
   const handleSetDefault = async (addressId) => {
-    await dispatch(setDefaultAddress(addressId));
+    const result = await dispatch(setDefaultAddress(addressId));
+    if (setDefaultAddress.fulfilled.match(result)) {
+      success('Default Address Set', 'This address is now your default shipping address.');
+    } else if (setDefaultAddress.rejected.match(result)) {
+      toastError('Failed', result.payload || 'Failed to set default address.');
+    }
   };
 
   const closeModal = () => {
