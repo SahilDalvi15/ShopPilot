@@ -10,6 +10,7 @@ import {
 } from '../store/slices/wishlistSlice';
 import { addToCart as addToCartAction } from '../store/slices/cartSlice';
 import { useToast } from '../contexts/ToastContext';
+import WishlistItemSkeleton from '../components/skeletons/WishlistItemSkeleton';
 
 const WishlistPage = () => {
   const [selectedItems, setSelectedItems] = useState([]);
@@ -133,7 +134,13 @@ const WishlistPage = () => {
             )}
           </div>
 
-          {wishlistItems.length === 0 ? (
+          {loading ? (
+            <>
+              <WishlistItemSkeleton />
+              <WishlistItemSkeleton />
+              <WishlistItemSkeleton />
+            </>
+          ) : wishlistItems.length === 0 ? (
             <div className="bg-white rounded-lg shadow-md p-12 text-center">
               <Heart className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Your wishlist is empty</h3>
