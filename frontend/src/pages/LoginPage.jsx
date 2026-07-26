@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { login, clearError } from '../store/slices/authSlice';
+import { useToast } from '../contexts/ToastContext';
 import { LogIn, Mail, Lock, AlertCircle } from 'lucide-react';
 
 const LoginPage = () => {
@@ -14,6 +15,7 @@ const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state) => state.auth);
+  const { success, error: toastError } = useToast();
 
   const handleChange = (e) => {
     setFormData({
@@ -60,12 +62,10 @@ const LoginPage = () => {
     const result = await dispatch(login(formData));
     
     if (login.fulfilled.match(result)) {
+      success('Welcome back!', 'You have successfully signed in.');
       navigate('/products');
     } else if (login.rejected.match(result)) {
-      setErrors({
-        ...errors,
-        submit: result.payload || 'Login failed',
-      });
+      toastError('Login Failed', result.payload || 'Please check your credentials and try again.');
     }
   };
 
