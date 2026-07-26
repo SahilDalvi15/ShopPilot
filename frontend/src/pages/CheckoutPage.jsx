@@ -5,10 +5,12 @@ import { MapPin, CreditCard, Truck, Shield, ArrowRight, Plus, Check } from 'luci
 import { fetchAddresses } from '../store/slices/addressSlice';
 import { createPaymentOrder, verifyPayment } from '../store/slices/paymentSlice';
 import { clearCart } from '../store/slices/cartSlice';
+import { useToast } from '../contexts/ToastContext';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { error: toastError, success, warning } = useToast();
   
   const cartItems = useSelector((state) => state.cart.items);
   const cartTotal = useSelector((state) => state.cart.totalAmount);
@@ -50,7 +52,7 @@ const CheckoutPage = () => {
 
   const handlePlaceOrder = async () => {
     if (!selectedAddress) {
-      alert('Please select a shipping address');
+      warning('Address Required', 'Please select a shipping address to continue.');
       return;
     }
 
@@ -94,9 +96,10 @@ const CheckoutPage = () => {
 
               if (verifyPayment.fulfilled.match(verifyResult)) {
                 await dispatch(clearCart());
+                success('Order Placed!', 'Your order has been placed successfully.');
                 navigate('/orders');
               } else {
-                alert('Payment verification failed');
+                toastError('Payment Failed', 'Payment verification failed. Please try again.');
               }
             },
             prefill: {
@@ -111,14 +114,18 @@ const CheckoutPage = () => {
 
           const rzp = new window.Razorpay(options);
           rzp.open();
+        } else if (createPaymentOrder.rejected.match(result)) {
+          toastError('Payment Init Failed', result.payload || 'Failed to initialize payment. Please try again.');
         }
       } else {
         // Cash on delivery - create order directly
+        success('Order Placed!', 'Your order has been placed successfully via Cash on Delivery.');
+        await dispatch(clearCart());
         navigate('/orders');
       }
     } catch (error) {
       console.error('Error placing order:', error);
-      alert('Failed to place order. Please try again.');
+      toastError('Order Failed', 'Failed to place order. Please try again.');
     } finally {
       setIsProcessing(false);
     }
