@@ -11,6 +11,7 @@ import {
   clearError,
 } from '../store/slices/addressSlice';
 import { useToast } from '../contexts/ToastContext';
+import AddressCardSkeleton from '../components/skeletons/AddressCardSkeleton';
 
 const AddressesPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -146,87 +147,91 @@ const AddressesPage = () => {
 
           {/* Addresses List */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {addresses.map((address) => (
-              <div
-                key={address._id}
-                className={`bg-white rounded-lg shadow-md p-6 relative ${
-                  address.isDefault ? 'border-2 border-purple-600' : ''
-                }`}
-              >
-                {address.isDefault && (
-                  <div className="absolute top-4 right-4 bg-purple-600 text-white text-xs px-3 py-1 rounded-full">
-                    Default
-                  </div>
-                )}
-
-                <div className="flex items-start space-x-4 mb-4">
-                  <div className="bg-purple-100 p-3 rounded-full">
-                    {getAddressIcon(address.addressType)}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 text-lg">
-                      {address.fullName}
-                    </h3>
-                    <p className="text-gray-600 text-sm">{address.phoneNumber}</p>
-                  </div>
-                </div>
-
-                <div className="space-y-2 mb-4">
-                  <p className="text-gray-700">
-                    {address.addressLine1}
-                    {address.addressLine2 && `, ${address.addressLine2}`}
-                  </p>
-                  <p className="text-gray-700">
-                    {address.city}, {address.state} - {address.postalCode}
-                  </p>
-                  <p className="text-gray-700">{address.country}</p>
-                </div>
-
-                <div className="flex items-center justify-between pt-4 border-t">
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => handleEdit(address)}
-                      className="flex items-center space-x-1 text-purple-600 hover:text-purple-700 transition"
-                    >
-                      <Edit className="h-4 w-4" />
-                      <span>Edit</span>
-                    </button>
-                    <button
-                      onClick={() => handleDelete(address._id)}
-                      className="flex items-center space-x-1 text-red-600 hover:text-red-700 transition"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      <span>Delete</span>
-                    </button>
-                  </div>
-
-                  {!address.isDefault && (
-                    <button
-                      onClick={() => handleSetDefault(address._id)}
-                      className="flex items-center space-x-1 text-gray-600 hover:text-purple-600 transition"
-                    >
-                      <Check className="h-4 w-4" />
-                      <span>Set as Default</span>
-                    </button>
-                  )}
-                </div>
+            {loading ? (
+              <>
+                <AddressCardSkeleton />
+                <AddressCardSkeleton />
+              </>
+            ) : addresses.length === 0 ? (
+              <div className="col-span-2 text-center py-12 bg-white rounded-lg shadow-sm">
+                <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600">No addresses yet</p>
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="mt-4 text-purple-600 hover:text-purple-700 font-medium"
+                >
+                  Add your first address
+                </button>
               </div>
-            ))}
-          </div>
+            ) : (
+              addresses.map((address) => (
+                <div
+                  key={address._id}
+                  className={`bg-white rounded-lg shadow-md p-6 relative ${
+                    address.isDefault ? 'border-2 border-purple-600' : ''
+                  }`}
+                >
+                  {address.isDefault && (
+                    <div className="absolute top-4 right-4 bg-purple-600 text-white text-xs px-3 py-1 rounded-full">
+                      Default
+                    </div>
+                  )}
 
-          {addresses.length === 0 && (
-            <div className="bg-white rounded-lg shadow-md p-12 text-center">
-              <MapPin className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No addresses yet</h3>
-              <p className="text-gray-600 mb-6">Add your first address to get started</p>
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition"
-              >
-                Add Address
-              </button>
-            </div>
-          )}
+                  <div className="flex items-start space-x-4 mb-4">
+                    <div className="bg-purple-100 p-3 rounded-full">
+                      {getAddressIcon(address.addressType)}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900 text-lg">
+                        {address.fullName}
+                      </h3>
+                      <p className="text-gray-600 text-sm">{address.phoneNumber}</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 mb-4">
+                    <p className="text-gray-700">
+                      {address.addressLine1}
+                      {address.addressLine2 && `, ${address.addressLine2}`}
+                    </p>
+                    <p className="text-gray-700">
+                      {address.city}, {address.state} - {address.postalCode}
+                    </p>
+                    <p className="text-gray-700">{address.country}</p>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t">
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleEdit(address)}
+                        className="flex items-center space-x-1 text-purple-600 hover:text-purple-700 transition"
+                      >
+                        <Edit className="h-4 w-4" />
+                        <span>Edit</span>
+                      </button>
+                      <button
+                        onClick={() => handleDelete(address._id)}
+                        className="flex items-center space-x-1 text-red-600 hover:text-red-700 transition"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span>Delete</span>
+                      </button>
+                    </div>
+
+                    {!address.isDefault && (
+                      <button
+                        onClick={() => handleSetDefault(address._id)}
+                        className="flex items-center space-x-1 text-gray-600 hover:text-purple-600 transition"
+                      >
+                        <Check className="h-4 w-4" />
+                        <span>Set as Default</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
 
           {/* Back to Profile */}
           <div className="mt-8">
