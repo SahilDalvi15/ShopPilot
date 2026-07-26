@@ -6,6 +6,7 @@ import { fetchAddresses } from '../store/slices/addressSlice';
 import { createPaymentOrder, verifyPayment } from '../store/slices/paymentSlice';
 import { clearCart } from '../store/slices/cartSlice';
 import { useToast } from '../contexts/ToastContext';
+import AddressCardSkeleton from '../components/skeletons/AddressCardSkeleton';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const CheckoutPage = () => {
   const cartTotal = useSelector((state) => state.cart.totalAmount);
   const cartDiscount = useSelector((state) => state.cart.totalDiscount);
   const appliedCoupon = useSelector((state) => state.cart.appliedCoupon);
-  const { addresses } = useSelector((state) => state.address);
+  const { addresses, loading: addressesLoading } = useSelector((state) => state.address);
 
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('razorpay');
@@ -181,7 +182,20 @@ const CheckoutPage = () => {
                 </div>
 
                 <div className="space-y-4">
-                  {addresses.map((address) => (
+                  {addressesLoading ? (
+                    <AddressCardSkeleton />
+                  ) : addresses.length === 0 ? (
+                    <div className="text-center py-8 bg-gray-50 rounded-lg">
+                      <p className="text-gray-600 mb-4">No addresses found</p>
+                      <Link
+                        to="/addresses"
+                        className="text-purple-600 hover:text-purple-700 font-medium"
+                      >
+                        Add an address
+                      </Link>
+                    </div>
+                  ) : (
+                    addresses.map((address) => (
                     <div
                       key={address._id}
                       onClick={() => setSelectedAddress(address._id)}
@@ -219,7 +233,8 @@ const CheckoutPage = () => {
                         )}
                       </div>
                     </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </div>
 
