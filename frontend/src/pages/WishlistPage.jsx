@@ -9,12 +9,14 @@ import {
   addToCart,
 } from '../store/slices/wishlistSlice';
 import { addToCart as addToCartAction } from '../store/slices/cartSlice';
+import { useToast } from '../contexts/ToastContext';
 
 const WishlistPage = () => {
   const [selectedItems, setSelectedItems] = useState([]);
 
   const dispatch = useDispatch();
   const { items: wishlistItems, loading } = useSelector((state) => state.wishlist);
+  const { success, error: toastError } = useToast();
 
   useEffect(() => {
     dispatch(fetchWishlist());
@@ -38,41 +40,63 @@ const WishlistPage = () => {
 
   const handleRemoveFromWishlist = async (itemId) => {
     if (window.confirm('Remove this item from wishlist?')) {
-      await dispatch(removeFromWishlist(itemId));
-      setSelectedItems(selectedItems.filter((id) => id !== itemId));
+      const result = await dispatch(removeFromWishlist(itemId));
+      if (removeFromWishlist.fulfilled.match(result)) {
+        success('Removed', 'Item removed from wishlist.');
+        setSelectedItems(selectedItems.filter((id) => id !== itemId));
+      } else if (removeFromWishlist.rejected.match(result)) {
+        toastError('Failed', result.payload || 'Failed to remove item.');
+      }
     }
   };
 
   const handleRemoveSelected = async () => {
     if (window.confirm(`Remove ${selectedItems.length} items from wishlist?`)) {
+      let successCount = 0;
       for (const itemId of selectedItems) {
-        await dispatch(removeFromWishlist(itemId));
+        const result = await dispatch(removeFromWishlist(itemId));
+        if (removeFromWishlist.fulfilled.match(result)) {
+          successCount++;
+        }
+      }
+      if (successCount > 0) {
+        success('Removed', `${successCount} items removed from wishlist.`);
       }
       setSelectedItems([]);
     }
   };
 
   const handleMoveToCart = async (item) => {
-    await dispatch(addToCartAction({
+    const result = await dispatch(addToCartAction({
       productId: item._id,
       quantity: 1,
       price: item.discountedPrice || item.price,
     }));
-    alert(`${item.title} added to cart!`);
+    if (addToCartAction.fulfilled.match(result)) {
+      success('Added to Cart', `${item.title} has been added to your cart.`);
+    } else if (addToCartAction.rejected.match(result)) {
+      toastError('Failed', result.payload || 'Failed to add item to cart.');
+    }
   };
 
   const handleMoveSelectedToCart = async () => {
+    let successCount = 0;
     for (const itemId of selectedItems) {
       const item = wishlistItems.find((i) => i._id === itemId);
       if (item) {
-        await dispatch(addToCartAction({
+        const result = await dispatch(addToCartAction({
           productId: item._id,
           quantity: 1,
           price: item.discountedPrice || item.price,
         }));
+        if (addToCartAction.fulfilled.match(result)) {
+          successCount++;
+        }
       }
     }
-    alert(`${selectedItems.length} items added to cart!`);
+    if (successCount > 0) {
+      success('Added to Cart', `${successCount} items added to your cart.`);
+    }
   };
 
   const calculateTotal = () => {
