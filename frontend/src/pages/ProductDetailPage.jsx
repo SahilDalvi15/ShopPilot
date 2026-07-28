@@ -3,6 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { productService } from '../services/productService';
 import { Heart, ShoppingCart, Star, Minus, Plus, Truck, Shield, RotateCcw } from 'lucide-react';
+import ReviewForm from '../components/ReviewForm';
+import ReviewList from '../components/ReviewList';
 
 const ProductDetailPage = () => {
   const { slug } = useParams();
@@ -202,6 +204,26 @@ const ProductDetailPage = () => {
               </div>
             </div>
           )}
+
+          {/* Reviews Section */}
+          <div className="border-t border-gray-200 p-6">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-6">Customer Reviews</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Review Form */}
+              <div className="lg:col-span-1">
+                <ReviewForm productId={product._id} onSubmit={() => {}} loading={false} />
+              </div>
+              
+              {/* Review List */}
+              <div className="lg:col-span-2">
+                <ReviewList 
+                  reviews={product.reviews || []} 
+                  loading={false}
+                  onHelpful={() => {}}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
