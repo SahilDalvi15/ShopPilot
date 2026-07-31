@@ -13,6 +13,11 @@ import ProfilePage from './pages/ProfilePage';
 import AddressesPage from './pages/AddressesPage';
 import WishlistPage from './pages/WishlistPage';
 import CheckoutPage from './pages/CheckoutPage';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminStats from './pages/admin/AdminStats';
+import AdminProducts from './pages/admin/AdminProducts';
+import AdminOrders from './pages/admin/AdminOrders';
+import AdminUsers from './pages/admin/AdminUsers';
 import './App.css';
 
 function App() {
@@ -53,6 +58,14 @@ function App() {
               element={isAuthenticated ? <WishlistPage /> : <Navigate to="/login" />} 
             />
             <Route path="/" element={<Navigate to="/products" />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminDashboard />}>
+              <Route index element={<AdminStats />} />
+              <Route path="products" element={<AdminProducts />} />
+              <Route path="orders" element={<AdminOrders />} />
+              <Route path="users" element={<AdminUsers />} />
+            </Route>
           </Routes>
         </main>
         <Footer />
