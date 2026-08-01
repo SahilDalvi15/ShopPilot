@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Plus, Search, Edit, Trash2, Eye, Filter, MoreVertical } from 'lucide-react';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 const AdminProducts = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
 
@@ -89,7 +91,10 @@ const AdminProducts = () => {
           <h1 className="text-3xl font-bold text-gray-900">Products</h1>
           <p className="text-gray-600 mt-2">Manage your product inventory</p>
         </div>
-        <button className="flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition">
+        <button 
+          onClick={() => navigate('/admin/products/new')}
+          className="flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition"
+        >
           <Plus className="w-5 h-5" />
           Add Product
         </button>
