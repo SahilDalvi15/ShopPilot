@@ -1,11 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { authenticate } = require('../middlewares/auth.middleware');
-const { createOrder, getOrders, getOrderById, cancelOrder } = require('../controllers/order.controller');
+const { authenticate, authorize } = require('../middlewares/auth.middleware');
+const validate = require('../middleware/validate');
+const { createOrderSchema, updateOrderStatusSchema } = require('../validators/orderValidator');
+const { createOrder, getOrders, getOrderById, cancelOrder, updateOrderStatus } = require('../controllers/order.controller');
 
-router.post('/', authenticate, createOrder);
+router.post('/', authenticate, validate(createOrderSchema), createOrder);
 router.get('/', authenticate, getOrders);
 router.get('/:orderId', authenticate, getOrderById);
 router.put('/:orderId/cancel', authenticate, cancelOrder);
+router.put('/:orderId/status', authenticate, authorize(['admin', 'super_admin']), validate(updateOrderStatusSchema), updateOrderStatus);
 
 module.exports = router;
