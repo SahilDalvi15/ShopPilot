@@ -52,13 +52,16 @@ const AdminProductForm = ({ isEdit = false, initialData = null }) => {
         }
       });
 
+      // Extract image URLs from the images array
+      const imageUrls = images.map((img) => img.url || img.preview || img);
+
       const productData = {
         ...formData,
         price: parseFloat(formData.price),
         discount: parseFloat(formData.discount),
         stock: parseInt(formData.stock),
         specifications,
-        images: images.map((img) => img.preview || img),
+        images: imageUrls,
       };
 
       console.log('Product data:', productData);
@@ -293,6 +296,7 @@ const AdminProductForm = ({ isEdit = false, initialData = null }) => {
                 maxImages={5}
                 maxSizeMB={5}
                 label="Upload Images"
+                useApi={true}
               />
             </div>
           </div>
