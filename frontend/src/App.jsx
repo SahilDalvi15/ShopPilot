@@ -16,6 +16,7 @@ import CheckoutPage from './pages/CheckoutPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminStats from './pages/admin/AdminStats';
 import AdminProducts from './pages/admin/AdminProducts';
+import AdminProductForm from './pages/admin/AdminProductForm';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminUsers from './pages/admin/AdminUsers';
 import './App.css';
@@ -63,6 +64,8 @@ function App() {
             <Route path="/admin" element={<AdminDashboard />}>
               <Route index element={<AdminStats />} />
               <Route path="products" element={<AdminProducts />} />
+              <Route path="products/new" element={<AdminProductForm />} />
+              <Route path="products/:id/edit" element={<AdminProductForm isEdit />} />
               <Route path="orders" element={<AdminOrders />} />
               <Route path="users" element={<AdminUsers />} />
             </Route>
