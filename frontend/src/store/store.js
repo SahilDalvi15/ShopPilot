@@ -4,6 +4,7 @@ import cartReducer from './slices/cartSlice';
 import wishlistReducer from './slices/wishlistSlice';
 import addressReducer from './slices/addressSlice';
 import paymentReducer from './slices/paymentSlice';
+import reviewReducer from './slices/reviewSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     wishlist: wishlistReducer,
     address: addressReducer,
     payment: paymentReducer,
+    reviews: reviewReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
