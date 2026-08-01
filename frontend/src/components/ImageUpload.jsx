@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
-import { Upload, X, Image as ImageIcon, AlertCircle } from 'lucide-react';
+import { Upload, X, Image as ImageIcon, AlertCircle, Loader2 } from 'lucide-react';
+import uploadService from '../services/uploadService';
 
 const ImageUpload = ({ 
   images = [], 
@@ -7,10 +8,12 @@ const ImageUpload = ({
   maxImages = 5, 
   maxSizeMB = 5,
   acceptedTypes = ['image/jpeg', 'image/png', 'image/webp'],
-  label = 'Product Images'
+  label = 'Product Images',
+  useApi = false
 }) => {
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState('');
+  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
 
   const validateFile = (file) => {
@@ -30,35 +33,62 @@ const ImageUpload = ({
     return true;
   };
 
-  const handleFiles = (files) => {
+  const handleFiles = async (files) => {
     setError('');
-    const validFiles = [];
-    const newImages = [...images];
-
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      
-      // Check max images limit
-      if (newImages.length + validFiles.length >= maxImages) {
-        setError(`Maximum ${maxImages} images allowed`);
-        break;
-      }
-
-      if (validateFile(file)) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          newImages.push({
-            file,
-            preview: e.target.result,
-            id: Date.now() + Math.random(),
-          });
-          
-          if (newImages.length === images.length + validFiles.length + 1) {
-            onImagesChange(newImages);
+    
+    if (useApi) {
+      // Upload to API
+      setUploading(true);
+      try {
+        const formData = new FormData();
+        files.forEach((file) => {
+          if (images.length < maxImages) {
+            formData.append('images', file);
           }
-        };
-        reader.readAsDataURL(file);
-        validFiles.push(file);
+        });
+
+        const response = await uploadService.uploadImages(formData);
+        const uploadedImages = response.data.images.map((url) => ({
+          url,
+          id: Date.now() + Math.random(),
+        }));
+
+        onImagesChange([...images, ...uploadedImages]);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to upload images');
+      } finally {
+        setUploading(false);
+      }
+    } else {
+      // Local preview
+      const validFiles = [];
+      const newImages = [...images];
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        // Check max images limit
+        if (newImages.length + validFiles.length >= maxImages) {
+          setError(`Maximum ${maxImages} images allowed`);
+          break;
+        }
+
+        if (validateFile(file)) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            newImages.push({
+              file,
+              preview: e.target.result,
+              id: Date.now() + Math.random(),
+            });
+            
+            if (newImages.length === images.length + validFiles.length + 1) {
+              onImagesChange(newImages);
+            }
+          };
+          reader.readAsDataURL(file);
+          validFiles.push(file);
+        }
       }
     }
   };
@@ -112,7 +142,7 @@ const ImageUpload = ({
           dragActive
             ? 'border-purple-500 bg-purple-50'
             : 'border-gray-300 hover:border-purple-400 hover:bg-gray-50'
-        }`}
+        } ${uploading ? 'opacity-50 pointer-events-none' : ''}`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
@@ -125,6 +155,7 @@ const ImageUpload = ({
           accept={acceptedTypes.join(',')}
           onChange={handleChange}
           className="hidden"
+          disabled={uploading}
         />
 
         <div className="flex flex-col items-center gap-4">
@@ -133,18 +164,23 @@ const ImageUpload = ({
               dragActive ? 'bg-purple-100' : 'bg-gray-100'
             }`}
           >
-            <Upload className={`w-8 h-8 ${dragActive ? 'text-purple-600' : 'text-gray-400'}`} />
+            {uploading ? (
+              <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
+            ) : (
+              <Upload className={`w-8 h-8 ${dragActive ? 'text-purple-600' : 'text-gray-400'}`} />
+            )}
           </div>
           
           <div>
             <p className="text-gray-900 font-medium">
-              {dragActive ? 'Drop images here' : 'Drag & drop images here'}
+              {uploading ? 'Uploading...' : dragActive ? 'Drop images here' : 'Drag & drop images here'}
             </p>
             <p className="text-gray-500 text-sm mt-1">or</p>
             <button
               type="button"
               onClick={onButtonClick}
-              className="mt-2 text-purple-600 font-medium hover:text-purple-700 transition"
+              disabled={uploading}
+              className="mt-2 text-purple-600 font-medium hover:text-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               browse files
             </button>
@@ -173,7 +209,7 @@ const ImageUpload = ({
               className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200"
             >
               <img
-                src={image.preview || image}
+                src={image.url || image.preview || image}
                 alt={`Preview ${index + 1}`}
                 className="w-full h-full object-cover"
               />
