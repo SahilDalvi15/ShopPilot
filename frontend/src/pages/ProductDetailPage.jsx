@@ -1,13 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { productService } from '../services/productService';
 import { Heart, ShoppingCart, Star, Minus, Plus, Truck, Shield, RotateCcw } from 'lucide-react';
 import ReviewForm from '../components/ReviewForm';
 import ReviewList from '../components/ReviewList';
+import { fetchProductReviews, createReview, markReviewHelpful } from '../store/slices/reviewSlice';
+import { useToast } from '../contexts/ToastContext';
 
 const ProductDetailPage = () => {
   const { slug } = useParams();
+  const dispatch = useDispatch();
+  const { success, error: toastError } = useToast();
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
 
@@ -17,11 +22,36 @@ const ProductDetailPage = () => {
   });
 
   const product = data?.data;
+  const { reviews, loading: reviewsLoading, submitting } = useSelector((state) => state.reviews);
+
+  useEffect(() => {
+    if (product?._id) {
+      dispatch(fetchProductReviews(product._id));
+    }
+  }, [dispatch, product?._id]);
 
   const handleQuantityChange = (change) => {
     const newQuantity = quantity + change;
     if (newQuantity >= 1 && newQuantity <= (product?.stock || 10)) {
       setQuantity(newQuantity);
+    }
+  };
+
+  const handleReviewSubmit = async (reviewData) => {
+    try {
+      await dispatch(createReview(reviewData)).unwrap();
+      success('Review submitted successfully!');
+    } catch (err) {
+      toastError(err || 'Failed to submit review');
+    }
+  };
+
+  const handleHelpful = async (reviewId) => {
+    try {
+      await dispatch(markReviewHelpful(reviewId)).unwrap();
+      success('Thanks for your feedback!');
+    } catch (err) {
+      toastError(err || 'Failed to mark review as helpful');
     }
   };
 
@@ -211,15 +241,15 @@ const ProductDetailPage = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Review Form */}
               <div className="lg:col-span-1">
-                <ReviewForm productId={product._id} onSubmit={() => {}} loading={false} />
+                <ReviewForm productId={product._id} onSubmit={handleReviewSubmit} loading={submitting} />
               </div>
               
               {/* Review List */}
               <div className="lg:col-span-2">
                 <ReviewList 
-                  reviews={product.reviews || []} 
-                  loading={false}
-                  onHelpful={() => {}}
+                  reviews={reviews || product.reviews || []} 
+                  loading={reviewsLoading}
+                  onHelpful={handleHelpful}
                 />
               </div>
             </div>
