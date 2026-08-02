@@ -7,6 +7,7 @@ const Inventory = require('../models/Inventory.model');
 const User = require('../models/User.model');
 const logger = require('../utils/logger');
 const emailService = require('./emailService');
+const { emitToUser, emitToAdmins } = require('../config/socket');
 
 class OrderService {
   async createOrder(userId, orderData) {
@@ -179,6 +180,31 @@ class OrderService {
     } catch (emailError) {
       logger.error(`Failed to send order confirmation email: ${emailError.message}`);
       // Don't fail order creation if email fails
+    }
+
+    // Emit real-time notification to user
+    try {
+      emitToUser(userId, 'order_created', {
+        orderId: order._id,
+        orderNumber: order.orderNumber,
+        totalAmount: order.totalAmount,
+        status: order.orderStatus,
+      });
+    } catch (socketError) {
+      logger.error(`Failed to emit order notification: ${socketError.message}`);
+    }
+
+    // Emit notification to admins
+    try {
+      emitToAdmins('new_order', {
+        orderId: order._id,
+        orderNumber: order.orderNumber,
+        userId,
+        totalAmount: order.totalAmount,
+        customerName: order.shippingAddress.fullName,
+      });
+    } catch (socketError) {
+      logger.error(`Failed to emit admin notification: ${socketError.message}`);
     }
 
     logger.info(`Order ${order._id} created for user ${userId}`);
