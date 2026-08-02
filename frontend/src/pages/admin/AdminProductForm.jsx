@@ -1,25 +1,52 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Save, ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import adminProductService from '../../services/adminProductService';
 import ImageUpload from '../../components/ImageUpload';
+import { useToast } from '../../contexts/ToastContext';
 
-const AdminProductForm = ({ isEdit = false, initialData = null }) => {
+const AdminProductForm = ({ isEdit = false }) => {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const { success, error: toastError } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    title: initialData?.title || '',
-    description: initialData?.description || '',
-    brand: initialData?.brand || '',
-    category: initialData?.category || '',
-    price: initialData?.price || '',
-    discount: initialData?.discount || 0,
-    stock: initialData?.stock || '',
-    specifications: initialData?.specifications || {},
+    title: '',
+    description: '',
+    brand: '',
+    category: '',
+    price: '',
+    discount: 0,
+    stock: '',
+    specifications: {},
   });
-  const [images, setImages] = useState(initialData?.images || []);
-  const [specs, setSpecs] = useState(
-    Object.entries(initialData?.specifications || {}).map(([key, value]) => ({ key, value }))
-  );
+  const [images, setImages] = useState([]);
+  const [specs, setSpecs] = useState([]);
+
+  // Fetch product data if editing
+  const { data: productData, isLoading: fetchLoading } = useQuery({
+    queryKey: ['product', id],
+    queryFn: () => adminProductService.getProductById(id),
+    enabled: isEdit && !!id,
+    onSuccess: (data) => {
+      const product = data.data;
+      setFormData({
+        title: product.title || '',
+        description: product.description || '',
+        brand: product.brand || '',
+        category: product.category || '',
+        price: product.price || '',
+        discount: product.discount || 0,
+        stock: product.stock || '',
+        specifications: product.specifications || {},
+      });
+      setImages(product.images || []);
+      setSpecs(
+        Object.entries(product.specifications || {}).map(([key, value]) => ({ key, value }))
+      );
+    },
+  });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -64,17 +91,30 @@ const AdminProductForm = ({ isEdit = false, initialData = null }) => {
         images: imageUrls,
       };
 
-      console.log('Product data:', productData);
-      // TODO: Call API to create/update product
-      // await productService.createProduct(productData) or productService.updateProduct(id, productData)
+      if (isEdit && id) {
+        await adminProductService.updateProduct(id, productData);
+        success('Product updated successfully');
+      } else {
+        await adminProductService.createProduct(productData);
+        success('Product created successfully');
+      }
 
       navigate('/admin/products');
     } catch (error) {
       console.error('Error saving product:', error);
+      toastError(error.response?.data?.message || 'Failed to save product');
     } finally {
       setLoading(false);
     }
   };
+
+  if (fetchLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

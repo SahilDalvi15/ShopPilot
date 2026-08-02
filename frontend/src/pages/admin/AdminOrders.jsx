@@ -1,62 +1,34 @@
 import { useState } from 'react';
-import { Search, Filter, Eye, Download, MoreVertical } from 'lucide-react';
+import { Search, Filter, Eye, Download, MoreVertical, Loader2 } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import adminOrderService from '../../services/adminOrderService';
+import { useToast } from '../../contexts/ToastContext';
 
 const AdminOrders = () => {
+  const queryClient = useQueryClient();
+  const { success, error: toastError } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
 
-  const orders = [
-    {
-      id: '#12345',
-      customer: 'John Doe',
-      email: 'john@example.com',
-      items: 3,
-      total: 2499,
-      status: 'Delivered',
-      date: '2024-01-15',
-      paymentMethod: 'Razorpay',
+  // Fetch orders
+  const { data: response, isLoading, error } = useQuery({
+    queryKey: ['admin-orders'],
+    queryFn: () => adminOrderService.getAllOrders(),
+  });
+
+  const orders = response?.data || [];
+
+  // Update order status mutation
+  const updateStatusMutation = useMutation({
+    mutationFn: ({ orderId, status }) => adminOrderService.updateOrderStatus(orderId, status),
+    onSuccess: () => {
+      success('Order status updated successfully');
+      queryClient.invalidateQueries(['admin-orders']);
     },
-    {
-      id: '#12346',
-      customer: 'Jane Smith',
-      email: 'jane@example.com',
-      items: 2,
-      total: 1899,
-      status: 'Processing',
-      date: '2024-01-15',
-      paymentMethod: 'COD',
+    onError: (err) => {
+      toastError(err.response?.data?.message || 'Failed to update order status');
     },
-    {
-      id: '#12347',
-      customer: 'Bob Johnson',
-      email: 'bob@example.com',
-      items: 5,
-      total: 3299,
-      status: 'Shipped',
-      date: '2024-01-14',
-      paymentMethod: 'Razorpay',
-    },
-    {
-      id: '#12348',
-      customer: 'Alice Brown',
-      email: 'alice@example.com',
-      items: 1,
-      total: 999,
-      status: 'Pending',
-      date: '2024-01-14',
-      paymentMethod: 'Razorpay',
-    },
-    {
-      id: '#12349',
-      customer: 'Charlie Wilson',
-      email: 'charlie@example.com',
-      items: 4,
-      total: 4599,
-      status: 'Delivered',
-      date: '2024-01-13',
-      paymentMethod: 'COD',
-    },
-  ];
+  });
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -76,13 +48,17 @@ const AdminOrders = () => {
   };
 
   const filteredOrders = orders.filter((order) => {
-    const matchesSearch = order.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = order.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         order.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         order._id?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterStatus === 'all' || 
-                         order.status.toLowerCase() === filterStatus.toLowerCase();
+                         order.status?.toLowerCase() === filterStatus.toLowerCase();
     return matchesSearch && matchesFilter;
   });
+
+  const handleStatusChange = (orderId, newStatus) => {
+    updateStatusMutation.mutate({ orderId, status: newStatus });
+  };
 
   return (
     <div className="space-y-6">
@@ -131,56 +107,74 @@ const AdminOrders = () => {
 
       {/* Orders Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Order ID</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Customer</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Items</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Total</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Payment</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Status</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Date</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {filteredOrders.map((order) => (
-                <tr key={order.id} className="hover:bg-gray-50 transition">
-                  <td className="px-6 py-4 font-medium text-gray-900">{order.id}</td>
-                  <td className="px-6 py-4">
-                    <div>
-                      <p className="font-medium text-gray-900">{order.customer}</p>
-                      <p className="text-sm text-gray-500">{order.email}</p>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-gray-700">{order.items}</td>
-                  <td className="px-6 py-4 font-semibold text-gray-900">₹{order.total.toLocaleString()}</td>
-                  <td className="px-6 py-4 text-gray-700">{order.paymentMethod}</td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
-                      {order.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-gray-700">{order.date}</td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <button className="p-2 hover:bg-gray-100 rounded-lg transition" title="View">
-                        <Eye className="w-4 h-4 text-gray-600" />
-                      </button>
-                      <button className="p-2 hover:bg-gray-100 rounded-lg transition" title="More">
-                        <MoreVertical className="w-4 h-4 text-gray-600" />
-                      </button>
-                    </div>
-                  </td>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <p className="text-red-600">Failed to load orders</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Order ID</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Customer</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Items</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Total</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Payment</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Status</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Date</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {filteredOrders.map((order) => (
+                  <tr key={order._id} className="hover:bg-gray-50 transition">
+                    <td className="px-6 py-4 font-medium text-gray-900">{order._id}</td>
+                    <td className="px-6 py-4">
+                      <div>
+                        <p className="font-medium text-gray-900">{order.user?.name || 'Unknown'}</p>
+                        <p className="text-sm text-gray-500">{order.user?.email || 'N/A'}</p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-gray-700">{order.items?.length || 0}</td>
+                    <td className="px-6 py-4 font-semibold text-gray-900">₹{order.totalAmount?.toLocaleString() || 0}</td>
+                    <td className="px-6 py-4 text-gray-700 capitalize">{order.paymentMethod || 'N/A'}</td>
+                    <td className="px-6 py-4">
+                      <select
+                        value={order.status}
+                        onChange={(e) => handleStatusChange(order._id, e.target.value)}
+                        disabled={updateStatusMutation.isLoading}
+                        className={`px-3 py-1 text-xs font-medium rounded-full border-0 ${getStatusColor(order.status)} cursor-pointer disabled:opacity-50`}
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="processing">Processing</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                    </td>
+                    <td className="px-6 py-4 text-gray-700">
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <button className="p-2 hover:bg-gray-100 rounded-lg transition" title="View">
+                          <Eye className="w-4 h-4 text-gray-600" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
         
-        {filteredOrders.length === 0 && (
+        {!isLoading && filteredOrders.length === 0 && (
           <div className="text-center py-12">
             <p className="text-gray-600">No orders found</p>
           </div>

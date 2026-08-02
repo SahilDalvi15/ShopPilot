@@ -1,62 +1,46 @@
 import { useState } from 'react';
-import { Search, Filter, Edit, Trash2, Shield, UserCheck, UserX, MoreVertical } from 'lucide-react';
+import { Search, Filter, Edit, Trash2, Shield, UserCheck, UserX, MoreVertical, Loader2 } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import adminUserService from '../../services/adminUserService';
+import { useToast } from '../../contexts/ToastContext';
 
 const AdminUsers = () => {
+  const queryClient = useQueryClient();
+  const { success, error: toastError } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState('all');
 
-  const users = [
-    {
-      id: 1,
-      name: 'John Doe',
-      email: 'john@example.com',
-      role: 'Admin',
-      status: 'Active',
-      orders: 12,
-      joined: '2024-01-01',
-      avatar: 'https://via.placeholder.com/40',
+  // Fetch users
+  const { data: response, isLoading, error } = useQuery({
+    queryKey: ['admin-users'],
+    queryFn: () => adminUserService.getAllUsers(),
+  });
+
+  const users = response?.data || [];
+
+  // Delete user mutation
+  const deleteMutation = useMutation({
+    mutationFn: adminUserService.deleteUser,
+    onSuccess: () => {
+      success('User deleted successfully');
+      queryClient.invalidateQueries(['admin-users']);
     },
-    {
-      id: 2,
-      name: 'Jane Smith',
-      email: 'jane@example.com',
-      role: 'Customer',
-      status: 'Active',
-      orders: 8,
-      joined: '2024-01-05',
-      avatar: 'https://via.placeholder.com/40',
+    onError: (err) => {
+      toastError(err.response?.data?.message || 'Failed to delete user');
     },
-    {
-      id: 3,
-      name: 'Bob Johnson',
-      email: 'bob@example.com',
-      role: 'Customer',
-      status: 'Inactive',
-      orders: 3,
-      joined: '2024-01-10',
-      avatar: 'https://via.placeholder.com/40',
+  });
+
+  // Toggle block mutation
+  const toggleBlockMutation = useMutation({
+    mutationFn: ({ userId, isBlocked }) => adminUserService.toggleUserBlock(userId, isBlocked),
+    onSuccess: () => {
+      success('User status updated successfully');
+      queryClient.invalidateQueries(['admin-users']);
     },
-    {
-      id: 4,
-      name: 'Alice Brown',
-      email: 'alice@example.com',
-      role: 'Customer',
-      status: 'Active',
-      orders: 15,
-      joined: '2024-01-12',
-      avatar: 'https://via.placeholder.com/40',
+    onError: (err) => {
+      toastError(err.response?.data?.message || 'Failed to update user status');
     },
-    {
-      id: 5,
-      name: 'Charlie Wilson',
-      email: 'charlie@example.com',
-      role: 'Admin',
-      status: 'Active',
-      orders: 5,
-      joined: '2024-01-15',
-      avatar: 'https://via.placeholder.com/40',
-    },
-  ];
+  });
 
   const getRoleColor = (role) => {
     switch (role) {
@@ -69,23 +53,27 @@ const AdminUsers = () => {
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Active':
-        return 'bg-green-100 text-green-700';
-      case 'Inactive':
-        return 'bg-red-100 text-red-700';
-      default:
-        return 'bg-gray-100 text-gray-700';
-    }
+  const getStatusColor = (isBlocked) => {
+    return isBlocked ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700';
   };
 
   const filteredUsers = users.filter((user) => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterRole === 'all' || user.role === filterRole;
+    const matchesSearch = user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         user.email?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = filterRole === 'all' || 
+                         user.role?.toLowerCase() === filterRole.toLowerCase();
     return matchesSearch && matchesFilter;
   });
+
+  const handleDelete = (userId) => {
+    if (window.confirm('Are you sure you want to delete this user?')) {
+      deleteMutation.mutate(userId);
+    }
+  };
+
+  const handleToggleBlock = (userId, currentStatus) => {
+    toggleBlockMutation.mutate({ userId, isBlocked: !currentStatus });
+  };
 
   return (
     <div className="space-y-6">
@@ -131,70 +119,90 @@ const AdminUsers = () => {
 
       {/* Users Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">User</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Role</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Status</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Orders</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Joined</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {filteredUsers.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50 transition">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-4">
-                      <img
-                        src={user.avatar}
-                        alt={user.name}
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                      <div>
-                        <p className="font-medium text-gray-900">{user.name}</p>
-                        <p className="text-sm text-gray-500">{user.email}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 text-xs font-medium rounded-full ${getRoleColor(user.role)}`}>
-                      {user.role}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(user.status)}`}>
-                      {user.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-gray-700">{user.orders}</td>
-                  <td className="px-6 py-4 text-gray-700">{user.joined}</td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <button className="p-2 hover:bg-gray-100 rounded-lg transition" title="Edit">
-                        <Edit className="w-4 h-4 text-gray-600" />
-                      </button>
-                      <button className="p-2 hover:bg-gray-100 rounded-lg transition" title="Toggle Status">
-                        {user.status === 'Active' ? (
-                          <UserX className="w-4 h-4 text-red-600" />
-                        ) : (
-                          <UserCheck className="w-4 h-4 text-green-600" />
-                        )}
-                      </button>
-                      <button className="p-2 hover:bg-red-50 rounded-lg transition" title="Delete">
-                        <Trash2 className="w-4 h-4 text-red-600" />
-                      </button>
-                    </div>
-                  </td>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <p className="text-red-600">Failed to load users</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">User</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Role</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Status</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Joined</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {filteredUsers.map((user) => (
+                  <tr key={user._id} className="hover:bg-gray-50 transition">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-4">
+                        <img
+                          src={user.avatar || 'https://via.placeholder.com/40'}
+                          alt={user.name}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                        <div>
+                          <p className="font-medium text-gray-900">{user.name || 'Unknown'}</p>
+                          <p className="text-sm text-gray-500">{user.email || 'N/A'}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-3 py-1 text-xs font-medium rounded-full capitalize ${getRoleColor(user.role)}`}>
+                        {user.role || 'Customer'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(user.isBlocked)}`}>
+                        {user.isBlocked ? 'Blocked' : 'Active'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-gray-700">
+                      {new Date(user.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <button className="p-2 hover:bg-gray-100 rounded-lg transition" title="Edit">
+                          <Edit className="w-4 h-4 text-gray-600" />
+                        </button>
+                        <button 
+                          onClick={() => handleToggleBlock(user._id, user.isBlocked)}
+                          disabled={toggleBlockMutation.isLoading}
+                          className="p-2 hover:bg-gray-100 rounded-lg transition disabled:opacity-50" 
+                          title="Toggle Status"
+                        >
+                          {user.isBlocked ? (
+                            <UserCheck className="w-4 h-4 text-green-600" />
+                          ) : (
+                            <UserX className="w-4 h-4 text-red-600" />
+                          )}
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(user._id)}
+                          disabled={deleteMutation.isLoading}
+                          className="p-2 hover:bg-red-50 rounded-lg transition disabled:opacity-50" 
+                          title="Delete"
+                        >
+                          <Trash2 className="w-4 h-4 text-red-600" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
         
-        {filteredUsers.length === 0 && (
+        {!isLoading && filteredUsers.length === 0 && (
           <div className="text-center py-12">
             <p className="text-gray-600">No users found</p>
           </div>
