@@ -2,6 +2,7 @@ const User = require('../models/User.model');
 const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require('../utils/jwt');
 const { setCache, getCache, deleteCache } = require('../utils/redis');
 const logger = require('../utils/logger');
+const emailService = require('./emailService');
 
 class AuthService {
   async register(userData) {
@@ -28,6 +29,14 @@ class AuthService {
     // Generate email verification token
     const verificationToken = user.generateEmailVerificationToken();
     await user.save();
+
+    // Send welcome email
+    try {
+      await emailService.sendWelcomeEmail(email, `${firstName} ${lastName}`);
+    } catch (emailError) {
+      logger.error(`Failed to send welcome email: ${emailError.message}`);
+      // Don't fail registration if email fails
+    }
 
     // TODO: Send verification email
     logger.info(`Verification token for ${email}: ${verificationToken}`);
@@ -174,7 +183,15 @@ class AuthService {
     const resetToken = user.generatePasswordResetToken();
     await user.save();
 
-    // TODO: Send password reset email
+    // Send password reset email
+    try {
+      const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+      await emailService.sendPasswordResetEmail(email, `${user.firstName} ${user.lastName}`, resetLink);
+    } catch (emailError) {
+      logger.error(`Failed to send password reset email: ${emailError.message}`);
+      // Don't fail if email sending fails
+    }
+
     logger.info(`Password reset token for ${email}: ${resetToken}`);
   }
 

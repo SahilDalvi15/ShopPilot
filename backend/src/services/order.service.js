@@ -4,7 +4,9 @@ const Cart = require('../models/Cart.model');
 const Address = require('../models/Address.model');
 const Product = require('../models/Product.model');
 const Inventory = require('../models/Inventory.model');
+const User = require('../models/User.model');
 const logger = require('../utils/logger');
+const emailService = require('./emailService');
 
 class OrderService {
   async createOrder(userId, orderData) {
@@ -160,6 +162,23 @@ class OrderService {
     if (paymentMethod === 'razorpay') {
       // razorpayOrder = await createRazorpayOrder(order);
       logger.info(`Razorpay order would be created for order ${order._id}`);
+    }
+
+    // Send order confirmation email
+    try {
+      const user = await User.findById(userId);
+      if (user) {
+        const shippingAddressStr = `${order.shippingAddress.addressLine1}, ${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.postalCode}`;
+        await emailService.sendOrderConfirmationEmail(user.email, `${user.firstName} ${user.lastName}`, {
+          orderId: order.orderNumber,
+          totalAmount: order.totalAmount,
+          paymentMethod: order.paymentMethod,
+          shippingAddress: shippingAddressStr,
+        });
+      }
+    } catch (emailError) {
+      logger.error(`Failed to send order confirmation email: ${emailError.message}`);
+      // Don't fail order creation if email fails
     }
 
     logger.info(`Order ${order._id} created for user ${userId}`);
