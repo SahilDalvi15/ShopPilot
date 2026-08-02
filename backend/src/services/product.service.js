@@ -3,6 +3,7 @@ const Brand = require('../models/Brand.model');
 const Category = require('../models/Category.model');
 const Inventory = require('../models/Inventory.model');
 const logger = require('../utils/logger');
+const elasticsearch = require('../config/elasticsearch');
 
 class ProductService {
   async getProducts(query) {
@@ -227,6 +228,13 @@ class ProductService {
       currentStock: stock || 0
     });
 
+    // Index product in Elasticsearch
+    try {
+      await elasticsearch.indexProduct(product);
+    } catch (error) {
+      logger.error(`Failed to index product in Elasticsearch: ${error.message}`);
+    }
+
     logger.info(`Product ${product._id} created by user ${userId}`);
 
     return {
@@ -309,6 +317,13 @@ class ProductService {
       );
     }
 
+    // Update Elasticsearch index
+    try {
+      await elasticsearch.indexProduct(product);
+    } catch (error) {
+      logger.error(`Failed to update product in Elasticsearch: ${error.message}`);
+    }
+
     logger.info(`Product ${productId} updated by user ${userId}`);
 
     return {
@@ -335,6 +350,13 @@ class ProductService {
 
     product.isDeleted = true;
     await product.save();
+
+    // Delete from Elasticsearch
+    try {
+      await elasticsearch.deleteProduct(productId);
+    } catch (error) {
+      logger.error(`Failed to delete product from Elasticsearch: ${error.message}`);
+    }
 
     logger.info(`Product ${productId} deleted`);
   }

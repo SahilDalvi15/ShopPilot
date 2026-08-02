@@ -12,6 +12,7 @@ const hpp = require('hpp');
 const connectDB = require('./config/database');
 const logger = require('./utils/logger');
 const errorHandler = require('./middlewares/errorHandler');
+const { initializeSocket } = require('./config/socket');
 
 // Import routes
 const authRoutes = require('./routes/auth.routes');
@@ -27,6 +28,7 @@ const couponRoutes = require('./routes/coupon.routes');
 const notificationRoutes = require('./routes/notification.routes');
 const paymentRoutes = require('./routes/payment.routes');
 const uploadRoutes = require('./routes/upload.routes');
+const searchRoutes = require('./routes/search.routes');
 
 const app = express();
 
@@ -82,6 +84,7 @@ app.use('/api/v1/coupons', couponRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/payments', paymentRoutes);
 app.use('/api/v1/upload', uploadRoutes);
+app.use('/api/v1/search', searchRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -108,6 +111,9 @@ const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, () => {
   logger.info(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
 });
+
+// Initialize Socket.IO
+initializeSocket(server);
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
