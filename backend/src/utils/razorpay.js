@@ -1,110 +1,41 @@
-const Razorpay = require('razorpay');
+// Razorpay integration removed - using COD only
+// This file is kept for future reference if Razorpay is needed
+
 const logger = require('./logger');
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
-
 /**
- * Create Razorpay order
- * @param {Object} options - Order options
- * @param {number} options.amount - Amount in paise (1 INR = 100 paise)
- * @param {string} options.currency - Currency code (default: INR)
- * @param {string} options.receipt - Receipt ID
- * @param {Object} options.notes - Additional notes
- * @returns {Promise<Object>} Razorpay order
+ * Create Razorpay order (disabled - using COD only)
  */
 const createOrder = async (options) => {
-  try {
-    const orderOptions = {
-      amount: options.amount,
-      currency: options.currency || 'INR',
-      receipt: options.receipt,
-      notes: options.notes || {},
-      payment_capture: 1, // Auto-capture payment
-    };
-
-    const order = await razorpay.orders.create(orderOptions);
-    logger.info('Razorpay order created', { orderId: order.id, receipt: options.receipt });
-    return order;
-  } catch (error) {
-    logger.error('Error creating Razorpay order', { error: error.message });
-    throw new Error('Failed to create payment order');
-  }
+  throw new Error('Razorpay payment is disabled. Using COD only.');
 };
 
 /**
- * Verify Razorpay payment signature
- * @param {string} orderId - Razorpay order ID
- * @param {string} paymentId - Razorpay payment ID
- * @param {string} signature - Razorpay signature
- * @returns {boolean} Verification result
+ * Verify Razorpay payment signature (disabled - using COD only)
  */
 const verifyPayment = (orderId, paymentId, signature) => {
-  try {
-    const crypto = require('crypto');
-    const generatedSignature = crypto
-      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
-      .update(`${orderId}|${paymentId}`)
-      .digest('hex');
-
-    const isValid = generatedSignature === signature;
-    logger.info('Payment verification', { orderId, paymentId, isValid });
-    return isValid;
-  } catch (error) {
-    logger.error('Error verifying payment signature', { error: error.message });
-    throw new Error('Payment verification failed');
-  }
+  throw new Error('Razorpay payment is disabled. Using COD only.');
 };
 
 /**
- * Fetch payment details from Razorpay
- * @param {string} paymentId - Razorpay payment ID
- * @returns {Promise<Object>} Payment details
+ * Fetch payment details from Razorpay (disabled - using COD only)
  */
 const fetchPayment = async (paymentId) => {
-  try {
-    const payment = await razorpay.payments.fetch(paymentId);
-    logger.info('Payment details fetched', { paymentId, status: payment.status });
-    return payment;
-  } catch (error) {
-    logger.error('Error fetching payment details', { error: error.message });
-    throw new Error('Failed to fetch payment details');
-  }
+  throw new Error('Razorpay payment is disabled. Using COD only.');
 };
 
 /**
- * Initiate refund for a payment
- * @param {string} paymentId - Razorpay payment ID
- * @param {number} amount - Refund amount in paise (optional, full refund if not provided)
- * @returns {Promise<Object>} Refund details
+ * Initiate refund for a payment (disabled - using COD only)
  */
 const initiateRefund = async (paymentId, amount) => {
-  try {
-    const refundOptions = {
-      payment_id: paymentId,
-    };
-
-    if (amount) {
-      refundOptions.amount = amount;
-    }
-
-    const refund = await razorpay.payments.refund(refundOptions);
-    logger.info('Refund initiated', { paymentId, refundId: refund.id });
-    return refund;
-  } catch (error) {
-    logger.error('Error initiating refund', { error: error.message });
-    throw new Error('Failed to initiate refund');
-  }
+  throw new Error('Razorpay payment is disabled. Using COD only.');
 };
 
 /**
- * Get Razorpay key ID (for frontend)
- * @returns {string} Razorpay key ID
+ * Get Razorpay key ID (disabled - using COD only)
  */
 const getKeyId = () => {
-  return process.env.RAZORPAY_KEY_ID;
+  return null;
 };
 
 module.exports = {

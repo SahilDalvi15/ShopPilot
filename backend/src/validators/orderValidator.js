@@ -27,27 +27,11 @@ const createOrderSchema = Joi.object({
     'any.required': 'Shipping address is required',
   }),
   paymentMethod: Joi.string()
-    .valid('cod', 'razorpay')
+    .valid('cod')
     .required()
     .messages({
-      'any.only': 'Payment method must be either cod or razorpay',
+      'any.only': 'Payment method must be COD',
       'any.required': 'Payment method is required',
-    }),
-  paymentDetails: Joi.object()
-    .when('paymentMethod', {
-      is: 'razorpay',
-      then: Joi.object({
-        razorpayOrderId: Joi.string().required().messages({
-          'any.required': 'Razorpay order ID is required',
-        }),
-        razorpayPaymentId: Joi.string().required().messages({
-          'any.required': 'Razorpay payment ID is required',
-        }),
-        razorpaySignature: Joi.string().required().messages({
-          'any.required': 'Razorpay signature is required',
-        }),
-      }),
-      otherwise: Joi.optional(),
     }),
 });
 

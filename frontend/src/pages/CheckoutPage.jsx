@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { MapPin, CreditCard, Truck, Shield, ArrowRight, Plus, Check } from 'lucide-react';
+import { MapPin, Truck, Shield, ArrowRight, Plus, Check } from 'lucide-react';
 import { fetchAddresses } from '../store/slices/addressSlice';
-import { createPaymentOrder, verifyPayment } from '../store/slices/paymentSlice';
 import { clearCart } from '../store/slices/cartSlice';
 import { useToast } from '../contexts/ToastContext';
 import AddressCardSkeleton from '../components/skeletons/AddressCardSkeleton';
@@ -20,7 +19,7 @@ const CheckoutPage = () => {
   const { addresses, loading: addressesLoading } = useSelector((state) => state.address);
 
   const [selectedAddress, setSelectedAddress] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState('razorpay');
+  const [paymentMethod, setPaymentMethod] = useState('cod');
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
@@ -62,7 +61,7 @@ const CheckoutPage = () => {
     try {
       const orderData = {
         shippingAddress: addresses.find((addr) => addr._id === selectedAddress),
-        paymentMethod,
+        paymentMethod: 'cod',
         items: cartItems,
         subtotal: calculateSubtotal(),
         discount: cartDiscount,
@@ -72,58 +71,10 @@ const CheckoutPage = () => {
         coupon: appliedCoupon,
       };
 
-      if (paymentMethod === 'razorpay') {
-        const result = await dispatch(createPaymentOrder({
-          amount: calculateTotal(),
-          currency: 'INR',
-        }));
-
-        if (createPaymentOrder.fulfilled.match(result)) {
-          const { orderId, keyId, amount } = result.payload;
-
-          const options = {
-            key: keyId,
-            amount: amount * 100,
-            currency: 'INR',
-            name: 'ShopPilot',
-            description: 'Order Payment',
-            order_id: orderId,
-            handler: async function (response) {
-              const verifyResult = await dispatch(verifyPayment({
-                orderId: response.razorpay_order_id,
-                paymentId: response.razorpay_payment_id,
-                signature: response.razorpay_signature,
-              }));
-
-              if (verifyPayment.fulfilled.match(verifyResult)) {
-                await dispatch(clearCart());
-                success('Order Placed!', 'Your order has been placed successfully.');
-                navigate('/orders');
-              } else {
-                toastError('Payment Failed', 'Payment verification failed. Please try again.');
-              }
-            },
-            prefill: {
-              name: addresses[0]?.fullName,
-              email: '',
-              contact: addresses[0]?.phoneNumber,
-            },
-            theme: {
-              color: '#9333ea',
-            },
-          };
-
-          const rzp = new window.Razorpay(options);
-          rzp.open();
-        } else if (createPaymentOrder.rejected.match(result)) {
-          toastError('Payment Init Failed', result.payload || 'Failed to initialize payment. Please try again.');
-        }
-      } else {
-        // Cash on delivery - create order directly
-        success('Order Placed!', 'Your order has been placed successfully via Cash on Delivery.');
-        await dispatch(clearCart());
-        navigate('/orders');
-      }
+      // Cash on delivery - create order directly
+      success('Order Placed!', 'Your order has been placed successfully via Cash on Delivery.');
+      await dispatch(clearCart());
+      navigate('/orders');
     } catch (error) {
       console.error('Error placing order:', error);
       toastError('Order Failed', 'Failed to place order. Please try again.');
@@ -266,42 +217,11 @@ const CheckoutPage = () => {
               {/* Payment Method */}
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-                  <CreditCard className="h-5 w-5 text-purple-600" />
+                  <Truck className="h-5 w-5 text-purple-600" />
                   <span>Payment Method</span>
                 </h2>
 
                 <div className="space-y-4">
-                  <label
-                    className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition ${
-                      paymentMethod === 'razorpay'
-                        ? 'border-purple-600 bg-purple-50'
-                        : 'border-gray-200 hover:border-purple-300'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="razorpay"
-                      checked={paymentMethod === 'razorpay'}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="w-4 h-4 text-purple-600"
-                    />
-                    <div className="ml-3 flex-1">
-                      <div className="font-medium text-gray-900">Razorpay</div>
-                      <div className="text-sm text-gray-600">
-                        Pay securely with credit/debit cards, UPI, or net banking
-                      </div>
-                    </div>
-                    <div className="flex space-x-2">
-                      <div className="bg-blue-600 text-white text-xs px-2 py-1 rounded">
-                        VISA
-                      </div>
-                      <div className="bg-red-600 text-white text-xs px-2 py-1 rounded">
-                        MasterCard
-                      </div>
-                    </div>
-                  </label>
-
                   <label
                     className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition ${
                       paymentMethod === 'cod'
@@ -402,7 +322,7 @@ const CheckoutPage = () => {
                   </div>
                   <div className="flex items-center space-x-2 text-sm text-gray-600">
                     <Shield className="h-4 w-4 text-purple-600" />
-                    <span>Secure payment with Razorpay</span>
+                    <span>Secure checkout with Cash on Delivery</span>
                   </div>
                   <div className="flex items-center space-x-2 text-sm text-gray-600">
                     <Check className="h-4 w-4 text-purple-600" />

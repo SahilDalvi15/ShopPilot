@@ -10,7 +10,7 @@ A modern, full-stack e-commerce application built with React, Node.js, Express, 
 - **Product Management** - Browse, search, filter products
 - **Shopping Cart** - Add to cart, quantity management
 - **Wishlist** - Save favorite products
-- **Checkout** - Razorpay payment integration
+- **Checkout** - Cash on Delivery (COD) payment
 - **Order Management** - View order history and status
 - **Address Management** - Multiple shipping/billing addresses
 - **Product Reviews** - Rate and review products
@@ -26,7 +26,7 @@ A modern, full-stack e-commerce application built with React, Node.js, Express, 
 - **Input Validation** - Joi validation middleware
 - **File Upload** - Cloudinary integration for image hosting
 - **Email Service** - SMTP integration for notifications
-- **Payment Integration** - Razorpay payment gateway
+- **Payment** - Cash on Delivery (COD) support
 - **Caching** - Redis for session management
 - **Logging** - Winston logger for structured logs
 - **Security** - Helmet, CORS, rate limiting, XSS protection
@@ -42,7 +42,7 @@ A modern, full-stack e-commerce application built with React, Node.js, Express, 
 - TailwindCSS
 - Lucide Icons
 - Axios
-- Razorpay SDK
+- Socket.IO Client
 
 ### Backend
 - Node.js
@@ -55,7 +55,8 @@ A modern, full-stack e-commerce application built with React, Node.js, Express, 
 - Cloudinary
 - Nodemailer
 - Winston
-- Razorpay
+- Socket.IO
+- Elasticsearch
 
 ## Project Structure
 
@@ -128,14 +129,13 @@ CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
 
-RAZORPAY_KEY_ID=your_key_id
-RAZORPAY_KEY_SECRET=your_key_secret
-
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your_email@gmail.com
 SMTP_PASSWORD=your_app_password
 EMAIL_FROM=noreply@shoppilot.ai
+
+ELASTICSEARCH_URL=http://localhost:9200
 ```
 
 4. **Start Backend Server**
@@ -167,7 +167,6 @@ See `backend/.env.example` for all required environment variables.
 Create `frontend/.env`:
 ```env
 VITE_API_URL=http://localhost:5000/api/v1
-VITE_RAZORPAY_KEY_ID=your_key_id
 ```
 
 ## API Documentation

@@ -6,7 +6,6 @@ import {
   fetchWishlist,
   removeFromWishlist,
   clearWishlist,
-  addToCart,
 } from '../store/slices/wishlistSlice';
 import { addToCart as addToCartAction } from '../store/slices/cartSlice';
 import { useToast } from '../contexts/ToastContext';
