@@ -38,9 +38,7 @@ const inventorySchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Indexes
-inventorySchema.index({ productId: 1 });
-inventorySchema.index({ isActive: 1 });
+// IndexesinventorySchema.index({ isActive: 1 });
 
 // Virtual for available stock
 inventorySchema.virtual('availableStock').get(function() {

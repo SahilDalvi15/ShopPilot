@@ -64,9 +64,7 @@ const addressSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Indexes
-addressSchema.index({ userId: 1 });
-addressSchema.index({ userId: 1, isDefault: 1 });
+// IndexesaddressSchema.index({ userId: 1, isDefault: 1 });
 addressSchema.index({ isDeleted: 1 });
 
 // Pre-save middleware to ensure only one default address per user

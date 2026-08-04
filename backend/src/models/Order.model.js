@@ -103,11 +103,7 @@ const orderSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Indexes
-orderSchema.index({ orderNumber: 1 });
-orderSchema.index({ userId: 1 });
-orderSchema.index({ orderStatus: 1 });
-orderSchema.index({ paymentStatus: 1 });
+// IndexesorderSchema.index({ paymentStatus: 1 });
 orderSchema.index({ createdAt: -1 });
 orderSchema.index({ userId: 1, orderStatus: 1 });
 orderSchema.index({ orderStatus: 1, createdAt: -1 });

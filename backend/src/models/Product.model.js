@@ -115,12 +115,7 @@ const productSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Indexes
-productSchema.index({ slug: 1 });
-productSchema.index({ title: 'text' });
-productSchema.index({ brandId: 1 });
-productSchema.index({ categoryId: 1 });
-productSchema.index({ price: 1 });
+// IndexesproductSchema.index({ title: 'text' });productSchema.index({ price: 1 });
 productSchema.index({ discountedPrice: 1 });
 productSchema.index({ rating: 1 });
 productSchema.index({ createdAt: -1 });

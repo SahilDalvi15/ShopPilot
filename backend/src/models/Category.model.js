@@ -42,10 +42,7 @@ const categorySchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Indexes
-categorySchema.index({ slug: 1 });
-categorySchema.index({ parentId: 1 });
-categorySchema.index({ isActive: 1 });
+// IndexescategorySchema.index({ isActive: 1 });
 categorySchema.index({ level: 1 });
 
 // Generate slug from name before saving

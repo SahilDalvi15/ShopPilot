@@ -56,9 +56,7 @@ const cartSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Indexes
-cartSchema.index({ userId: 1 });
-
+// Indexes
 // Calculate totals before saving
 cartSchema.pre('save', function(next) {
   this.subtotal = this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);

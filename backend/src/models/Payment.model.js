@@ -57,10 +57,6 @@ const paymentSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Indexes
-paymentSchema.index({ orderId: 1 });
-paymentSchema.index({ userId: 1 });
-paymentSchema.index({ status: 1 });
-paymentSchema.index({ createdAt: -1 });
+// IndexespaymentSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model('Payment', paymentSchema);

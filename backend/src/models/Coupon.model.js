@@ -72,9 +72,7 @@ const couponSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Indexes
-couponSchema.index({ code: 1 });
-couponSchema.index({ validFrom: 1 });
+// IndexescouponSchema.index({ validFrom: 1 });
 couponSchema.index({ validUntil: 1 });
 
 // Virtual for checking if coupon is valid

@@ -36,10 +36,7 @@ const brandSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Indexes
-brandSchema.index({ name: 1 });
-brandSchema.index({ slug: 1 });
-brandSchema.index({ isActive: 1 });
+// IndexesbrandSchema.index({ isActive: 1 });
 
 // Generate slug from name before saving
 brandSchema.pre('save', function(next) {

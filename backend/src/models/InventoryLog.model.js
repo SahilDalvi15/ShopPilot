@@ -35,9 +35,7 @@ const inventoryLogSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Indexes
-inventoryLogSchema.index({ productId: 1 });
-inventoryLogSchema.index({ inventoryId: 1 });
+// IndexesinventoryLogSchema.index({ inventoryId: 1 });
 inventoryLogSchema.index({ changeType: 1 });
 inventoryLogSchema.index({ createdAt: -1 });
 inventoryLogSchema.index({ productId: 1, changeType: 1 });

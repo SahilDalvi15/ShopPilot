@@ -55,11 +55,6 @@ const refundSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Indexes
-refundSchema.index({ orderId: 1 });
-refundSchema.index({ paymentId: 1 });
-refundSchema.index({ userId: 1 });
-refundSchema.index({ status: 1 });
-refundSchema.index({ createdAt: -1 });
+// IndexesrefundSchema.index({ paymentId: 1 });refundSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model('Refund', refundSchema);

@@ -52,10 +52,7 @@ const orderItemSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Indexes
-orderItemSchema.index({ orderId: 1 });
-orderItemSchema.index({ productId: 1 });
-orderItemSchema.index({ orderId: 1, productId: 1 });
+// IndexesorderItemSchema.index({ orderId: 1, productId: 1 });
 
 // Calculate subtotal before saving
 orderItemSchema.pre('save', function(next) {

@@ -62,9 +62,7 @@ const userSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Indexes
-userSchema.index({ email: 1 });
-userSchema.index({ phoneNumber: 1 });
+// IndexesuserSchema.index({ phoneNumber: 1 });
 userSchema.index({ role: 1 });
 userSchema.index({ isActive: 1 });
 userSchema.index({ createdAt: -1 });
