@@ -18,7 +18,7 @@ export const SocketProvider = ({ children }) => {
   const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    const socketInstance = io(import.meta.env.VITE_API_URL.replace('/api/v1', ''), {
+    const socketInstance = io((import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1').replace('/api/v1', ''), {
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionAttempts: 5,
