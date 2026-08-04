@@ -6,7 +6,9 @@ let io;
 const initializeSocket = (server) => {
   io = new Server(server, {
     cors: {
-      origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+      origin: process.env.FRONTEND_URL
+        ? process.env.FRONTEND_URL.split(',').map(u => u.trim())
+        : ['http://localhost:5173', 'http://localhost:5174'],
       methods: ['GET', 'POST'],
       credentials: true,
     },
