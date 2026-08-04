@@ -41,12 +41,12 @@ class ProductService {
       queryObj.$text = { $search: search };
     }
 
-    if (minPrice !== undefined || maxPrice !== undefined) {
+    if ((minPrice !== undefined && minPrice !== '') || (maxPrice !== undefined && maxPrice !== '')) {
       queryObj.discountedPrice = {};
-      if (minPrice !== undefined) {
+      if (minPrice !== undefined && minPrice !== '') {
         queryObj.discountedPrice.$gte = parseFloat(minPrice);
       }
-      if (maxPrice !== undefined) {
+      if (maxPrice !== undefined && maxPrice !== '') {
         queryObj.discountedPrice.$lte = parseFloat(maxPrice);
       }
     }
@@ -69,18 +69,18 @@ class ProductService {
       slug: product.slug,
       description: product.description,
       shortDescription: product.shortDescription,
-      brand: {
+      brand: product.brandId ? {
         id: product.brandId._id,
         name: product.brandId.name,
         slug: product.brandId.slug,
         logo: product.brandId.logo
-      },
-      category: {
+      } : null,
+      category: product.categoryId ? {
         id: product.categoryId._id,
         name: product.categoryId.name,
         slug: product.categoryId.slug,
         image: product.categoryId.image
-      },
+      } : null,
       images: product.images,
       price: product.price,
       discount: product.discount,
