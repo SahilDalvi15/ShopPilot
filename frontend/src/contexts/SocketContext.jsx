@@ -19,7 +19,7 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     const socketInstance = io((import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1').replace('/api/v1', ''), {
-      transports: ['websocket', 'polling'],
+      transports: ['polling', 'websocket'],
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
