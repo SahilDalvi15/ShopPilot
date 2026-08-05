@@ -1,10 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { productService } from '../services/productService';
 import { Search, Filter, Grid, List, Heart, ShoppingCart, Star } from 'lucide-react';
 import ProductCardSkeleton from '../components/skeletons/ProductCardSkeleton';
 
 const ProductsPage = () => {
+  const location = useLocation();
+  const getPageTitle = () => {
+    switch (location.pathname) {
+      case '/brands': return 'Brands';
+      case '/categories': return 'Categories';
+      case '/deals': return 'Deals & Offers';
+      case '/new-arrivals': return 'New Arrivals';
+      default: return 'All Products';
+    }
+  };
+
   const [filters, setFilters] = useState({
     page: 1,
     limit: 12,
@@ -18,8 +30,13 @@ const ProductsPage = () => {
   });
   const [viewMode, setViewMode] = useState('grid');
 
+  // Reset filters if route changes, e.g. from /products to /deals
+  useEffect(() => {
+    setFilters(prev => ({ ...prev, page: 1, category: '', brand: '', minPrice: '', maxPrice: '', search: '' }));
+  }, [location.pathname]);
+
   const { data, isLoading, error } = useQuery({
-    queryKey: ['products', filters],
+    queryKey: ['products', filters, location.pathname],
     queryFn: () => productService.getProducts(filters),
   });
 
@@ -43,7 +60,7 @@ const ProductsPage = () => {
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">Products</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{getPageTitle()}</h1>
             
             <form onSubmit={handleSearch} className="flex-1 max-w-md w-full">
               <div className="relative">
@@ -200,15 +217,15 @@ const ProductsPage = () => {
                             {product.discount > 0 ? (
                               <>
                                 <span className="text-lg font-bold text-indigo-600">
-                                  ₹{product.discountedPrice.toLocaleString()}
+                                  ₹{(product.discountedPrice || 0).toLocaleString()}
                                 </span>
                                 <span className="text-sm text-gray-500 line-through ml-2">
-                                  ₹{product.price.toLocaleString()}
+                                  ₹{(product.price || 0).toLocaleString()}
                                 </span>
                               </>
                             ) : (
                               <span className="text-lg font-bold text-gray-900">
-                                ₹{product.price.toLocaleString()}
+                                ₹{(product.price || 0).toLocaleString()}
                               </span>
                             )}
                           </div>
