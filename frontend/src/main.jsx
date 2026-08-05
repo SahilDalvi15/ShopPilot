@@ -15,7 +15,7 @@ import ToastContainer from './components/ToastContainer'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ErrorBoundary>
-      <Router>
+      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Provider store={store}>
           <QueryClientProvider client={queryClient}>
             <SocketProvider>
