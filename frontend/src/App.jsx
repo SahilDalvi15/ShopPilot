@@ -35,28 +35,32 @@ function App() {
           <Route path="/products/:slug" element={<ProductDetailPage />} />
           <Route 
             path="/cart" 
-            element={isAuthenticated ? <CartPage /> : <Navigate to="/login" />} 
+            element={isAuthenticated ? <CartPage /> : <Navigate to="/login" replace />} 
           />
           <Route 
             path="/checkout" 
-            element={isAuthenticated ? <CheckoutPage /> : <Navigate to="/login" />} 
+            element={isAuthenticated ? <CheckoutPage /> : <Navigate to="/login" replace />} 
           />
           <Route 
             path="/orders" 
-            element={isAuthenticated ? <OrdersPage /> : <Navigate to="/login" />} 
+            element={isAuthenticated ? <OrdersPage /> : <Navigate to="/login" replace />} 
           />
           <Route 
             path="/profile" 
-            element={isAuthenticated ? <ProfilePage /> : <Navigate to="/login" />} 
+            element={isAuthenticated ? <ProfilePage /> : <Navigate to="/login" replace />} 
           />
           <Route 
             path="/addresses" 
-            element={isAuthenticated ? <AddressesPage /> : <Navigate to="/login" />} 
+            element={isAuthenticated ? <AddressesPage /> : <Navigate to="/login" replace />} 
           />
           <Route 
             path="/wishlist" 
-            element={isAuthenticated ? <WishlistPage /> : <Navigate to="/login" />} 
+            element={isAuthenticated ? <WishlistPage /> : <Navigate to="/login" replace />} 
           />
+          <Route path="/brands" element={<ProductsPage />} />
+          <Route path="/categories" element={<ProductsPage />} />
+          <Route path="/deals" element={<ProductsPage />} />
+          <Route path="/new-arrivals" element={<ProductsPage />} />
           <Route path="/" element={<Navigate to="/products" />} />
           
           {/* Admin Routes */}
