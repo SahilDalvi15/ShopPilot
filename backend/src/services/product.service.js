@@ -16,7 +16,8 @@ class ProductService {
       minPrice,
       maxPrice,
       sortBy = 'createdAt',
-      sortOrder = 'desc'
+      sortOrder = 'desc',
+      isDeal
     } = query;
 
     const skip = (page - 1) * limit;
@@ -49,6 +50,10 @@ class ProductService {
       if (maxPrice !== undefined && maxPrice !== '') {
         queryObj.discountedPrice.$lte = parseFloat(maxPrice);
       }
+    }
+
+    if (isDeal === 'true') {
+      queryObj.discount = { $gt: 0 };
     }
 
     // Get products
