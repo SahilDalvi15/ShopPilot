@@ -1,10 +1,15 @@
 const Joi = require('joi');
 
 const registerSchema = Joi.object({
-  name: Joi.string().min(2).max(50).required().messages({
-    'string.min': 'Name must be at least 2 characters',
-    'string.max': 'Name must not exceed 50 characters',
-    'any.required': 'Name is required',
+  firstName: Joi.string().min(2).max(50).required().messages({
+    'string.min': 'First name must be at least 2 characters',
+    'string.max': 'First name must not exceed 50 characters',
+    'any.required': 'First name is required',
+  }),
+  lastName: Joi.string().min(2).max(50).required().messages({
+    'string.min': 'Last name must be at least 2 characters',
+    'string.max': 'Last name must not exceed 50 characters',
+    'any.required': 'Last name is required',
   }),
   email: Joi.string().email().required().messages({
     'string.email': 'Please provide a valid email address',
@@ -21,11 +26,12 @@ const registerSchema = Joi.object({
       'string.pattern.base': 'Password must contain at least one uppercase letter, one lowercase letter, and one number',
       'any.required': 'Password is required',
     }),
-  phone: Joi.string()
-    .pattern(/^[0-9]{10}$/)
+  phoneNumber: Joi.string()
+    .pattern(/^\+?[\d\s-]{10,}$/)
     .optional()
+    .allow('')
     .messages({
-      'string.pattern.base': 'Phone number must be 10 digits',
+      'string.pattern.base': 'Invalid phone number format',
     }),
 });
 
@@ -40,15 +46,20 @@ const loginSchema = Joi.object({
 });
 
 const updateProfileSchema = Joi.object({
-  name: Joi.string().min(2).max(50).optional().messages({
-    'string.min': 'Name must be at least 2 characters',
-    'string.max': 'Name must not exceed 50 characters',
+  firstName: Joi.string().min(2).max(50).optional().messages({
+    'string.min': 'First name must be at least 2 characters',
+    'string.max': 'First name must not exceed 50 characters',
   }),
-  phone: Joi.string()
-    .pattern(/^[0-9]{10}$/)
+  lastName: Joi.string().min(2).max(50).optional().messages({
+    'string.min': 'Last name must be at least 2 characters',
+    'string.max': 'Last name must not exceed 50 characters',
+  }),
+  phoneNumber: Joi.string()
+    .pattern(/^\+?[\d\s-]{10,}$/)
     .optional()
+    .allow('')
     .messages({
-      'string.pattern.base': 'Phone number must be 10 digits',
+      'string.pattern.base': 'Invalid phone number format',
     }),
   avatar: Joi.string().uri().optional().messages({
     'string.uri': 'Avatar must be a valid URL',
