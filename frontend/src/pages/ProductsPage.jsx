@@ -27,12 +27,22 @@ const ProductsPage = () => {
     maxPrice: '',
     sortBy: 'createdAt',
     sortOrder: 'desc',
+    isDeal: location.pathname === '/deals' ? 'true' : undefined
   });
   const [viewMode, setViewMode] = useState('grid');
 
   // Reset filters if route changes, e.g. from /products to /deals
   useEffect(() => {
-    setFilters(prev => ({ ...prev, page: 1, category: '', brand: '', minPrice: '', maxPrice: '', search: '' }));
+    setFilters(prev => ({ 
+      ...prev, 
+      page: 1, 
+      category: '', 
+      brand: '', 
+      minPrice: '', 
+      maxPrice: '', 
+      search: '',
+      isDeal: location.pathname === '/deals' ? 'true' : undefined
+    }));
   }, [location.pathname]);
 
   const { data, isLoading, error } = useQuery({
