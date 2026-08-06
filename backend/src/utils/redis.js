@@ -1,46 +1,24 @@
-const redis = require('redis');
 const logger = require('./logger');
 
-let redisClient;
+// In-memory cache as fallback
+const memoryCache = new Map();
 
 const connectRedis = async () => {
-  try {
-    redisClient = redis.createClient({
-      url: process.env.REDIS_URL || 'redis://localhost:6379'
-    });
-
-    redisClient.on('error', (err) => {
-      logger.error('Redis Client Error:', err);
-    });
-
-    redisClient.on('connect', () => {
-      logger.info('Redis connected successfully');
-    });
-
-    redisClient.on('disconnect', () => {
-      logger.warn('Redis disconnected');
-    });
-
-    await redisClient.connect();
-    return redisClient;
-  } catch (error) {
-    logger.error('Redis connection error:', error);
-    throw error;
-  }
+  logger.info('Using in-memory cache instead of Redis');
+  return true;
 };
 
 const getRedisClient = () => {
-  if (!redisClient) {
-    throw new Error('Redis client not initialized. Call connectRedis() first.');
-  }
-  return redisClient;
+  return null; // Not needed for in-memory mock
 };
 
 // Cache helpers
 const setCache = async (key, value, expiry = 3600) => {
   try {
-    const client = getRedisClient();
-    await client.setEx(key, expiry, JSON.stringify(value));
+    memoryCache.set(key, {
+      value,
+      expiry: Date.now() + expiry * 1000
+    });
     return true;
   } catch (error) {
     logger.error('Error setting cache:', error);
@@ -50,9 +28,14 @@ const setCache = async (key, value, expiry = 3600) => {
 
 const getCache = async (key) => {
   try {
-    const client = getRedisClient();
-    const value = await client.get(key);
-    return value ? JSON.parse(value) : null;
+    const item = memoryCache.get(key);
+    if (!item) return null;
+    
+    if (Date.now() > item.expiry) {
+      memoryCache.delete(key);
+      return null;
+    }
+    return item.value;
   } catch (error) {
     logger.error('Error getting cache:', error);
     return null;
@@ -61,8 +44,7 @@ const getCache = async (key) => {
 
 const deleteCache = async (key) => {
   try {
-    const client = getRedisClient();
-    await client.del(key);
+    memoryCache.delete(key);
     return true;
   } catch (error) {
     logger.error('Error deleting cache:', error);
@@ -72,11 +54,8 @@ const deleteCache = async (key) => {
 
 const deletePattern = async (pattern) => {
   try {
-    const client = getRedisClient();
-    const keys = await client.keys(pattern);
-    if (keys.length > 0) {
-      await client.del(keys);
-    }
+    // Simple mock for deletePattern: clear everything
+    memoryCache.clear();
     return true;
   } catch (error) {
     logger.error('Error deleting pattern:', error);
