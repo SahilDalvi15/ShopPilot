@@ -22,7 +22,8 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const result = await authService.login(req.body);
+    const { email, password } = req.body;
+    const result = await authService.login(email, password);
     
     // Set refresh token in httpOnly cookie
     res.cookie('refreshToken', result.tokens.refreshToken, {
