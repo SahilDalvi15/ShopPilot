@@ -10,6 +10,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 
 const connectDB = require('./config/database');
+const { connectRedis } = require('./utils/redis');
 const logger = require('./utils/logger');
 const errorHandler = require('./middlewares/errorHandler');
 const { initializeSocket } = require('./config/socket');
@@ -32,8 +33,9 @@ const searchRoutes = require('./routes/search.routes');
 
 const app = express();
 
-// Connect to database
+// Connect to database and Redis
 connectDB();
+connectRedis();
 
 // Security middleware
 app.use(helmet());
