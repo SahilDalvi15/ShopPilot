@@ -26,8 +26,8 @@ export const cartService = {
     return response.data;
   },
 
-  applyCoupon: async (couponCode) => {
-    const response = await apiClient.post('/cart/coupon', { couponCode });
+  applyCoupon: async (code) => {
+    const response = await apiClient.post('/cart/coupon', { code });
     return response.data;
   },
 

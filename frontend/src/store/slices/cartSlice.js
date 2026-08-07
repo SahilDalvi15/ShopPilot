@@ -273,9 +273,10 @@ const cartSlice = createSlice({
       })
       .addCase(applyCouponAsync.fulfilled, (state, action) => {
         state.loading = false;
-        state.appliedCoupon = action.payload.coupon;
-        state.totalDiscount = action.payload.totalDiscount;
-        state.totalAmount = action.payload.totalAmount;
+        state.appliedCoupon = action.payload.appliedCoupon;
+        state.subtotal = action.payload.cart.subtotal;
+        state.totalDiscount = action.payload.cart.totalDiscount;
+        state.totalAmount = action.payload.cart.totalAmount;
       })
       .addCase(applyCouponAsync.rejected, (state, action) => {
         state.loading = false;
@@ -288,6 +289,7 @@ const cartSlice = createSlice({
       .addCase(removeCouponAsync.fulfilled, (state, action) => {
         state.loading = false;
         state.appliedCoupon = null;
+        state.subtotal = action.payload.subtotal;
         state.totalDiscount = action.payload.totalDiscount;
         state.totalAmount = action.payload.totalAmount;
       })
