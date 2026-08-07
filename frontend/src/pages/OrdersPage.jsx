@@ -1,14 +1,31 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Package, Truck, CheckCircle, XCircle, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import { orderService } from '../services/order.service';
+import { useToast } from '../contexts/ToastContext';
 
 const OrdersPage = () => {
   const [expandedOrders, setExpandedOrders] = useState({});
+  const [cancellingOrderId, setCancellingOrderId] = useState(null);
+  const queryClient = useQueryClient();
+  const { success, error: toastError } = useToast();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['orders'],
     queryFn: () => orderService.getOrders(),
+  });
+
+  const cancelOrderMutation = useMutation({
+    mutationFn: (orderId) => orderService.cancelOrder(orderId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      success('Order Cancelled', 'Your order has been cancelled successfully.');
+      setCancellingOrderId(null);
+    },
+    onError: (err) => {
+      toastError('Cancellation Failed', err.response?.data?.message || 'Failed to cancel order.');
+      setCancellingOrderId(null);
+    },
   });
 
   const orders = data?.data || [];
@@ -158,9 +175,18 @@ const OrdersPage = () => {
                     )}
                   </button>
                   
-                  {order.orderStatus === 'pending' || order.orderStatus === 'confirmed' ? (
-                    <button className="text-red-600 hover:text-red-700 font-medium">
-                      Cancel Order
+                  {(order.orderStatus === 'pending' || order.orderStatus === 'confirmed') ? (
+                    <button
+                      onClick={() => {
+                        if (window.confirm('Are you sure you want to cancel this order?')) {
+                          setCancellingOrderId(order._id || order.id);
+                          cancelOrderMutation.mutate(order._id || order.id);
+                        }
+                      }}
+                      disabled={cancellingOrderId === (order._id || order.id)}
+                      className="text-red-600 hover:text-red-700 font-medium disabled:opacity-50"
+                    >
+                      {cancellingOrderId === (order._id || order.id) ? 'Cancelling...' : 'Cancel Order'}
                     </button>
                   ) : null}
                 </div>
