@@ -112,7 +112,7 @@ const ProductsPage = () => {
       return;
     }
 
-    const isInWishlist = wishlistItems?.some(item => item.productId === product.id || item.productId?._id === product.id);
+    const isInWishlist = wishlistItems?.some(item => item._id === product.id);
     
     try {
       if (isInWishlist) {
@@ -337,7 +337,7 @@ const ProductsPage = () => {
                         >
                           <Heart 
                             className={`w-4 h-4 ${
-                              wishlistItems?.some(item => item.productId === product.id || item.productId?._id === product.id)
+                              wishlistItems?.some(item => item._id === product.id)
                                 ? 'text-red-500 fill-current' 
                                 : 'text-gray-400'
                             }`} 

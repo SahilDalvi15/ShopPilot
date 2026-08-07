@@ -14,7 +14,10 @@ export const fetchWishlist = createAsyncThunk(
     try {
       const response = await wishlistService.getWishlist();
       // response.data is { id, userId, items: [...] }
-      return response.data.items || [];
+      return (response.data.items || []).map(item => ({
+        ...item.product,
+        _id: item.productId
+      }));
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch wishlist');
     }
@@ -28,7 +31,10 @@ export const addToWishlist = createAsyncThunk(
       await wishlistService.addToWishlist(productId);
       // Re-fetch the full wishlist so state has the complete items array
       const fullWishlist = await wishlistService.getWishlist();
-      return fullWishlist.data.items || [];
+      return (fullWishlist.data.items || []).map(item => ({
+        ...item.product,
+        _id: item.productId
+      }));
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to add to wishlist');
     }
@@ -42,7 +48,10 @@ export const removeFromWishlist = createAsyncThunk(
       await wishlistService.removeFromWishlist(productId);
       // Re-fetch the full wishlist so state has the complete items array
       const fullWishlist = await wishlistService.getWishlist();
-      return fullWishlist.data.items || [];
+      return (fullWishlist.data.items || []).map(item => ({
+        ...item.product,
+        _id: item.productId
+      }));
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to remove from wishlist');
     }
