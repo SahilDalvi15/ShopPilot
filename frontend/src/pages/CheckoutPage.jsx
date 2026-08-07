@@ -202,19 +202,19 @@ const CheckoutPage = () => {
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Items</h2>
                 <div className="space-y-4">
                   {cartItems.map((item) => (
-                    <div key={item._id} className="flex items-center space-x-4">
+                    <div key={item.productId} className="flex items-center space-x-4">
                       <img
-                        src={item.image}
-                        alt={item.title}
+                        src={item.product?.images?.[0] || '/placeholder.jpg'}
+                        alt={item.product?.title}
                         className="w-16 h-16 object-cover rounded-lg"
                       />
                       <div className="flex-1">
-                        <h3 className="font-medium text-gray-900">{item.title}</h3>
+                        <h3 className="font-medium text-gray-900">{item.product?.title}</h3>
                         <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
                       </div>
                       <div className="text-right">
                         <p className="font-semibold text-gray-900">
-                          ₹{item.price.toLocaleString()}
+                          ₹{(item.price || 0).toLocaleString()}
                         </p>
                       </div>
                     </div>
@@ -299,7 +299,7 @@ const CheckoutPage = () => {
                     <div className="flex items-center justify-between">
                       <div>
                         <span className="font-medium text-green-800">
-                          Coupon Applied: {appliedCoupon}
+                          Coupon Applied: {appliedCoupon.code}
                         </span>
                       </div>
                       <button className="text-green-600 hover:text-green-700 text-sm">
