@@ -1,6 +1,9 @@
+import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { selectIsAuthenticated } from './store/slices/authSlice';
+import { fetchCart } from './store/slices/cartSlice';
+import { fetchWishlist } from './store/slices/wishlistSlice';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import LoginPage from './pages/LoginPage';
@@ -22,7 +25,16 @@ import AdminUsers from './pages/admin/AdminUsers';
 import './App.css';
 
 function App() {
+  const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
+
+  // Fetch cart and wishlist from backend whenever the user is authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchCart());
+      dispatch(fetchWishlist());
+    }
+  }, [dispatch, isAuthenticated]);
 
   return (
     <div className="min-h-screen flex flex-col">

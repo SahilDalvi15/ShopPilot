@@ -1,39 +1,69 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { removeItem, updateItemQuantity, applyCoupon, removeCoupon } from '../store/slices/cartSlice';
+import { fetchCart, removeFromCart, updateCartItem, applyCouponAsync, removeCouponAsync } from '../store/slices/cartSlice';
+import { useToast } from '../contexts/ToastContext';
 import { Trash2, Plus, Minus, ShoppingBag, Tag, X } from 'lucide-react';
 
 const CartPage = () => {
   const dispatch = useDispatch();
+  const { success, error: toastError } = useToast();
   const cartItems = useSelector((state) => state.cart.items);
   const subtotal = useSelector((state) => state.cart.subtotal);
   const totalDiscount = useSelector((state) => state.cart.totalDiscount);
   const totalAmount = useSelector((state) => state.cart.totalAmount);
   const appliedCoupon = useSelector((state) => state.cart.appliedCoupon);
+  const loading = useSelector((state) => state.cart.loading);
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
   const [couponCode, setCouponCode] = useState('');
 
-  const handleRemoveItem = (productId) => {
-    dispatch(removeItem(productId));
-  };
+  // Fetch cart from backend on mount
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchCart());
+    }
+  }, [dispatch, isAuthenticated]);
 
-  const handleQuantityChange = (productId, newQuantity) => {
-    if (newQuantity >= 1) {
-      dispatch(updateItemQuantity({ productId, quantity: newQuantity }));
+  const handleRemoveItem = async (productId) => {
+    try {
+      await dispatch(removeFromCart(productId)).unwrap();
+      success('Removed', 'Item removed from cart.');
+    } catch (err) {
+      toastError('Error', err || 'Failed to remove item.');
     }
   };
 
-  const handleApplyCoupon = (e) => {
+  const handleQuantityChange = async (productId, newQuantity) => {
+    if (newQuantity >= 1) {
+      try {
+        await dispatch(updateCartItem({ itemId: productId, quantity: newQuantity })).unwrap();
+      } catch (err) {
+        toastError('Error', err || 'Failed to update quantity.');
+      }
+    }
+  };
+
+  const handleApplyCoupon = async (e) => {
     e.preventDefault();
     if (couponCode.trim()) {
-      dispatch(applyCoupon({ code: couponCode.toUpperCase(), discountAmount: 100 })); // Mock discount
-      setCouponCode('');
+      try {
+        await dispatch(applyCouponAsync(couponCode.toUpperCase())).unwrap();
+        success('Coupon Applied', 'Coupon applied successfully!');
+        setCouponCode('');
+      } catch (err) {
+        toastError('Error', err || 'Invalid coupon code.');
+      }
     }
   };
 
-  const handleRemoveCoupon = () => {
-    dispatch(removeCoupon());
+  const handleRemoveCoupon = async () => {
+    try {
+      await dispatch(removeCouponAsync()).unwrap();
+      success('Coupon Removed', 'Coupon removed.');
+    } catch (err) {
+      toastError('Error', err || 'Failed to remove coupon.');
+    }
   };
 
   if (cartItems.length === 0) {

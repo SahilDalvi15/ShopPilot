@@ -26,10 +26,12 @@ export const fetchCart = createAsyncThunk(
 
 export const addToCart = createAsyncThunk(
   'cart/addToCart',
-  async (cartData, { rejectWithValue }) => {
+  async (cartData, { dispatch, rejectWithValue }) => {
     try {
-      const response = await cartService.addToCart(cartData);
-      return response.data;
+      await cartService.addToCart(cartData);
+      // Re-fetch the full cart so Redux state has all items with product details
+      const fullCart = await cartService.getCart();
+      return fullCart.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to add item to cart');
     }
@@ -40,8 +42,10 @@ export const updateCartItem = createAsyncThunk(
   'cart/updateCartItem',
   async ({ itemId, quantity }, { rejectWithValue }) => {
     try {
-      const response = await cartService.updateCartItem(itemId, quantity);
-      return response.data;
+      await cartService.updateCartItem(itemId, quantity);
+      // Re-fetch the full cart so Redux state stays in sync
+      const fullCart = await cartService.getCart();
+      return fullCart.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to update cart item');
     }
@@ -52,8 +56,10 @@ export const removeFromCart = createAsyncThunk(
   'cart/removeFromCart',
   async (itemId, { rejectWithValue }) => {
     try {
-      const response = await cartService.removeFromCart(itemId);
-      return { itemId, ...response.data };
+      await cartService.removeFromCart(itemId);
+      // Re-fetch the full cart so Redux state stays in sync
+      const fullCart = await cartService.getCart();
+      return fullCart.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to remove item from cart');
     }
