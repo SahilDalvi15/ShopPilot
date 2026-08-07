@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useQuery } from '@tanstack/react-query';
 import { productService } from '../services/productService';
+import { categoryService } from '../services/category.service';
+import { brandService } from '../services/brand.service';
 import { addToCart } from '../store/slices/cartSlice';
 import { addToWishlist, removeFromWishlist } from '../store/slices/wishlistSlice';
 import { useToast } from '../contexts/ToastContext';
@@ -58,6 +60,16 @@ const ProductsPage = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ['products', filters, location.pathname],
     queryFn: () => productService.getProducts(filters),
+  });
+
+  const { data: categoriesData } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => categoryService.getCategories(),
+  });
+
+  const { data: brandsData } = useQuery({
+    queryKey: ['brands'],
+    queryFn: () => brandService.getBrands(),
   });
 
   const handleSearch = (e) => {
@@ -162,6 +174,76 @@ const ProductsPage = () => {
               <div className="flex items-center gap-2 mb-6">
                 <Filter className="w-5 h-5 text-gray-600" />
                 <h2 className="font-semibold text-gray-900">Filters</h2>
+              </div>
+
+              {/* Categories */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Category
+                </label>
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  <div className="flex items-center">
+                    <input
+                      type="radio"
+                      id="cat-all"
+                      name="category"
+                      value=""
+                      checked={filters.category === ''}
+                      onChange={(e) => handleFilterChange('category', e.target.value)}
+                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                    />
+                    <label htmlFor="cat-all" className="ml-2 text-sm text-gray-700">All Categories</label>
+                  </div>
+                  {categoriesData?.data?.map((cat) => (
+                    <div key={cat.id || cat._id} className="flex items-center">
+                      <input
+                        type="radio"
+                        id={`cat-${cat.id || cat._id}`}
+                        name="category"
+                        value={cat.id || cat._id}
+                        checked={filters.category === (cat.id || cat._id)}
+                        onChange={(e) => handleFilterChange('category', e.target.value)}
+                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                      />
+                      <label htmlFor={`cat-${cat.id || cat._id}`} className="ml-2 text-sm text-gray-700">{cat.name}</label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Brands */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Brand
+                </label>
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  <div className="flex items-center">
+                    <input
+                      type="radio"
+                      id="brand-all"
+                      name="brand"
+                      value=""
+                      checked={filters.brand === ''}
+                      onChange={(e) => handleFilterChange('brand', e.target.value)}
+                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                    />
+                    <label htmlFor="brand-all" className="ml-2 text-sm text-gray-700">All Brands</label>
+                  </div>
+                  {brandsData?.data?.map((brand) => (
+                    <div key={brand.id || brand._id} className="flex items-center">
+                      <input
+                        type="radio"
+                        id={`brand-${brand.id || brand._id}`}
+                        name="brand"
+                        value={brand.id || brand._id}
+                        checked={filters.brand === (brand.id || brand._id)}
+                        onChange={(e) => handleFilterChange('brand', e.target.value)}
+                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                      />
+                      <label htmlFor={`brand-${brand.id || brand._id}`} className="ml-2 text-sm text-gray-700">{brand.name}</label>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Price Range */}
