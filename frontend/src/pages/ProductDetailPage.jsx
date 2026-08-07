@@ -30,10 +30,10 @@ const ProductDetailPage = () => {
   const { reviews, loading: reviewsLoading, submitting } = useSelector((state) => state.reviews);
 
   useEffect(() => {
-    if (product?._id) {
-      dispatch(fetchProductReviews(product._id));
+    if (product?.id) {
+      dispatch(fetchProductReviews(product.id));
     }
-  }, [dispatch, product?._id]);
+  }, [dispatch, product?.id]);
 
   const handleQuantityChange = (change) => {
     const newQuantity = quantity + change;
@@ -67,7 +67,7 @@ const ProductDetailPage = () => {
     }
     
     try {
-      await dispatch(addToCart({ productId: product._id, quantity })).unwrap();
+      await dispatch(addToCart({ productId: product.id, quantity })).unwrap();
       success('Added to Cart', `${product.title} was successfully added to your cart.`);
     } catch (err) {
       toastError('Error', err || 'Failed to add item to cart.');
@@ -80,14 +80,14 @@ const ProductDetailPage = () => {
       return;
     }
 
-    const isInWishlist = wishlistItems?.some(item => item.productId === product._id || item.productId?._id === product._id);
+    const isInWishlist = wishlistItems?.some(item => item.productId === product.id || item.productId?._id === product.id);
     
     try {
       if (isInWishlist) {
-        await dispatch(removeFromWishlist(product._id)).unwrap();
+        await dispatch(removeFromWishlist(product.id)).unwrap();
         success('Removed from Wishlist', `${product.title} removed from your wishlist.`);
       } else {
-        await dispatch(addToWishlist(product._id)).unwrap();
+        await dispatch(addToWishlist(product.id)).unwrap();
         success('Added to Wishlist', `${product.title} added to your wishlist.`);
       }
     } catch (err) {
@@ -238,7 +238,7 @@ const ProductDetailPage = () => {
                 >
                   <Heart 
                     className={`w-5 h-5 ${
-                      wishlistItems?.some(item => item.productId === product._id || item.productId?._id === product._id)
+                      wishlistItems?.some(item => item.productId === product.id || item.productId?._id === product.id)
                         ? 'text-red-500 fill-current' 
                         : 'text-gray-600'
                     }`} 
@@ -291,7 +291,7 @@ const ProductDetailPage = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Review Form */}
               <div className="lg:col-span-1">
-                <ReviewForm productId={product._id} onSubmit={handleReviewSubmit} loading={submitting} />
+                <ReviewForm productId={product.id} onSubmit={handleReviewSubmit} loading={submitting} />
               </div>
               
               {/* Review List */}

@@ -83,7 +83,7 @@ const ProductsPage = () => {
     }
     
     try {
-      await dispatch(addToCart({ productId: product._id, quantity: 1 })).unwrap();
+      await dispatch(addToCart({ productId: product.id, quantity: 1 })).unwrap();
       success('Added to Cart', `${product.title} was successfully added to your cart.`);
     } catch (err) {
       toastError('Error', err || 'Failed to add item to cart.');
