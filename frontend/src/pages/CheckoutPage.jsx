@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { MapPin, Truck, Shield, ArrowRight, Plus, Check } from 'lucide-react';
 import { fetchAddresses } from '../store/slices/addressSlice';
-import { clearCart } from '../store/slices/cartSlice';
+import { clearCart, applyCouponAsync, removeCouponAsync } from '../store/slices/cartSlice';
 import { orderService } from '../services/order.service';
 import { useToast } from '../contexts/ToastContext';
 import AddressCardSkeleton from '../components/skeletons/AddressCardSkeleton';
@@ -88,6 +88,32 @@ const CheckoutPage = () => {
       toastError('Order Failed', error.response?.data?.message || 'Failed to place order. Please try again.');
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const [couponCode, setCouponCode] = useState('');
+  const cartLoading = useSelector((state) => state.cart.loading);
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) {
+      warning('Required', 'Please enter a coupon code.');
+      return;
+    }
+    const result = await dispatch(applyCouponAsync(couponCode));
+    if (applyCouponAsync.fulfilled.match(result)) {
+      success('Coupon Applied', 'Your coupon has been applied successfully.');
+      setCouponCode('');
+    } else {
+      toastError('Failed', result.payload || 'Failed to apply coupon.');
+    }
+  };
+
+  const handleRemoveCoupon = async () => {
+    const result = await dispatch(removeCouponAsync());
+    if (removeCouponAsync.fulfilled.match(result)) {
+      success('Coupon Removed', 'Your coupon has been removed.');
+    } else {
+      toastError('Failed', result.payload || 'Failed to remove coupon.');
     }
   };
 
@@ -264,7 +290,7 @@ const CheckoutPage = () => {
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between text-gray-600">
                     <span>Subtotal ({cartItems.length} items)</span>
-                    <span>₹{calculateSubtotal().toLocaleString()}</span>
+                    <span>₹{cartTotal.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Shipping</span>
@@ -302,8 +328,12 @@ const CheckoutPage = () => {
                           Coupon Applied: {appliedCoupon.code}
                         </span>
                       </div>
-                      <button className="text-green-600 hover:text-green-700 text-sm">
-                        Remove
+                      <button 
+                        onClick={handleRemoveCoupon} 
+                        disabled={cartLoading}
+                        className="text-green-600 hover:text-green-700 text-sm disabled:opacity-50"
+                      >
+                        {cartLoading ? 'Removing...' : 'Remove'}
                       </button>
                     </div>
                   </div>
@@ -312,11 +342,17 @@ const CheckoutPage = () => {
                     <div className="flex space-x-2">
                       <input
                         type="text"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value)}
                         placeholder="Enter coupon code"
                         className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600"
                       />
-                      <button className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition">
-                        Apply
+                      <button 
+                        onClick={handleApplyCoupon} 
+                        disabled={cartLoading || !couponCode.trim()}
+                        className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {cartLoading ? 'Applying...' : 'Apply'}
                       </button>
                     </div>
                   </div>
