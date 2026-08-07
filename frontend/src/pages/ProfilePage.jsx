@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { User, Mail, Phone, MapPin, Calendar, Edit, Camera, Lock, Bell, LogOut } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Calendar, Edit, Camera, Lock, Bell, LogOut, Shuffle } from 'lucide-react';
 import { updateProfile } from '../store/slices/authSlice';
 import { useToast } from '../contexts/ToastContext';
 
@@ -21,7 +21,16 @@ const ProfilePage = () => {
     phoneNumber: user?.phoneNumber || '',
     dateOfBirth: user?.dateOfBirth || '',
     gender: user?.gender || '',
+    profilePicture: user?.profilePicture || '',
   });
+
+  const generateAvatar = () => {
+    const seed = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+    const styles = ['adventurer', 'avataaars', 'bottts', 'fun-emoji', 'lorelei', 'notionists', 'pixel-art'];
+    const style = styles[Math.floor(Math.random() * styles.length)];
+    const avatarUrl = `https://api.dicebear.com/7.x/${style}/svg?seed=${seed}`;
+    setFormData(prev => ({ ...prev, profilePicture: avatarUrl }));
+  };
 
   const handleInputChange = (e) => {
     setFormData({
@@ -52,6 +61,7 @@ const ProfilePage = () => {
       phoneNumber: user?.phoneNumber || '',
       dateOfBirth: user?.dateOfBirth || '',
       gender: user?.gender || '',
+      profilePicture: user?.profilePicture || '',
     });
     setIsEditing(false);
   };
@@ -109,14 +119,29 @@ const ProfilePage = () => {
                 {/* Profile Picture Section */}
                 <div className="flex items-center space-x-6 mb-8">
                   <div className="relative">
-                    <div className="w-32 h-32 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
-                      <span className="text-white font-bold text-4xl">
-                        {user?.firstName?.charAt(0) || 'U'}
-                      </span>
-                    </div>
-                    <button className="absolute bottom-0 right-0 bg-purple-600 text-white p-2 rounded-full hover:bg-purple-700 transition">
-                      <Camera className="h-4 w-4" />
-                    </button>
+                    {(isEditing ? formData.profilePicture : user?.profilePicture) ? (
+                      <img
+                        src={isEditing ? formData.profilePicture : user?.profilePicture}
+                        alt="Profile"
+                        className="w-32 h-32 rounded-full object-cover border-4 border-purple-200 shadow-lg"
+                      />
+                    ) : (
+                      <div className="w-32 h-32 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                        <span className="text-white font-bold text-4xl">
+                          {user?.firstName?.charAt(0) || 'U'}
+                        </span>
+                      </div>
+                    )}
+                    {isEditing && (
+                      <button
+                        type="button"
+                        onClick={generateAvatar}
+                        className="absolute bottom-0 right-0 bg-purple-600 text-white p-2.5 rounded-full hover:bg-purple-700 transition shadow-md"
+                        title="Generate random avatar"
+                      >
+                        <Shuffle className="h-4 w-4" />
+                      </button>
+                    )}
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-gray-900">
@@ -126,6 +151,16 @@ const ProfilePage = () => {
                     <p className="text-sm text-gray-500 mt-1">
                       Member since {new Date(user?.createdAt).toLocaleDateString()}
                     </p>
+                    {isEditing && (
+                      <button
+                        type="button"
+                        onClick={generateAvatar}
+                        className="mt-2 text-sm text-purple-600 hover:text-purple-700 font-medium flex items-center gap-1"
+                      >
+                        <Shuffle className="h-3.5 w-3.5" />
+                        Generate New Avatar
+                      </button>
+                    )}
                   </div>
                 </div>
 

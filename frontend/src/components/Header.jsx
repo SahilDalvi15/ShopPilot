@@ -126,12 +126,19 @@ const Header = () => {
               <button className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-full transition">
                 {isAuthenticated ? (
                   <>
-                    <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
-                      <span className="text-white font-semibold">
-                        {user?.firstName?.charAt(0) || 'U'}
-                      </span>
-                    </div>
-                    <User className="h-5 w-5 text-gray-700" />
+                    {user?.profilePicture ? (
+                      <img
+                        src={user.profilePicture}
+                        alt="Profile"
+                        className="w-8 h-8 rounded-full object-cover border-2 border-purple-300"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
+                        <span className="text-white font-semibold">
+                          {user?.firstName?.charAt(0) || 'U'}
+                        </span>
+                      </div>
+                    )}
                   </>
                 ) : (
                   <User className="h-6 w-6 text-gray-700" />
