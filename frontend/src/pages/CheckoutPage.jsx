@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { MapPin, Truck, Shield, ArrowRight, Plus, Check } from 'lucide-react';
+import { MapPin, Truck, Shield, ArrowRight, Plus, Check, CreditCard } from 'lucide-react';
 import { fetchAddresses } from '../store/slices/addressSlice';
 import { clearCart, applyCouponAsync, removeCouponAsync } from '../store/slices/cartSlice';
 import { orderService } from '../services/order.service';
 import { useToast } from '../contexts/ToastContext';
 import AddressCardSkeleton from '../components/skeletons/AddressCardSkeleton';
+import MockPaymentModal from '../components/MockPaymentModal';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const CheckoutPage = () => {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('cod');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isMockModalOpen, setIsMockModalOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchAddresses());
@@ -57,12 +59,29 @@ const CheckoutPage = () => {
       return;
     }
 
+    if (paymentMethod === 'mock') {
+      setIsMockModalOpen(true);
+      return;
+    }
+
+    // Process COD directly
+    await processOrder('cod');
+  };
+
+  const handleMockPaymentSuccess = async () => {
+    setIsMockModalOpen(false);
+    await processOrder('mock');
+  };
+
+  const processOrder = async (method) => {
     setIsProcessing(true);
 
     try {
       const shippingAddress = addresses.find((addr) => addr._id === selectedAddress);
       
       const orderData = {
+        shippingAddressId: selectedAddress,
+        billingAddressId: selectedAddress,
         shippingAddress: {
           fullName: shippingAddress.fullName,
           phoneNumber: shippingAddress.phoneNumber,
@@ -73,14 +92,13 @@ const CheckoutPage = () => {
           postalCode: shippingAddress.postalCode,
           country: shippingAddress.country || 'India',
         },
-        paymentMethod: 'COD', // Backend enum uses uppercase
+        paymentMethod: method, 
       };
 
       // Create order via API
       await orderService.createOrder(orderData);
 
-      // Cash on delivery - order created directly
-      success('Order Placed!', 'Your order has been placed successfully via Cash on Delivery.');
+      success('Order Placed!', `Your order has been placed successfully via ${method === 'cod' ? 'Cash on Delivery' : 'Online Payment'}.`);
       await dispatch(clearCart());
       navigate('/orders');
     } catch (error) {
@@ -258,6 +276,32 @@ const CheckoutPage = () => {
                 <div className="space-y-4">
                   <label
                     className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition ${
+                      paymentMethod === 'mock'
+                        ? 'border-purple-600 bg-purple-50'
+                        : 'border-gray-200 hover:border-purple-300'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="mock"
+                      checked={paymentMethod === 'mock'}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="w-4 h-4 text-purple-600 focus:ring-purple-500 border-gray-300"
+                    />
+                    <div className="ml-3 flex-1 flex items-center justify-between">
+                      <div>
+                        <div className="font-medium text-gray-900">Credit/Debit Card (Mock)</div>
+                        <div className="text-sm text-gray-600">
+                          Secure online payment via FakeGateway
+                        </div>
+                      </div>
+                      <CreditCard className={`h-6 w-6 ${paymentMethod === 'mock' ? 'text-purple-600' : 'text-gray-400'}`} />
+                    </div>
+                  </label>
+
+                  <label
+                    className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition ${
                       paymentMethod === 'cod'
                         ? 'border-purple-600 bg-purple-50'
                         : 'border-gray-200 hover:border-purple-300'
@@ -269,7 +313,7 @@ const CheckoutPage = () => {
                       value="cod"
                       checked={paymentMethod === 'cod'}
                       onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="w-4 h-4 text-purple-600"
+                      className="w-4 h-4 text-purple-600 focus:ring-purple-500 border-gray-300"
                     />
                     <div className="ml-3 flex-1">
                       <div className="font-medium text-gray-900">Cash on Delivery</div>
@@ -404,6 +448,13 @@ const CheckoutPage = () => {
           </div>
         </div>
       </div>
+
+      <MockPaymentModal 
+        isOpen={isMockModalOpen}
+        onClose={() => setIsMockModalOpen(false)}
+        amount={calculateTotal()}
+        onSuccess={handleMockPaymentSuccess}
+      />
     </div>
   );
 };
