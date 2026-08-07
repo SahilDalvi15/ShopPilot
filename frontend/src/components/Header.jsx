@@ -139,50 +139,39 @@ const Header = () => {
 
               {/* Dropdown Menu */}
               {isAuthenticated && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block">
-                  <Link
-                    to="/profile"
-                    className="block px-4 py-2 hover:bg-gray-100 transition"
-                  >
-                    My Profile
-                  </Link>
-                  <Link
-                    to="/orders"
-                    className="block px-4 py-2 hover:bg-gray-100 transition"
-                  >
-                    My Orders
-                  </Link>
-                  <Link
-                    to="/addresses"
-                    className="block px-4 py-2 hover:bg-gray-100 transition"
-                  >
-                    Addresses
-                  </Link>
-                  <hr className="my-2" />
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 hover:bg-gray-100 transition flex items-center space-x-2"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    <span>Logout</span>
-                  </button>
+                <div className="absolute right-0 top-full pt-2 w-48 hidden group-hover:block z-50">
+                  <div className="bg-white rounded-lg shadow-lg py-2 border border-gray-100">
+                    <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100 transition">
+                      My Profile
+                    </Link>
+                    <Link to="/orders" className="block px-4 py-2 hover:bg-gray-100 transition">
+                      My Orders
+                    </Link>
+                    <Link to="/addresses" className="block px-4 py-2 hover:bg-gray-100 transition">
+                      Addresses
+                    </Link>
+                    <hr className="my-2" />
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100 transition flex items-center space-x-2"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      <span>Logout</span>
+                    </button>
+                  </div>
                 </div>
               )}
 
               {!isAuthenticated && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block">
-                  <Link
-                    to="/login"
-                    className="block px-4 py-2 hover:bg-gray-100 transition"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="block px-4 py-2 hover:bg-gray-100 transition"
-                  >
-                    Register
-                  </Link>
+                <div className="absolute right-0 top-full pt-2 w-48 hidden group-hover:block z-50">
+                  <div className="bg-white rounded-lg shadow-lg py-2 border border-gray-100">
+                    <Link to="/login" className="block px-4 py-2 hover:bg-gray-100 transition">
+                      Login
+                    </Link>
+                    <Link to="/register" className="block px-4 py-2 hover:bg-gray-100 transition">
+                      Register
+                    </Link>
+                  </div>
                 </div>
               )}
             </div>
