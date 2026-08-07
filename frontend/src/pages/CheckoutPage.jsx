@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { MapPin, Truck, Shield, ArrowRight, Plus, Check } from 'lucide-react';
 import { fetchAddresses } from '../store/slices/addressSlice';
 import { clearCart } from '../store/slices/cartSlice';
+import { orderService } from '../services/order.service';
 import { useToast } from '../contexts/ToastContext';
 import AddressCardSkeleton from '../components/skeletons/AddressCardSkeleton';
 
@@ -59,25 +60,32 @@ const CheckoutPage = () => {
     setIsProcessing(true);
 
     try {
+      const shippingAddress = addresses.find((addr) => addr._id === selectedAddress);
+      
       const orderData = {
-        shippingAddress: addresses.find((addr) => addr._id === selectedAddress),
-        paymentMethod: 'cod',
-        items: cartItems,
-        subtotal: calculateSubtotal(),
-        discount: cartDiscount,
-        shipping: calculateShipping(),
-        tax: calculateTax(),
-        total: calculateTotal(),
-        coupon: appliedCoupon,
+        shippingAddress: {
+          fullName: shippingAddress.fullName,
+          phoneNumber: shippingAddress.phoneNumber,
+          addressLine1: shippingAddress.addressLine1,
+          addressLine2: shippingAddress.addressLine2,
+          city: shippingAddress.city,
+          state: shippingAddress.state,
+          postalCode: shippingAddress.postalCode,
+          country: shippingAddress.country || 'India',
+        },
+        paymentMethod: 'COD', // Backend enum uses uppercase
       };
 
-      // Cash on delivery - create order directly
+      // Create order via API
+      await orderService.createOrder(orderData);
+
+      // Cash on delivery - order created directly
       success('Order Placed!', 'Your order has been placed successfully via Cash on Delivery.');
       await dispatch(clearCart());
       navigate('/orders');
     } catch (error) {
       console.error('Error placing order:', error);
-      toastError('Order Failed', 'Failed to place order. Please try again.');
+      toastError('Order Failed', error.response?.data?.message || 'Failed to place order. Please try again.');
     } finally {
       setIsProcessing(false);
     }
