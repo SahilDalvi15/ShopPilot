@@ -30,6 +30,7 @@ const notificationRoutes = require('./routes/notification.routes');
 const paymentRoutes = require('./routes/payment.routes');
 const uploadRoutes = require('./routes/upload.routes');
 const searchRoutes = require('./routes/search.routes');
+const statsRoutes = require('./routes/stats.routes');
 
 const app = express();
 
@@ -89,6 +90,7 @@ app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/payments', paymentRoutes);
 app.use('/api/v1/upload', uploadRoutes);
 app.use('/api/v1/search', searchRoutes);
+app.use('/api/v1/stats', statsRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
