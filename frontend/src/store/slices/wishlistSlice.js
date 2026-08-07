@@ -13,7 +13,8 @@ export const fetchWishlist = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await wishlistService.getWishlist();
-      return response.data;
+      // response.data is { id, userId, items: [...] }
+      return response.data.items || [];
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch wishlist');
     }
@@ -24,8 +25,10 @@ export const addToWishlist = createAsyncThunk(
   'wishlist/addToWishlist',
   async (productId, { rejectWithValue }) => {
     try {
-      const response = await wishlistService.addToWishlist(productId);
-      return response.data;
+      await wishlistService.addToWishlist(productId);
+      // Re-fetch the full wishlist so state has the complete items array
+      const fullWishlist = await wishlistService.getWishlist();
+      return fullWishlist.data.items || [];
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to add to wishlist');
     }
@@ -36,8 +39,10 @@ export const removeFromWishlist = createAsyncThunk(
   'wishlist/removeFromWishlist',
   async (productId, { rejectWithValue }) => {
     try {
-      const response = await wishlistService.removeFromWishlist(productId);
-      return { productId, ...response.data };
+      await wishlistService.removeFromWishlist(productId);
+      // Re-fetch the full wishlist so state has the complete items array
+      const fullWishlist = await wishlistService.getWishlist();
+      return fullWishlist.data.items || [];
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to remove from wishlist');
     }
@@ -121,9 +126,7 @@ const wishlistSlice = createSlice({
       })
       .addCase(removeFromWishlist.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = state.items.filter(
-          (item) => item.productId !== action.payload.productId
-        );
+        state.items = action.payload || [];
       })
       .addCase(removeFromWishlist.rejected, (state, action) => {
         state.loading = false;
