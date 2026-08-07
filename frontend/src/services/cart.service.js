@@ -7,17 +7,17 @@ export const cartService = {
   },
 
   addToCart: async (cartData) => {
-    const response = await apiClient.post('/cart', cartData);
+    const response = await apiClient.post('/cart/items', cartData);
     return response.data;
   },
 
-  updateCartItem: async (itemId, quantity) => {
-    const response = await apiClient.put(`/cart/${itemId}`, { quantity });
+  updateCartItem: async (productId, quantity) => {
+    const response = await apiClient.put(`/cart/items/${productId}`, { quantity });
     return response.data;
   },
 
-  removeFromCart: async (itemId) => {
-    const response = await apiClient.delete(`/cart/${itemId}`);
+  removeFromCart: async (productId) => {
+    const response = await apiClient.delete(`/cart/items/${productId}`);
     return response.data;
   },
 
@@ -27,7 +27,7 @@ export const cartService = {
   },
 
   applyCoupon: async (couponCode) => {
-    const response = await apiClient.post('/cart/apply-coupon', { couponCode });
+    const response = await apiClient.post('/cart/coupon', { couponCode });
     return response.data;
   },
 
