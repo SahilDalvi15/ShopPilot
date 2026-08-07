@@ -1,10 +1,16 @@
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { User, Mail, Phone, MapPin, Calendar, Edit, Camera, Lock, Bell, LogOut } from 'lucide-react';
+import { updateProfile } from '../store/slices/authSlice';
+import { useToast } from '../contexts/ToastContext';
 
 const ProfilePage = () => {
+  const dispatch = useDispatch();
+  const { success, error: toastError } = useToast();
+  
   const user = useSelector((state) => state.auth.user);
+  const loading = useSelector((state) => state.auth.loading);
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
 
@@ -24,9 +30,18 @@ const ProfilePage = () => {
     });
   };
 
-  const handleSave = () => {
-    // TODO: Call API to update profile
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      const resultAction = await dispatch(updateProfile(formData));
+      if (updateProfile.fulfilled.match(resultAction)) {
+        success('Profile Updated', 'Your profile has been updated successfully.');
+        setIsEditing(false);
+      } else {
+        toastError('Update Failed', resultAction.payload || 'Failed to update profile.');
+      }
+    } catch (err) {
+      toastError('Update Failed', 'An unexpected error occurred.');
+    }
   };
 
   const handleCancel = () => {
@@ -241,13 +256,18 @@ const ProfilePage = () => {
                       <>
                         <button
                           onClick={handleSave}
-                          className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition"
+                          disabled={loading}
+                          className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition disabled:opacity-50 flex items-center space-x-2"
                         >
-                          Save Changes
+                          {loading && (
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          )}
+                          <span>Save Changes</span>
                         </button>
                         <button
                           onClick={handleCancel}
-                          className="bg-gray-200 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-300 transition"
+                          disabled={loading}
+                          className="bg-gray-200 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-300 transition disabled:opacity-50"
                         >
                           Cancel
                         </button>
@@ -270,6 +290,7 @@ const ProfilePage = () => {
             {activeTab === 'security' && (
               <div className="p-6">
                 <div className="space-y-6">
+                  {/* Change Password - Temporarily disabled as backend route does not exist
                   <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-4">
                       <Lock className="h-6 w-6 text-purple-600" />
@@ -282,6 +303,7 @@ const ProfilePage = () => {
                       Change
                     </button>
                   </div>
+                  */}
 
                   <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-4">
