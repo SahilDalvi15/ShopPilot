@@ -7,12 +7,12 @@ export const wishlistService = {
   },
 
   addToWishlist: async (productId) => {
-    const response = await apiClient.post('/wishlist', { productId });
+    const response = await apiClient.post('/wishlist/items', { productId });
     return response.data;
   },
 
   removeFromWishlist: async (productId) => {
-    const response = await apiClient.delete(`/wishlist/${productId}`);
+    const response = await apiClient.delete(`/wishlist/items/${productId}`);
     return response.data;
   },
 
@@ -21,8 +21,8 @@ export const wishlistService = {
     return response.data;
   },
 
-  moveAllToCart: async () => {
-    const response = await apiClient.post('/wishlist/move-to-cart');
+  moveToCart: async (productId) => {
+    const response = await apiClient.post(`/wishlist/items/${productId}/move-to-cart`);
     return response.data;
   },
 };

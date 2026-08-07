@@ -4,6 +4,9 @@ import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { productService } from '../services/productService';
 import { Heart, ShoppingCart, Star, Minus, Plus, Truck, Shield, RotateCcw } from 'lucide-react';
+import { addToCart } from '../store/slices/cartSlice';
+import { addToWishlist, removeFromWishlist } from '../store/slices/wishlistSlice';
+import { selectIsAuthenticated } from '../store/slices/authSlice';
 import ReviewForm from '../components/ReviewForm';
 import ReviewList from '../components/ReviewList';
 import { fetchProductReviews, createReview, markReviewHelpful } from '../store/slices/reviewSlice';
@@ -15,6 +18,8 @@ const ProductDetailPage = () => {
   const { success, error: toastError } = useToast();
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const wishlistItems = useSelector((state) => state.wishlist.items);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['product', slug],
@@ -52,6 +57,41 @@ const ProductDetailPage = () => {
       success('Thanks for your feedback!');
     } catch (err) {
       toastError(err || 'Failed to mark review as helpful');
+    }
+  };
+
+  const handleAddToCart = async () => {
+    if (!isAuthenticated) {
+      toastError('Authentication Required', 'Please login to add items to your cart.');
+      return;
+    }
+    
+    try {
+      await dispatch(addToCart({ productId: product._id, quantity })).unwrap();
+      success('Added to Cart', `${product.title} was successfully added to your cart.`);
+    } catch (err) {
+      toastError('Error', err || 'Failed to add item to cart.');
+    }
+  };
+
+  const handleToggleWishlist = async () => {
+    if (!isAuthenticated) {
+      toastError('Authentication Required', 'Please login to add items to your wishlist.');
+      return;
+    }
+
+    const isInWishlist = wishlistItems?.some(item => item.productId === product._id || item.productId?._id === product._id);
+    
+    try {
+      if (isInWishlist) {
+        await dispatch(removeFromWishlist(product._id)).unwrap();
+        success('Removed from Wishlist', `${product.title} removed from your wishlist.`);
+      } else {
+        await dispatch(addToWishlist(product._id)).unwrap();
+        success('Added to Wishlist', `${product.title} added to your wishlist.`);
+      }
+    } catch (err) {
+      toastError('Error', err || 'Failed to update wishlist.');
     }
   };
 
@@ -185,14 +225,24 @@ const ProductDetailPage = () => {
 
               <div className="flex gap-3">
                 <button
+                  onClick={handleAddToCart}
                   disabled={product.stock === 0}
                   className="flex-1 bg-indigo-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   <ShoppingCart className="w-5 h-5" />
                   Add to Cart
                 </button>
-                <button className="p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                  <Heart className="w-5 h-5 text-gray-600" />
+                <button 
+                  onClick={handleToggleWishlist}
+                  className="p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <Heart 
+                    className={`w-5 h-5 ${
+                      wishlistItems?.some(item => item.productId === product._id || item.productId?._id === product._id)
+                        ? 'text-red-500 fill-current' 
+                        : 'text-gray-600'
+                    }`} 
+                  />
                 </button>
               </div>
 

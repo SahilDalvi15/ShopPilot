@@ -1,12 +1,22 @@
 import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { useQuery } from '@tanstack/react-query';
 import { productService } from '../services/productService';
+import { addToCart } from '../store/slices/cartSlice';
+import { addToWishlist, removeFromWishlist } from '../store/slices/wishlistSlice';
+import { useToast } from '../contexts/ToastContext';
 import { Search, Filter, Grid, List, Heart, ShoppingCart, Star } from 'lucide-react';
 import ProductCardSkeleton from '../components/skeletons/ProductCardSkeleton';
 
 const ProductsPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { success, error: toastError } = useToast();
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const wishlistItems = useSelector((state) => state.wishlist.items);
+  
   const getPageTitle = () => {
     switch (location.pathname) {
       case '/brands': return 'Brands';
@@ -62,6 +72,47 @@ const ProductsPage = () => {
   const handlePageChange = (newPage) => {
     setFilters({ ...filters, page: newPage });
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleAddToCart = async (e, product) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      toastError('Authentication Required', 'Please login to add items to your cart.');
+      navigate('/login');
+      return;
+    }
+    
+    try {
+      await dispatch(addToCart({ productId: product._id, quantity: 1 })).unwrap();
+      success('Added to Cart', `${product.title} was successfully added to your cart.`);
+    } catch (err) {
+      toastError('Error', err || 'Failed to add item to cart.');
+    }
+  };
+
+  const handleToggleWishlist = async (e, product) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!isAuthenticated) {
+      toastError('Authentication Required', 'Please login to add items to your wishlist.');
+      navigate('/login');
+      return;
+    }
+
+    const isInWishlist = wishlistItems?.some(item => item.productId === product.id || item.productId?._id === product.id);
+    
+    try {
+      if (isInWishlist) {
+        await dispatch(removeFromWishlist(product.id)).unwrap();
+        success('Removed from Wishlist', `${product.title} removed from your wishlist.`);
+      } else {
+        await dispatch(addToWishlist(product.id)).unwrap();
+        success('Added to Wishlist', `${product.title} added to your wishlist.`);
+      }
+    } catch (err) {
+      toastError('Error', err || 'Failed to update wishlist.');
+    }
   };
 
   return (
@@ -198,8 +249,17 @@ const ProductsPage = () => {
                           alt={product.title}
                           className="w-full h-48 object-cover"
                         />
-                        <button className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-sm hover:bg-gray-50">
-                          <Heart className="w-4 h-4 text-gray-400" />
+                        <button 
+                          onClick={(e) => handleToggleWishlist(e, product)}
+                          className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-sm hover:bg-gray-50 transition-colors"
+                        >
+                          <Heart 
+                            className={`w-4 h-4 ${
+                              wishlistItems?.some(item => item.productId === product.id || item.productId?._id === product.id)
+                                ? 'text-red-500 fill-current' 
+                                : 'text-gray-400'
+                            }`} 
+                          />
                         </button>
                         {product.discount > 0 && (
                           <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-medium">
@@ -244,7 +304,10 @@ const ProductsPage = () => {
                           </span>
                         </div>
 
-                        <button className="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
+                        <button 
+                          onClick={(e) => handleAddToCart(e, product)}
+                          className="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2"
+                        >
                           <ShoppingCart className="w-4 h-4" />
                           Add to Cart
                         </button>
