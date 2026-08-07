@@ -1,33 +1,18 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Package, Truck, CheckCircle, XCircle, Clock, ChevronDown, ChevronUp } from 'lucide-react';
+import { orderService } from '../services/order.service';
 
 const OrdersPage = () => {
-  const [selectedOrder, setSelectedOrder] = useState(null);
   const [expandedOrders, setExpandedOrders] = useState({});
 
-  // Mock data - replace with actual API call
-  const orders = [
-    {
-      id: 'ORD20260614001',
-      orderNumber: 'ORD20260614001',
-      items: [
-        {
-          productTitle: 'Sample Product',
-          productImage: '/placeholder.jpg',
-          quantity: 2,
-          subtotal: 1798
-        }
-      ],
-      totalAmount: 1618,
-      paymentStatus: 'success',
-      orderStatus: 'confirmed',
-      createdAt: '2026-06-14T18:30:00.000Z',
-      statusHistory: [
-        { status: 'pending', timestamp: '2026-06-14T18:30:00.000Z', note: 'Order placed' },
-        { status: 'confirmed', timestamp: '2026-06-14T18:35:00.000Z', note: 'Order confirmed' }
-      ]
-    }
-  ];
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['orders'],
+    queryFn: () => orderService.getOrders(),
+  });
+
+  const orders = data?.data || [];
+
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -78,7 +63,15 @@ const OrdersPage = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">My Orders</h1>
 
-        {orders.length === 0 ? (
+        {isLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600" />
+          </div>
+        ) : error ? (
+          <div className="bg-red-50 text-red-600 p-4 rounded-lg">
+            Failed to load orders. {error.message}
+          </div>
+        ) : orders.length === 0 ? (
           <div className="text-center py-12">
             <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h2 className="text-2xl font-semibold text-gray-900 mb-2">No orders yet</h2>
@@ -130,16 +123,16 @@ const OrdersPage = () => {
                     {order.items.map((item, index) => (
                       <div key={index} className="flex gap-4">
                         <img
-                          src={item.productImage || '/placeholder.jpg'}
-                          alt={item.productTitle}
+                          src={item.product?.images?.[0] || '/placeholder.jpg'}
+                          alt={item.product?.title || 'Product'}
                           className="w-16 h-16 object-cover rounded-lg"
                         />
                         <div className="flex-1">
-                          <p className="font-medium text-gray-900">{item.productTitle}</p>
+                          <p className="font-medium text-gray-900">{item.product?.title || 'Product Unavailable'}</p>
                           <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
                         </div>
                         <div className="text-right">
-                          <p className="font-semibold text-gray-900">₹{item.subtotal.toLocaleString()}</p>
+                          <p className="font-semibold text-gray-900">₹{(item.price * item.quantity).toLocaleString()}</p>
                         </div>
                       </div>
                     ))}
@@ -173,7 +166,7 @@ const OrdersPage = () => {
                 </div>
 
                 {/* Order Status History */}
-                {expandedOrders[order.id] && (
+                {expandedOrders[order.id] && order.statusHistory && (
                   <div className="p-4 border-t border-gray-200 bg-gray-50">
                     <h3 className="font-semibold text-gray-900 mb-3">Order Status History</h3>
                     <div className="space-y-3">
