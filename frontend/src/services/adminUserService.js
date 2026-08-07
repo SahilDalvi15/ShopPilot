@@ -3,7 +3,7 @@ import api from './api';
 const adminUserService = {
   // Get all users (admin view)
   getAllUsers: async (params = {}) => {
-    const response = await api.get('/users', { params });
+    const response = await api.get('/users/admin/all', { params });
     return response.data;
   },
 
@@ -21,19 +21,19 @@ const adminUserService = {
 
   // Delete user
   deleteUser: async (userId) => {
-    const response = await api.delete(`/users/${userId}`);
+    const response = await api.delete(`/users/admin/${userId}`);
     return response.data;
   },
 
   // Update user role
   updateUserRole: async (userId, role) => {
-    const response = await api.put(`/users/${userId}/role`, { role });
+    const response = await api.put(`/users/admin/${userId}/role`, { role });
     return response.data;
   },
 
   // Block/Unblock user
   toggleUserBlock: async (userId, isBlocked) => {
-    const response = await api.put(`/users/${userId}/block`, { isBlocked });
+    const response = await api.put(`/users/admin/${userId}/block`, { isBlocked });
     return response.data;
   },
 };

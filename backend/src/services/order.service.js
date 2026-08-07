@@ -397,6 +397,124 @@ class OrderService {
 
     logger.info(`Order ${orderId} cancelled by user ${userId}`);
   }
+  async adminGetOrders(query) {
+    const { page = 1, limit = 10, status, search } = query;
+    const skip = (page - 1) * limit;
+
+    const queryObj = {};
+    if (status && status !== 'all') {
+      queryObj.orderStatus = status.toLowerCase();
+    }
+    
+    // We can't easily search across referenced collections in a standard find, 
+    // but we can try to find users matching the search and then find their orders.
+    if (search) {
+      const users = await User.find({
+        $or: [
+          { firstName: { $regex: search, $options: 'i' } },
+          { lastName: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } }
+        ]
+      });
+      const userIds = users.map(u => u._id);
+      queryObj.$or = [
+        { userId: { $in: userIds } },
+        { _id: search.length === 24 ? search : null } // Try exact order ID match if it's a valid ObjectId
+      ].filter(cond => cond._id !== null || cond.userId);
+    }
+
+    const orders = await Order.find(queryObj)
+      .populate('items')
+      .populate('userId', 'firstName lastName email')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    const total = await Order.countDocuments(queryObj);
+
+    const transformedOrders = orders.map(order => ({
+      _id: order._id,
+      orderNumber: order.orderNumber,
+      user: order.userId ? {
+        id: order.userId._id,
+        name: `${order.userId.firstName || ''} ${order.userId.lastName || ''}`.trim(),
+        email: order.userId.email
+      } : null,
+      items: order.items,
+      totalAmount: order.totalAmount,
+      paymentMethod: order.paymentMethod,
+      paymentStatus: order.paymentStatus,
+      status: order.orderStatus,
+      createdAt: order.createdAt
+    }));
+
+    return {
+      orders: transformedOrders,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: skip + limit < total,
+        hasPrev: page > 1
+      }
+    };
+  }
+
+  async adminUpdateOrderStatus(orderId, status, adminId) {
+    const order = await Order.findById(orderId);
+    if (!order) {
+      const error = new Error('Order not found');
+      error.statusCode = 404;
+      error.code = 'ORDER_NOT_FOUND';
+      throw error;
+    }
+
+    // Optional: Add logic to prevent certain state transitions
+
+    order.orderStatus = status;
+    order.statusHistory.push({
+      status,
+      timestamp: new Date(),
+      note: `Order status updated to ${status} by admin`,
+      updatedBy: adminId
+    });
+
+    await order.save();
+
+    // If order is cancelled by admin, restore inventory
+    if (status === 'cancelled') {
+      for (const itemId of order.items) {
+        const orderItem = await OrderItem.findById(itemId);
+        if (orderItem) {
+          await Inventory.findOneAndUpdate(
+            { productId: orderItem.productId },
+            {
+              $inc: { currentStock: orderItem.quantity },
+              lastStockUpdate: new Date()
+            }
+          );
+          
+          await Product.findByIdAndUpdate(orderItem.productId, {
+            $inc: { soldCount: -orderItem.quantity }
+          });
+        }
+      }
+    }
+
+    // Emit event
+    try {
+      emitToUser(order.userId, 'order_updated', {
+        orderId: order._id,
+        status: order.orderStatus,
+        message: `Your order status has been updated to ${status}`
+      });
+    } catch (err) {
+      logger.error(`Failed to emit order update: ${err.message}`);
+    }
+
+    return order;
+  }
 }
 
 module.exports = new OrderService();

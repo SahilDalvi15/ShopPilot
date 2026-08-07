@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectIsAuthenticated } from './store/slices/authSlice';
+import { selectIsAuthenticated, selectCurrentUser } from './store/slices/authSlice';
 import { fetchCart } from './store/slices/cartSlice';
 import { fetchWishlist } from './store/slices/wishlistSlice';
 import Header from './components/Header';
@@ -23,6 +23,17 @@ import AdminProductForm from './pages/admin/AdminProductForm';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminUsers from './pages/admin/AdminUsers';
 import './App.css';
+
+// Admin route guard component
+const AdminRoute = ({ children }) => {
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const user = useSelector(selectCurrentUser);
+  const isAdmin = ['admin', 'super_admin'].includes(user?.role);
+  
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (!isAdmin) return <Navigate to="/" replace />;
+  return children;
+};
 
 function App() {
   const dispatch = useDispatch();
@@ -75,8 +86,8 @@ function App() {
           <Route path="/new-arrivals" element={<ProductsPage />} />
           <Route path="/" element={<Navigate to="/products" />} />
           
-          {/* Admin Routes */}
-          <Route path="/admin" element={<AdminDashboard />}>
+          {/* Admin Routes - Protected */}
+          <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>}>
             <Route index element={<AdminStats />} />
             <Route path="products" element={<AdminProducts />} />
             <Route path="products/new" element={<AdminProductForm />} />

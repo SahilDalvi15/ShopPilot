@@ -153,6 +153,74 @@ const setDefaultAddress = async (req, res) => {
   }
 };
 
+const adminGetUsers = async (req, res) => {
+  try {
+    const result = await userService.adminGetUsers(req.query);
+    res.status(200).json({
+      success: true,
+      message: 'Users retrieved successfully',
+      data: result.users,
+      pagination: result.pagination
+    });
+  } catch (error) {
+    res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message || 'Failed to retrieve users',
+      error: { code: error.code || 'ADMIN_GET_USERS_ERROR' }
+    });
+  }
+};
+
+const adminUpdateUserRole = async (req, res) => {
+  try {
+    const user = await userService.adminUpdateUserRole(req.params.userId, req.body.role);
+    res.status(200).json({
+      success: true,
+      message: 'User role updated successfully',
+      data: user
+    });
+  } catch (error) {
+    res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message || 'Failed to update user role',
+      error: { code: error.code || 'ADMIN_UPDATE_ROLE_ERROR' }
+    });
+  }
+};
+
+const adminToggleUserBlock = async (req, res) => {
+  try {
+    const user = await userService.adminToggleUserBlock(req.params.userId, req.body.isBlocked);
+    res.status(200).json({
+      success: true,
+      message: `User ${req.body.isBlocked ? 'blocked' : 'unblocked'} successfully`,
+      data: user
+    });
+  } catch (error) {
+    res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message || 'Failed to toggle user block status',
+      error: { code: error.code || 'ADMIN_TOGGLE_BLOCK_ERROR' }
+    });
+  }
+};
+
+const adminDeleteUser = async (req, res) => {
+  try {
+    await userService.adminDeleteUser(req.params.userId);
+    res.status(200).json({
+      success: true,
+      message: 'User deleted successfully'
+    });
+  } catch (error) {
+    res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message || 'Failed to delete user',
+      error: { code: error.code || 'ADMIN_DELETE_USER_ERROR' }
+    });
+  }
+};
+
 module.exports = {
   getProfile,
   updateProfile,
@@ -161,5 +229,9 @@ module.exports = {
   addAddress,
   updateAddress,
   deleteAddress,
-  setDefaultAddress
+  setDefaultAddress,
+  adminGetUsers,
+  adminUpdateUserRole,
+  adminToggleUserBlock,
+  adminDeleteUser
 };

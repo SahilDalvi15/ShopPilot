@@ -3,7 +3,7 @@ import api from './api';
 const adminOrderService = {
   // Get all orders (admin view)
   getAllOrders: async (params = {}) => {
-    const response = await api.get('/orders', { params });
+    const response = await api.get('/orders/admin/all', { params });
     return response.data;
   },
 
@@ -15,7 +15,7 @@ const adminOrderService = {
 
   // Update order status
   updateOrderStatus: async (orderId, status) => {
-    const response = await api.put(`/orders/${orderId}/status`, { status });
+    const response = await api.put(`/orders/admin/${orderId}/status`, { status });
     return response.data;
   },
 

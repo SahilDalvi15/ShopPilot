@@ -178,6 +178,116 @@ class UserService {
 
     logger.info(`Address ${addressId} set as default for user ${userId}`);
   }
+  async adminGetUsers(query) {
+    const { page = 1, limit = 10, role, search } = query;
+    const skip = (page - 1) * limit;
+
+    const queryObj = { isDeleted: false };
+    if (role && role !== 'all') {
+      // In the frontend, roles are passed as 'Admin' or 'Customer'. Map appropriately.
+      queryObj.role = role.toLowerCase() === 'admin' ? { $in: ['admin', 'super_admin'] } : 'customer';
+    }
+
+    if (search) {
+      queryObj.$or = [
+        { firstName: { $regex: search, $options: 'i' } },
+        { lastName: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    const users = await User.find(queryObj)
+      .select('-password')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    const total = await User.countDocuments(queryObj);
+
+    const transformedUsers = users.map(user => ({
+      _id: user._id,
+      name: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+      email: user.email,
+      role: ['admin', 'super_admin'].includes(user.role) ? 'Admin' : 'Customer',
+      isBlocked: !user.isActive, // Map isActive to isBlocked for frontend
+      avatar: user.profilePicture, 
+      createdAt: user.createdAt
+    }));
+
+    return {
+      users: transformedUsers,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: skip + limit < total,
+        hasPrev: page > 1
+      }
+    };
+  }
+
+  async adminUpdateUserRole(userId, role) {
+    const user = await User.findById(userId);
+    if (!user) {
+      const error = new Error('User not found');
+      error.statusCode = 404;
+      error.code = 'USER_NOT_FOUND';
+      throw error;
+    }
+
+    // Role comes from frontend as 'Admin' or 'Customer'
+    user.role = role.toLowerCase() === 'admin' ? 'admin' : 'customer';
+    await user.save();
+    
+    return {
+      _id: user._id,
+      name: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+      email: user.email,
+      role: ['admin', 'super_admin'].includes(user.role) ? 'Admin' : 'Customer',
+      isBlocked: !user.isActive,
+      avatar: user.profilePicture,
+      createdAt: user.createdAt
+    };
+  }
+
+  async adminToggleUserBlock(userId, isBlocked) {
+    const user = await User.findById(userId);
+    if (!user) {
+      const error = new Error('User not found');
+      error.statusCode = 404;
+      error.code = 'USER_NOT_FOUND';
+      throw error;
+    }
+
+    user.isActive = !isBlocked;
+    await user.save();
+    
+    return {
+      _id: user._id,
+      name: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+      email: user.email,
+      role: ['admin', 'super_admin'].includes(user.role) ? 'Admin' : 'Customer',
+      isBlocked: !user.isActive,
+      avatar: user.profilePicture,
+      createdAt: user.createdAt
+    };
+  }
+
+  async adminDeleteUser(userId) {
+    const user = await User.findById(userId);
+    if (!user) {
+      const error = new Error('User not found');
+      error.statusCode = 404;
+      error.code = 'USER_NOT_FOUND';
+      throw error;
+    }
+
+    user.isDeleted = true;
+    await user.save();
+    
+    return true;
+  }
 }
 
 module.exports = new UserService();

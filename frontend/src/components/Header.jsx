@@ -10,6 +10,7 @@ import {
   X,
   LogOut,
   Settings,
+  LayoutDashboard,
 } from 'lucide-react';
 import { logout } from '../store/slices/authSlice';
 import { selectCartCount } from '../store/slices/cartSlice';
@@ -150,6 +151,12 @@ const Header = () => {
                     <Link to="/addresses" className="block px-4 py-2 hover:bg-gray-100 transition">
                       Addresses
                     </Link>
+                    {['admin', 'super_admin'].includes(user?.role) && (
+                      <Link to="/admin" className="block px-4 py-2 hover:bg-gray-100 transition text-purple-600 font-medium flex items-center space-x-2">
+                        <LayoutDashboard className="h-4 w-4" />
+                        <span>Admin Dashboard</span>
+                      </Link>
+                    )}
                     <hr className="my-2" />
                     <button
                       onClick={handleLogout}
@@ -270,6 +277,16 @@ const Header = () => {
                   >
                     Addresses
                   </Link>
+                  {['admin', 'super_admin'].includes(user?.role) && (
+                    <Link
+                      to="/admin"
+                      className="px-4 py-2 hover:bg-gray-100 rounded-lg transition text-purple-600 font-medium flex items-center space-x-2"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <LayoutDashboard className="h-4 w-4" />
+                      <span>Admin Dashboard</span>
+                    </Link>
+                  )}
                   <button
                     onClick={() => {
                       handleLogout();

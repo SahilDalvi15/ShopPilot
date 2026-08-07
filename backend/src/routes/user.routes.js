@@ -12,4 +12,13 @@ router.put('/addresses/:addressId', authenticate, updateAddress);
 router.delete('/addresses/:addressId', authenticate, deleteAddress);
 router.put('/addresses/:addressId/default', authenticate, setDefaultAddress);
 
+// Admin Routes
+const { authorize } = require('../middlewares/auth.middleware');
+const { adminGetUsers, adminUpdateUserRole, adminToggleUserBlock, adminDeleteUser } = require('../controllers/user.controller');
+
+router.get('/admin/all', authenticate, authorize(['admin', 'super_admin']), adminGetUsers);
+router.put('/admin/:userId/role', authenticate, authorize(['admin', 'super_admin']), adminUpdateUserRole);
+router.put('/admin/:userId/block', authenticate, authorize(['admin', 'super_admin']), adminToggleUserBlock);
+router.delete('/admin/:userId', authenticate, authorize(['admin', 'super_admin']), adminDeleteUser);
+
 module.exports = router;

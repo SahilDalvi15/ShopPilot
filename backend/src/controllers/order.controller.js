@@ -76,9 +76,54 @@ const cancelOrder = async (req, res) => {
   }
 };
 
+const adminGetOrders = async (req, res) => {
+  try {
+    const result = await orderService.adminGetOrders(req.query);
+    res.status(200).json({
+      success: true,
+      message: 'All orders retrieved successfully',
+      data: result.orders,
+      pagination: result.pagination
+    });
+  } catch (error) {
+    res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message || 'Failed to retrieve all orders',
+      error: {
+        code: error.code || 'ADMIN_GET_ORDERS_ERROR'
+      }
+    });
+  }
+};
+
+const adminUpdateOrderStatus = async (req, res) => {
+  try {
+    const order = await orderService.adminUpdateOrderStatus(
+      req.params.orderId,
+      req.body.status,
+      req.user.id
+    );
+    res.status(200).json({
+      success: true,
+      message: 'Order status updated successfully',
+      data: order
+    });
+  } catch (error) {
+    res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message || 'Failed to update order status',
+      error: {
+        code: error.code || 'ADMIN_UPDATE_ORDER_STATUS_ERROR'
+      }
+    });
+  }
+};
+
 module.exports = {
   createOrder,
   getOrders,
   getOrderById,
-  cancelOrder
+  cancelOrder,
+  adminGetOrders,
+  adminUpdateOrderStatus
 };

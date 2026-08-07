@@ -141,11 +141,11 @@ const AdminProducts = () => {
                         />
                         <div>
                           <p className="font-medium text-gray-900">{product.title}</p>
-                          <p className="text-sm text-gray-500">{product.brand}</p>
+                          <p className="text-sm text-gray-500">{product.brand?.name || product.brand}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-gray-700 capitalize">{product.category}</td>
+                    <td className="px-6 py-4 text-gray-700 capitalize">{product.category?.name || product.category}</td>
                     <td className="px-6 py-4 font-semibold text-gray-900">₹{product.price.toLocaleString()}</td>
                     <td className="px-6 py-4 text-gray-700">{product.stock}</td>
                     <td className="px-6 py-4">
