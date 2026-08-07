@@ -110,7 +110,7 @@ const reviewSlice = createSlice({
       // Mark helpful
       .addCase(markReviewHelpful.fulfilled, (state, action) => {
         const { reviewId } = action.payload;
-        const review = state.reviews.find((r) => r._id === reviewId);
+        const review = state.reviews.find((r) => r.id === reviewId);
         if (review) {
           review.helpfulCount = (review.helpfulCount || 0) + 1;
         }
@@ -118,7 +118,7 @@ const reviewSlice = createSlice({
       // Update review
       .addCase(updateReview.fulfilled, (state, action) => {
         const index = state.reviews.findIndex(
-          (r) => r._id === (action.payload.data?._id || action.payload._id)
+          (r) => r.id === (action.payload.data?.id || action.payload.id)
         );
         if (index !== -1) {
           state.reviews[index] = action.payload.data || action.payload;
@@ -126,7 +126,7 @@ const reviewSlice = createSlice({
       })
       // Delete review
       .addCase(deleteReview.fulfilled, (state, action) => {
-        state.reviews = state.reviews.filter((r) => r._id !== action.payload);
+        state.reviews = state.reviews.filter((r) => r.id !== action.payload);
       });
   },
 });

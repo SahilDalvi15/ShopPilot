@@ -32,11 +32,11 @@ const ReviewCard = ({ review, onHelpful }) => {
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">
-            {review.user?.name?.charAt(0).toUpperCase() || 'U'}
+            {review.user?.firstName?.charAt(0).toUpperCase() || 'U'}
           </div>
           <div>
             <h4 className="font-semibold text-gray-900">
-              {review.user?.name || 'Anonymous User'}
+              {review.user?.firstName ? `${review.user.firstName} ${review.user.lastName || ''}` : 'Anonymous User'}
             </h4>
             <div className="flex items-center gap-2 text-sm text-gray-500">
               <Calendar className="w-3 h-3" />
@@ -58,7 +58,7 @@ const ReviewCard = ({ review, onHelpful }) => {
       <p className="text-gray-700 mb-4 leading-relaxed">{review.comment}</p>
 
       {/* Verified Purchase Badge */}
-      {review.verifiedPurchase && (
+      {review.isVerifiedPurchase && (
         <div className="inline-flex items-center gap-1.5 bg-green-50 text-green-700 text-xs font-medium px-2 py-1 rounded-full mb-4">
           <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
             <path
@@ -74,7 +74,7 @@ const ReviewCard = ({ review, onHelpful }) => {
       {/* Helpful Button */}
       <div className="flex items-center justify-between pt-4 border-t border-gray-100">
         <button
-          onClick={() => onHelpful && onHelpful(review._id)}
+          onClick={() => onHelpful && onHelpful(review.id)}
           className="flex items-center gap-2 text-sm text-gray-600 hover:text-purple-600 transition"
         >
           <ThumbsUp className="w-4 h-4" />

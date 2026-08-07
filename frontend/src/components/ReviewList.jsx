@@ -132,7 +132,7 @@ const ReviewList = ({ reviews, loading, onHelpful, onFilterChange }) => {
           <div className="space-y-4">
             {displayReviews.map((review) => (
               <ReviewCard
-                key={review._id}
+                key={review.id}
                 review={review}
                 onHelpful={onHelpful}
               />

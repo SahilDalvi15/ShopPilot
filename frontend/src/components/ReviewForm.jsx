@@ -12,7 +12,7 @@ const ReviewForm = ({ productId, onSubmit, loading }) => {
     if (rating === 0 || !comment.trim()) return;
 
     onSubmit({
-      product: productId,
+      productId,
       rating,
       title: title.trim(),
       comment: comment.trim(),
