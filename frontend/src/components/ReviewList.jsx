@@ -61,7 +61,7 @@ const ReviewList = ({ reviews, loading, onHelpful, onFilterChange }) => {
 
           {/* Rating Distribution */}
           <div className="space-y-2">
-            {[54321].reverse().map((rating) => (
+            {[5, 4, 3, 2, 1].map((rating) => (
               <div key={rating} className="flex items-center gap-3">
                 <span className="text-sm font-medium text-gray-700 w-8">{rating}★</span>
                 <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
