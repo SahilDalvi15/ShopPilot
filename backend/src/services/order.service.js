@@ -253,14 +253,21 @@ class OrderService {
       orderNumber: order.orderNumber,
       items: order.items.map(item => ({
         productId: item.productId,
-        productTitle: item.productTitle,
-        productImage: item.productImage,
+        product: {
+          title: item.productTitle,
+          images: item.productImage ? [item.productImage] : []
+        },
         quantity: item.quantity,
+        price: item.price || item.discountedPrice,
         subtotal: item.subtotal
       })),
+      shippingAddress: order.shippingAddress,
       totalAmount: order.totalAmount,
+      paymentMethod: order.paymentMethod,
       paymentStatus: order.paymentStatus,
       orderStatus: order.orderStatus,
+      statusHistory: order.statusHistory,
+      estimatedDelivery: order.estimatedDelivery,
       createdAt: order.createdAt
     }));
 

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Package, ShoppingCart, Users, DollarSign, TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
-import adminStatsService from '../../../services/adminStatsService';
+import adminStatsService from '../../services/adminStatsService';
 
 const AdminStats = () => {
   const { data: statsResponse, isLoading, isError, error } = useQuery({
