@@ -8,6 +8,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import HomePage from './pages/HomePage';
 import ProductsPage from './pages/ProductsPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import CartPage from './pages/CartPage';
@@ -84,7 +85,7 @@ function App() {
           <Route path="/categories" element={<ProductsPage />} />
           <Route path="/deals" element={<ProductsPage />} />
           <Route path="/new-arrivals" element={<ProductsPage />} />
-          <Route path="/" element={<Navigate to="/products" />} />
+          <Route path="/" element={<HomePage />} />
           
           {/* Admin Routes - Protected */}
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>}>
