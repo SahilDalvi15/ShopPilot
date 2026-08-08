@@ -4,6 +4,7 @@ const { setCache, getCache, deleteCache } = require('../utils/redis');
 const logger = require('../utils/logger');
 const emailService = require('./emailService');
 
+// Main authentication service handling registration, login, and token management
 class AuthService {
   async register(userData) {
     const { email, password, firstName, lastName, phoneNumber } = userData;
