@@ -45,8 +45,9 @@ class AuthService {
     const accessToken = generateAccessToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
 
-    // Store refresh token in Redis
-    await setCache(`refresh_token:${user._id}`, refreshToken, 7 * 24 * 60 * 60);
+    // Store refresh token in DB
+    user.refreshToken = refreshToken;
+    await user.save();
 
     return {
       user: {
@@ -100,8 +101,9 @@ class AuthService {
     const accessToken = generateAccessToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
 
-    // Store refresh token in Redis
-    await setCache(`refresh_token:${user._id}`, refreshToken, 7 * 24 * 60 * 60);
+    // Store refresh token in DB
+    user.refreshToken = refreshToken;
+    await user.save();
 
     return {
       user: {
@@ -121,8 +123,8 @@ class AuthService {
   }
 
   async logout(userId) {
-    // Delete refresh token from Redis
-    await deleteCache(`refresh_token:${userId}`);
+    // Delete refresh token from DB
+    await User.findByIdAndUpdate(userId, { refreshToken: null });
     logger.info(`User ${userId} logged out`);
   }
 
@@ -131,15 +133,6 @@ class AuthService {
       // Verify refresh token
       const decoded = verifyRefreshToken(refreshToken);
       
-      // Check if refresh token exists in Redis
-      const storedToken = await getCache(`refresh_token:${decoded.id}`);
-      if (!storedToken || storedToken !== refreshToken) {
-        const error = new Error('Invalid refresh token');
-        error.statusCode = 401;
-        error.code = 'INVALID_REFRESH_TOKEN';
-        throw error;
-      }
-
       // Check if user still exists and is active
       const user = await User.findById(decoded.id);
       if (!user || !user.isActive) {
@@ -149,12 +142,21 @@ class AuthService {
         throw error;
       }
 
+      // Verify the token matches the one in DB
+      if (user.refreshToken !== refreshToken) {
+        const error = new Error('Invalid refresh token');
+        error.statusCode = 401;
+        error.code = 'INVALID_REFRESH_TOKEN';
+        throw error;
+      }
+
       // Generate new tokens
       const accessToken = generateAccessToken(user._id);
       const newRefreshToken = generateRefreshToken(user._id);
 
-      // Update refresh token in Redis
-      await setCache(`refresh_token:${user._id}`, newRefreshToken, 7 * 24 * 60 * 60);
+      // Update refresh token in DB
+      user.refreshToken = newRefreshToken;
+      await user.save();
 
       return {
         accessToken,
