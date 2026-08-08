@@ -166,7 +166,7 @@ const AddressesPage = () => {
             ) : (
               addresses.map((address) => (
                 <div
-                  key={address._id}
+                  key={address.id}
                   className={`bg-white rounded-lg shadow-md p-6 relative ${
                     address.isDefault ? 'border-2 border-purple-600' : ''
                   }`}
@@ -210,7 +210,7 @@ const AddressesPage = () => {
                         <span>Edit</span>
                       </button>
                       <button
-                        onClick={() => handleDelete(address._id)}
+                        onClick={() => handleDelete(address.id)}
                         className="flex items-center space-x-1 text-red-600 hover:text-red-700 transition"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -220,7 +220,7 @@ const AddressesPage = () => {
 
                     {!address.isDefault && (
                       <button
-                        onClick={() => handleSetDefault(address._id)}
+                        onClick={() => handleSetDefault(address.id)}
                         className="flex items-center space-x-1 text-gray-600 hover:text-purple-600 transition"
                       >
                         <Check className="h-4 w-4" />

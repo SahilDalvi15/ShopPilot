@@ -33,7 +33,7 @@ const CheckoutPage = () => {
     // Set default address as selected
     const defaultAddress = addresses.find((addr) => addr.isDefault);
     if (defaultAddress) {
-      setSelectedAddress(defaultAddress._id);
+      setSelectedAddress(defaultAddress.id);
     }
   }, [addresses]);
 
@@ -77,7 +77,7 @@ const CheckoutPage = () => {
     setIsProcessing(true);
 
     try {
-      const shippingAddress = addresses.find((addr) => addr._id === selectedAddress);
+      const shippingAddress = addresses.find((addr) => addr.id === selectedAddress);
       
       const orderData = {
         shippingAddressId: selectedAddress,
@@ -200,10 +200,10 @@ const CheckoutPage = () => {
                   ) : (
                     addresses.map((address) => (
                     <div
-                      key={address._id}
-                      onClick={() => setSelectedAddress(address._id)}
+                      key={address.id}
+                      onClick={() => setSelectedAddress(address.id)}
                       className={`p-4 border-2 rounded-lg cursor-pointer transition ${
-                        selectedAddress === address._id
+                        selectedAddress === address.id
                           ? 'border-purple-600 bg-purple-50'
                           : 'border-gray-200 hover:border-purple-300'
                       }`}
@@ -229,7 +229,7 @@ const CheckoutPage = () => {
                             {address.city}, {address.state} - {address.postalCode}
                           </p>
                         </div>
-                        {selectedAddress === address._id && (
+                        {selectedAddress === address.id && (
                           <div className="bg-purple-600 p-2 rounded-full">
                             <Check className="h-4 w-4 text-white" />
                           </div>
