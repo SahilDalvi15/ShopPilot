@@ -10,6 +10,8 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
 import ProductsPage from './pages/ProductsPage';
+import CategoriesPage from './pages/CategoriesPage';
+import BrandsPage from './pages/BrandsPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import CartPage from './pages/CartPage';
 import OrdersPage from './pages/OrdersPage';
@@ -81,8 +83,8 @@ function App() {
             path="/wishlist" 
             element={isAuthenticated ? <WishlistPage /> : <Navigate to="/login" replace />} 
           />
-          <Route path="/brands" element={<ProductsPage />} />
-          <Route path="/categories" element={<ProductsPage />} />
+          <Route path="/brands" element={<BrandsPage />} />
+          <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/deals" element={<ProductsPage />} />
           <Route path="/new-arrivals" element={<ProductsPage />} />
           <Route path="/" element={<HomePage />} />
