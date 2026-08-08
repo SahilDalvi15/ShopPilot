@@ -163,10 +163,10 @@ class AuthService {
         refreshToken: newRefreshToken
       };
     } catch (error) {
-      if (error.name === 'TokenExpiredError') {
-        const err = new Error('Refresh token expired');
+      if (error.name === 'TokenExpiredError' || error.name === 'JsonWebTokenError') {
+        const err = new Error('Invalid or expired refresh token');
         err.statusCode = 401;
-        err.code = 'TOKEN_EXPIRED';
+        err.code = 'INVALID_TOKEN';
         throw err;
       }
       throw error;

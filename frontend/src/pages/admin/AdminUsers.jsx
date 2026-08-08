@@ -145,7 +145,7 @@ const AdminUsers = () => {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
                         <img
-                          src={user.avatar || 'https://via.placeholder.com/40'}
+                          src={user.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`}
                           alt={user.name}
                           className="w-10 h-10 rounded-full object-cover"
                         />

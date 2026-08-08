@@ -131,11 +131,11 @@ const AdminProducts = () => {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {filteredProducts.map((product) => (
-                  <tr key={product._id} className="hover:bg-gray-50 transition">
+                  <tr key={product.id} className="hover:bg-gray-50 transition">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
                         <img
-                          src={product.images?.[0] || 'https://via.placeholder.com/100'}
+                          src={product.images?.[0] || '/placeholder.jpg'}
                           alt={product.title}
                           className="w-12 h-12 object-cover rounded-lg"
                         />
@@ -163,14 +163,14 @@ const AdminProducts = () => {
                           <Eye className="w-4 h-4 text-gray-600" />
                         </button>
                         <button 
-                          onClick={() => navigate(`/admin/products/${product._id}/edit`)}
+                          onClick={() => navigate(`/admin/products/${product.id}/edit`)}
                           className="p-2 hover:bg-gray-100 rounded-lg transition" 
                           title="Edit"
                         >
                           <Edit className="w-4 h-4 text-gray-600" />
                         </button>
                         <button 
-                          onClick={() => handleDelete(product._id)}
+                          onClick={() => handleDelete(product.id)}
                           disabled={deleteMutation.isLoading}
                           className="p-2 hover:bg-red-50 rounded-lg transition disabled:opacity-50" 
                           title="Delete"
