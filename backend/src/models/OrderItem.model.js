@@ -55,7 +55,7 @@ const orderItemSchema = new mongoose.Schema({
 // IndexesorderItemSchema.index({ orderId: 1, productId: 1 });
 
 // Calculate subtotal before saving
-orderItemSchema.pre('save', function(next) {
+orderItemSchema.pre('validate', function(next) {
   const price = this.discountedPrice || this.price;
   this.subtotal = price * this.quantity;
   next();
