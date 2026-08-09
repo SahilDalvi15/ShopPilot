@@ -355,10 +355,25 @@ const ProductCard = ({ product, navigate }) => {
           <span className="product-card__badge">-{product.discount}%</span>
         )}
         <div className="product-card__actions">
-          <button className="product-card__action" title="Add to Wishlist">
+          <button 
+            className="product-card__action" 
+            title="Add to Wishlist"
+            onClick={(e) => {
+              e.stopPropagation();
+              // To be implemented via props if needed, or redirect to product page for now
+              navigate(`/products/${product.slug}`);
+            }}
+          >
             <Heart className="w-4 h-4" />
           </button>
-          <button className="product-card__action" title="Add to Cart">
+          <button 
+            className="product-card__action" 
+            title="Add to Cart"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/products/${product.slug}`);
+            }}
+          >
             <ShoppingCart className="w-4 h-4" />
           </button>
         </div>
