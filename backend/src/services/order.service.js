@@ -91,7 +91,7 @@ class OrderService {
       paymentMethod,
       paymentStatus: paymentMethod === 'mock' ? 'success' : 'pending',
       orderStatus: paymentMethod === 'mock' ? 'confirmed' : 'pending',
-      coupon: cart.appliedCoupon ? cart.appliedCoupon : undefined,
+      ...(cart.appliedCoupon && cart.appliedCoupon.couponId && { coupon: cart.appliedCoupon }),
       estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days from now
     });
 

@@ -9,6 +9,7 @@ const createOrder = async (req, res) => {
       data: result
     });
   } catch (error) {
+    console.error('CREATE ORDER ERROR:', error);
     res.status(error.statusCode || 500).json({
       success: false,
       message: error.message || 'Failed to create order',
