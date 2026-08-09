@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { productService } from '../services/productService';
 import { categoryService } from '../services/category.service';
 import { brandService } from '../services/brand.service';
@@ -29,7 +29,6 @@ const ProductsPage = () => {
   };
 
   const [filters, setFilters] = useState({
-    page: 1,
     limit: 12,
     search: searchParams.get('search') || '',
     category: searchParams.get('category') || '',
@@ -48,7 +47,6 @@ const ProductsPage = () => {
   useEffect(() => {
     setFilters(prev => ({ 
       ...prev, 
-      page: 1, 
       category: searchParams.get('category') || '', 
       brand: searchParams.get('brand') || '', 
       search: searchParams.get('search') || '',
@@ -57,10 +55,18 @@ const ProductsPage = () => {
     }));
   }, [location.pathname, searchParams]);
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ['products', filters, location.pathname],
-    queryFn: () => productService.getProducts(filters),
+    queryFn: ({ pageParam = 1 }) => productService.getProducts({ ...filters, page: pageParam }),
+    getNextPageParam: (lastPage) => {
+      if (lastPage.pagination && lastPage.pagination.hasNext) {
+        return lastPage.pagination.page + 1;
+      }
+      return undefined;
+    },
   });
+
+  const products = data?.pages?.flatMap(page => page.data) || [];
 
   const { data: categoriesData } = useQuery({
     queryKey: ['categories'],
@@ -74,20 +80,14 @@ const ProductsPage = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    setFilters({ ...filters, page: 1 });
   };
 
   const handleFilterChange = (key, value) => {
-    setFilters({ ...filters, [key]: value, page: 1 });
-  };
-
-  const handlePageChange = (newPage) => {
-    setFilters({ ...filters, page: newPage });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setFilters({ ...filters, [key]: value });
   };
 
   const clearFilters = () => {
-    setFilters({ ...filters, search: '', minPrice: '', maxPrice: '', category: '', brand: '', page: 1 });
+    setFilters({ ...filters, search: '', minPrice: '', maxPrice: '', category: '', brand: '' });
     setSearchParams({}); // Clear URL params
   };
 
@@ -278,7 +278,7 @@ const ProductsPage = () => {
             <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-red-600 text-center">
               Error loading products: {error.message}
             </div>
-          ) : data?.data?.length === 0 ? (
+          ) : products.length === 0 ? (
             <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100">
               <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Search className="w-10 h-10 text-gray-400" />
@@ -297,7 +297,7 @@ const ProductsPage = () => {
           ) : (
             <>
               <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4' : 'grid-cols-1'}`}>
-                {data?.data?.map((product) => (
+                {products.map((product) => (
                   <div
                     key={product.id}
                     className={`bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 group flex ${viewMode === 'list' ? 'flex-row' : 'flex-col'}`}
@@ -389,39 +389,22 @@ const ProductsPage = () => {
                 ))}
               </div>
 
-              {/* Pagination */}
-              {data?.pagination && data.pagination.totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-12">
+              {/* Load More Button */}
+              {hasNextPage && (
+                <div className="flex justify-center mt-12">
                   <button
-                    onClick={() => handlePageChange(filters.page - 1)}
-                    disabled={!data.pagination.hasPrev}
-                    className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+                    onClick={() => fetchNextPage()}
+                    disabled={isFetchingNextPage}
+                    className="bg-white border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 px-8 py-3 rounded-full font-semibold shadow-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 group"
                   >
-                    Previous
-                  </button>
-                  
-                  <div className="flex items-center gap-1">
-                    {[...Array(data.pagination.totalPages)].map((_, i) => (
-                      <button
-                        key={i + 1}
-                        onClick={() => handlePageChange(i + 1)}
-                        className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
-                          filters.page === i + 1
-                            ? 'bg-indigo-600 text-white shadow-sm'
-                            : 'border border-gray-200 text-gray-700 hover:bg-gray-50'
-                        }`}
-                      >
-                        {i + 1}
-                      </button>
-                    ))}
-                  </div>
-                  
-                  <button
-                    onClick={() => handlePageChange(filters.page + 1)}
-                    disabled={!data.pagination.hasNext}
-                    className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-                  >
-                    Next
+                    {isFetchingNextPage ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                        Loading...
+                      </>
+                    ) : (
+                      'Load More Products'
+                    )}
                   </button>
                 </div>
               )}
