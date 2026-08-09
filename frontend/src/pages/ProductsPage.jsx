@@ -93,6 +93,7 @@ const ProductsPage = () => {
 
   const handleAddToCart = async (e, product) => {
     e.preventDefault();
+    e.stopPropagation();
     if (!isAuthenticated) {
       toastError('Authentication Required', 'Please login to add items to your cart.');
       navigate('/login');
@@ -300,7 +301,8 @@ const ProductsPage = () => {
                 {products.map((product) => (
                   <div
                     key={product.id}
-                    className={`bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 group flex ${viewMode === 'list' ? 'flex-row' : 'flex-col'}`}
+                    onClick={() => navigate(`/products/${product.slug}`)}
+                    className={`bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 group flex cursor-pointer ${viewMode === 'list' ? 'flex-row' : 'flex-col'}`}
                   >
                     <div className={`relative ${viewMode === 'list' ? 'w-48 shrink-0' : 'w-full'}`}>
                       <img
