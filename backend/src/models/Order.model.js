@@ -109,7 +109,7 @@ orderSchema.index({ userId: 1, orderStatus: 1 });
 orderSchema.index({ orderStatus: 1, createdAt: -1 });
 
 // Generate order number before saving
-orderSchema.pre('save', async function(next) {
+orderSchema.pre('validate', async function(next) {
   if (this.isNew && !this.orderNumber) {
     const date = new Date();
     const year = date.getFullYear();

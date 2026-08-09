@@ -91,7 +91,7 @@ class OrderService {
       paymentMethod,
       paymentStatus: paymentMethod === 'mock' ? 'success' : 'pending',
       orderStatus: paymentMethod === 'mock' ? 'confirmed' : 'pending',
-      coupon: cart.appliedCoupon,
+      coupon: cart.appliedCoupon ? cart.appliedCoupon : undefined,
       estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days from now
     });
 
@@ -114,49 +114,59 @@ class OrderService {
       });
       orderItems.push(orderItem._id);
 
-      // Update product sold count
+      // Update product sold count and stock
       await Product.findByIdAndUpdate(item.productId._id, {
-        $inc: { soldCount: item.quantity }
+        $inc: { soldCount: item.quantity, stock: -item.quantity }
       });
 
-      // Update inventory
-      await Inventory.findOneAndUpdate(
-        { productId: item.productId._id },
-        {
-          $inc: { currentStock: -item.quantity },
-          lastStockUpdate: new Date()
+      // Update inventory (skip if no inventory record exists)
+      try {
+        const inventoryRecord = await Inventory.findOneAndUpdate(
+          { productId: item.productId._id },
+          {
+            $inc: { currentStock: -item.quantity },
+            lastStockUpdate: new Date()
+          }
+        );
+
+        if (inventoryRecord) {
+          const InventoryLog = require('../models/InventoryLog.model');
+          await InventoryLog.create({
+            productId: item.productId._id,
+            inventoryId: inventoryRecord._id,
+            previousStock: product.stock,
+            newStock: product.stock - item.quantity,
+            changeType: 'sale',
+            quantityChanged: item.quantity,
+            referenceId: order._id,
+            referenceType: 'order',
+            performedBy: userId
+          });
         }
-      );
-
-      // Log inventory change
-      const InventoryLog = require('../models/InventoryLog.model');
-      await InventoryLog.create({
-        productId: item.productId._id,
-        inventoryId: (await Inventory.findOne({ productId: item.productId._id }))._id,
-        previousStock: product.stock,
-        newStock: product.stock - item.quantity,
-        changeType: 'sale',
-        quantityChanged: item.quantity,
-        referenceId: order._id,
-        referenceType: 'order',
-        performedBy: userId
-      });
+      } catch (invErr) {
+        logger.error(`Inventory update failed for product ${item.productId._id}: ${invErr.message}`);
+      }
     }
 
     order.items = orderItems;
     await order.save();
 
+    // Update coupon usage if applied (must read before clearing)
+    if (cart.appliedCoupon && cart.appliedCoupon.couponId) {
+      try {
+        const Coupon = require('../models/Coupon.model');
+        await Coupon.findByIdAndUpdate(cart.appliedCoupon.couponId, {
+          $inc: { usedCount: 1 }
+        });
+      } catch (couponErr) {
+        logger.error(`Coupon usage update failed: ${couponErr.message}`);
+      }
+    }
+
     // Clear cart
     cart.items = [];
     cart.appliedCoupon = null;
     await cart.save();
-
-    // Update coupon usage if applied
-    if (cart.appliedCoupon) {
-      await Coupon.findByIdAndUpdate(cart.appliedCoupon.couponId, {
-        $inc: { usedCount: 1 }
-      });
-    }
 
     // TODO: Create Razorpay order if payment method is razorpay
     let razorpayOrder = null;

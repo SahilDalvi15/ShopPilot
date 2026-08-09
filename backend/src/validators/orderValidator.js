@@ -1,38 +1,28 @@
 const Joi = require('joi');
 
 const createOrderSchema = Joi.object({
-  items: Joi.array()
-    .items(
-      Joi.object({
-        product: Joi.string().required().messages({
-          'any.required': 'Product ID is required',
-        }),
-        quantity: Joi.number().integer().min(1).required().messages({
-          'number.min': 'Quantity must be at least 1',
-          'any.required': 'Quantity is required',
-        }),
-        price: Joi.number().positive().required().messages({
-          'number.positive': 'Price must be positive',
-          'any.required': 'Price is required',
-        }),
-      })
-    )
-    .min(1)
-    .required()
-    .messages({
-      'array.min': 'At least one item is required',
-      'any.required': 'Items are required',
-    }),
-  shippingAddress: Joi.string().required().messages({
-    'any.required': 'Shipping address is required',
+  shippingAddressId: Joi.string().required().messages({
+    'any.required': 'Shipping address ID is required',
   }),
+  billingAddressId: Joi.string().optional(),
+  shippingAddress: Joi.object({
+    fullName: Joi.string().required(),
+    phoneNumber: Joi.string().required(),
+    addressLine1: Joi.string().required(),
+    addressLine2: Joi.string().allow('', null),
+    city: Joi.string().required(),
+    state: Joi.string().required(),
+    postalCode: Joi.string().required(),
+    country: Joi.string().optional(),
+  }).optional(),
   paymentMethod: Joi.string()
-    .valid('cod')
+    .valid('cod', 'mock', 'razorpay')
     .required()
     .messages({
-      'any.only': 'Payment method must be COD',
+      'any.only': 'Payment method must be one of: cod, mock, razorpay',
       'any.required': 'Payment method is required',
     }),
+  couponCode: Joi.string().optional().allow('', null),
 });
 
 const updateOrderStatusSchema = Joi.object({
