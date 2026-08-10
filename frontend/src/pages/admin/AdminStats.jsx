@@ -81,10 +81,19 @@ const AdminStats = () => {
 
   return (
     <div className="space-y-8">
-      {/* Page Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-2">Welcome back! Here's what's happening with your store.</p>
+      {/* Welcome Banner */}
+      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
+        <div className="relative z-10">
+          <h1 className="text-3xl font-bold mb-2">Welcome back to your Dashboard!</h1>
+          <p className="text-purple-100 max-w-xl text-lg">Here's a quick overview of what's happening with your store today. Keep up the great work!</p>
+        </div>
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 -translate-y-12 translate-x-8">
+          <div className="w-64 h-64 rounded-full bg-white opacity-5 mix-blend-overlay"></div>
+        </div>
+        <div className="absolute bottom-0 right-32 translate-y-1/2">
+          <div className="w-48 h-48 rounded-full bg-white opacity-10 mix-blend-overlay"></div>
+        </div>
       </div>
 
       {/* Stats Grid */}
@@ -92,8 +101,15 @@ const AdminStats = () => {
         {stats.map((stat) => (
           <div
             key={stat.title}
-            className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+            className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group"
           >
+            {/* Accent Bar */}
+            <div className={`absolute top-0 left-0 w-full h-1 ${
+              stat.color === 'green' ? 'bg-green-500' :
+              stat.color === 'blue' ? 'bg-blue-500' :
+              stat.color === 'purple' ? 'bg-purple-500' :
+              'bg-orange-500'
+            }`}></div>
             <div className="flex items-center justify-between mb-4">
               <div
                 className={`p-3 rounded-lg ${
@@ -128,14 +144,14 @@ const AdminStats = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Recent Orders */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Orders</h2>
           <div className="space-y-4">
             {recentOrders.length > 0 ? (
               recentOrders.map((order) => (
                 <div
                   key={order.id}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
+                  className="flex items-center justify-between p-4 bg-slate-50/50 rounded-xl hover:bg-white hover:shadow-md hover:-translate-y-0.5 border border-transparent hover:border-purple-100 transition-all duration-300"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
@@ -162,14 +178,14 @@ const AdminStats = () => {
         </div>
 
         {/* Top Products */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Top Products</h2>
           <div className="space-y-4">
             {topProducts.length > 0 ? (
               topProducts.map((product, index) => (
                 <div
                   key={product.name}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
+                  className="flex items-center justify-between p-4 bg-slate-50/50 rounded-xl hover:bg-white hover:shadow-md hover:-translate-y-0.5 border border-transparent hover:border-purple-100 transition-all duration-300"
                 >
                   <div className="flex items-center gap-4">
                     <div
