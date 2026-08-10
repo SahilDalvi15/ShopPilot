@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectIsAuthenticated, selectCurrentUser } from './store/slices/authSlice';
 import { fetchCart } from './store/slices/cartSlice';
@@ -25,6 +25,7 @@ import AdminProducts from './pages/admin/AdminProducts';
 import AdminProductForm from './pages/admin/AdminProductForm';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminUsers from './pages/admin/AdminUsers';
+import AdminSettings from './pages/admin/AdminSettings';
 import './App.css';
 
 // Admin route guard component
@@ -37,6 +38,16 @@ const AdminRoute = ({ children }) => {
   if (!isAdmin) return <Navigate to="/" replace />;
   return children;
 };
+
+const MainLayout = () => (
+  <div className="min-h-screen flex flex-col">
+    <Header />
+    <main className="flex-1">
+      <Outlet />
+    </main>
+    <Footer />
+  </div>
+);
 
 function App() {
   const dispatch = useDispatch();
@@ -51,57 +62,54 @@ function App() {
   }, [dispatch, isAuthenticated]);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1">
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/products/:slug" element={<ProductDetailPage />} />
-          <Route 
-            path="/cart" 
-            element={isAuthenticated ? <CartPage /> : <Navigate to="/login" replace />} 
-          />
-          <Route 
-            path="/checkout" 
-            element={isAuthenticated ? <CheckoutPage /> : <Navigate to="/login" replace />} 
-          />
-          <Route 
-            path="/orders" 
-            element={isAuthenticated ? <OrdersPage /> : <Navigate to="/login" replace />} 
-          />
-          <Route 
-            path="/profile" 
-            element={isAuthenticated ? <ProfilePage /> : <Navigate to="/login" replace />} 
-          />
-          <Route 
-            path="/addresses" 
-            element={isAuthenticated ? <AddressesPage /> : <Navigate to="/login" replace />} 
-          />
-          <Route 
-            path="/wishlist" 
-            element={isAuthenticated ? <WishlistPage /> : <Navigate to="/login" replace />} 
-          />
-          <Route path="/brands" element={<BrandsPage />} />
-          <Route path="/categories" element={<CategoriesPage />} />
-          <Route path="/deals" element={<ProductsPage />} />
-          <Route path="/new-arrivals" element={<ProductsPage />} />
-          <Route path="/" element={<HomePage />} />
-          
-          {/* Admin Routes - Protected */}
-          <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>}>
-            <Route index element={<AdminStats />} />
-            <Route path="products" element={<AdminProducts />} />
-            <Route path="products/new" element={<AdminProductForm />} />
-            <Route path="products/:id/edit" element={<AdminProductForm isEdit />} />
-            <Route path="orders" element={<AdminOrders />} />
-            <Route path="users" element={<AdminUsers />} />
-          </Route>
-        </Routes>
-      </main>
-      <Footer />
-    </div>
+    <Routes>
+      <Route element={<MainLayout />}>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/products/:slug" element={<ProductDetailPage />} />
+        <Route 
+          path="/cart" 
+          element={isAuthenticated ? <CartPage /> : <Navigate to="/login" replace />} 
+        />
+        <Route 
+          path="/checkout" 
+          element={isAuthenticated ? <CheckoutPage /> : <Navigate to="/login" replace />} 
+        />
+        <Route 
+          path="/orders" 
+          element={isAuthenticated ? <OrdersPage /> : <Navigate to="/login" replace />} 
+        />
+        <Route 
+          path="/profile" 
+          element={isAuthenticated ? <ProfilePage /> : <Navigate to="/login" replace />} 
+        />
+        <Route 
+          path="/addresses" 
+          element={isAuthenticated ? <AddressesPage /> : <Navigate to="/login" replace />} 
+        />
+        <Route 
+          path="/wishlist" 
+          element={isAuthenticated ? <WishlistPage /> : <Navigate to="/login" replace />} 
+        />
+        <Route path="/brands" element={<BrandsPage />} />
+        <Route path="/categories" element={<CategoriesPage />} />
+        <Route path="/deals" element={<ProductsPage />} />
+        <Route path="/new-arrivals" element={<ProductsPage />} />
+        <Route path="/" element={<HomePage />} />
+      </Route>
+      
+      {/* Admin Routes - Protected */}
+      <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>}>
+        <Route index element={<AdminStats />} />
+        <Route path="products" element={<AdminProducts />} />
+        <Route path="products/new" element={<AdminProductForm />} />
+        <Route path="products/:id/edit" element={<AdminProductForm isEdit />} />
+        <Route path="orders" element={<AdminOrders />} />
+        <Route path="users" element={<AdminUsers />} />
+        <Route path="settings" element={<AdminSettings />} />
+      </Route>
+    </Routes>
   );
 }
 
