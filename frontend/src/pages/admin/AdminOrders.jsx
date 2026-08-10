@@ -106,7 +106,7 @@ const AdminOrders = () => {
       </div>
 
       {/* Orders Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
@@ -118,21 +118,21 @@ const AdminOrders = () => {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-slate-50 border-b border-gray-100">
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Order ID</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Customer</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Items</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Total</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Payment</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Status</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Date</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Actions</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">Order ID</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">Customer</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">Items</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">Total</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">Payment</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">Status</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">Date</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-100">
                 {filteredOrders.map((order) => (
-                  <tr key={order._id} className="hover:bg-gray-50 transition">
+                  <tr key={order._id} className="hover:bg-purple-50/50 transition-colors group">
                     <td className="px-6 py-4 font-medium text-gray-900">{order._id}</td>
                     <td className="px-6 py-4">
                       <div>
@@ -148,7 +148,7 @@ const AdminOrders = () => {
                         value={order.status}
                         onChange={(e) => handleStatusChange(order._id, e.target.value)}
                         disabled={updateStatusMutation.isLoading}
-                        className={`px-3 py-1 text-xs font-medium rounded-full border-0 ${getStatusColor(order.status)} cursor-pointer disabled:opacity-50`}
+                        className={`px-3 py-1.5 text-xs font-semibold rounded-full border border-transparent hover:border-gray-200 transition-colors ${getStatusColor(order.status)} cursor-pointer disabled:opacity-50`}
                       >
                         <option value="pending">Pending</option>
                         <option value="processing">Processing</option>
@@ -161,9 +161,9 @@ const AdminOrders = () => {
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <button className="p-2 hover:bg-gray-100 rounded-lg transition" title="View">
-                          <Eye className="w-4 h-4 text-gray-600" />
+                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button className="p-2 text-slate-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors" title="View Details">
+                          <Eye className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
