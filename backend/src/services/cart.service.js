@@ -30,7 +30,8 @@ class CartService {
         quantity: item.quantity,
         price: item.price,
         discountedPrice: item.discountedPrice,
-        subtotal: item.price * item.quantity
+        subtotal: item.price * item.quantity,
+        selectedSize: item.selectedSize
       };
     }).filter(item => item !== null);
 
@@ -45,7 +46,7 @@ class CartService {
     };
   }
 
-  async addToCart(userId, { productId, quantity = 1 }) {
+  async addToCart(userId, { productId, quantity = 1, selectedSize }) {
     // Verify product exists and is active
     const product = await Product.findOne({ _id: productId, isActive: true, isDeleted: false });
     if (!product) {
@@ -69,9 +70,9 @@ class CartService {
       cart = await Cart.create({ userId, items: [] });
     }
 
-    // Check if item already exists in cart
+    // Check if item already exists in cart with same size
     const existingItemIndex = cart.items.findIndex(
-      item => item.productId.toString() === productId
+      item => item.productId.toString() === productId && item.selectedSize === selectedSize
     );
 
     if (existingItemIndex > -1) {
@@ -85,7 +86,8 @@ class CartService {
         productId,
         quantity,
         price: product.price,
-        discountedPrice: product.discountedPrice
+        discountedPrice: product.discountedPrice,
+        selectedSize
       });
     }
 
