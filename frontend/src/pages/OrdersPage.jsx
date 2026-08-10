@@ -225,6 +225,9 @@ const OrdersPage = () => {
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-gray-900 truncate">{item.product?.title || 'Product Unavailable'}</p>
                             <p className="text-sm text-gray-500">Qty: {item.quantity} × ₹{(item.price || 0).toLocaleString()}</p>
+                            {item.selectedSize && (
+                              <p className="text-sm text-gray-500 mt-0.5">Size: <span className="font-medium text-gray-700">{item.selectedSize}</span></p>
+                            )}
                           </div>
                           <p className="font-semibold text-gray-900">₹{((item.price || 0) * item.quantity).toLocaleString()}</p>
                         </div>
