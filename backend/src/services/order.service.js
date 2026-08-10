@@ -106,6 +106,7 @@ class OrderService {
         productImage: product.images[0],
         brand: product.brandId,
         category: product.categoryId,
+        selectedSize: item.selectedSize,
         quantity: item.quantity,
         price: item.price,
         discountedPrice: item.discountedPrice,
