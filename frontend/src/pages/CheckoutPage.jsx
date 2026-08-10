@@ -169,7 +169,7 @@ const CheckoutPage = () => {
             {/* Left Column - Checkout Steps */}
             <div className="lg:col-span-2 space-y-6">
               {/* Shipping Address */}
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-semibold text-gray-900 flex items-center space-x-2">
                     <MapPin className="h-5 w-5 text-purple-600" />
@@ -202,36 +202,36 @@ const CheckoutPage = () => {
                     <div
                       key={address._id || address.id}
                       onClick={() => setSelectedAddress(address._id || address.id)}
-                      className={`p-4 border-2 rounded-lg cursor-pointer transition ${
+                      className={`relative p-5 rounded-2xl cursor-pointer transition-all duration-300 ${
                         selectedAddress === (address._id || address.id)
-                          ? 'border-purple-600 bg-purple-50'
-                          : 'border-gray-200 hover:border-purple-300'
+                          ? 'bg-purple-50/50 border-2 border-purple-600 shadow-md ring-4 ring-purple-600/10'
+                          : 'bg-white border-2 border-gray-100 shadow-sm hover:border-purple-300 hover:shadow-md'
                       }`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-2">
-                            <span className="font-semibold text-gray-900">
+                            <span className="font-semibold text-gray-900 text-lg">
                               {address.fullName}
                             </span>
                             {address.isDefault && (
-                              <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded-full">
+                              <span className="text-xs bg-purple-100 text-purple-700 px-2.5 py-1 rounded-full font-medium">
                                 Default
                               </span>
                             )}
                           </div>
-                          <p className="text-sm text-gray-600">{address.phoneNumber}</p>
-                          <p className="text-sm text-gray-700 mt-1">
-                            {address.addressLine1}
-                            {address.addressLine2 && `, ${address.addressLine2}`}
+                          <p className="text-sm text-gray-600 mb-1 flex items-center gap-1.5">
+                             {address.phoneNumber}
                           </p>
-                          <p className="text-sm text-gray-700">
+                          <p className="text-sm text-gray-700 leading-relaxed">
+                            {address.addressLine1}
+                            {address.addressLine2 && `, ${address.addressLine2}`}<br />
                             {address.city}, {address.state} - {address.postalCode}
                           </p>
                         </div>
                         {selectedAddress === (address._id || address.id) && (
-                          <div className="bg-purple-600 p-2 rounded-full">
-                            <Check className="h-4 w-4 text-white" />
+                          <div className="absolute top-4 right-4 bg-purple-600 p-1.5 rounded-full shadow-sm animate-in zoom-in duration-200">
+                            <Check className="h-4 w-4 text-white" strokeWidth={3} />
                           </div>
                         )}
                       </div>
@@ -242,7 +242,7 @@ const CheckoutPage = () => {
               </div>
 
               {/* Order Items */}
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Items</h2>
                 <div className="space-y-4">
                   {cartItems.map((item) => (
@@ -270,80 +270,75 @@ const CheckoutPage = () => {
               </div>
 
               {/* Payment Method */}
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center space-x-2">
                   <Truck className="h-5 w-5 text-purple-600" />
                   <span>Payment Method</span>
                 </h2>
 
                 <div className="space-y-4">
-                  <label
-                    className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition ${
+                  <div
+                    onClick={() => setPaymentMethod('mock')}
+                    className={`relative flex items-center p-5 rounded-2xl cursor-pointer transition-all duration-300 ${
                       paymentMethod === 'mock'
-                        ? 'border-purple-600 bg-purple-50'
-                        : 'border-gray-200 hover:border-purple-300'
+                        ? 'bg-purple-50/50 border-2 border-purple-600 shadow-md ring-4 ring-purple-600/10'
+                        : 'bg-white border-2 border-gray-100 shadow-sm hover:border-purple-300 hover:shadow-md'
                     }`}
                   >
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="mock"
-                      checked={paymentMethod === 'mock'}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="w-4 h-4 text-purple-600 focus:ring-purple-500 border-gray-300"
-                    />
-                    <div className="ml-3 flex-1 flex items-center justify-between">
+                    <div className={`flex items-center justify-center w-6 h-6 rounded-full border-2 mr-4 flex-shrink-0 ${paymentMethod === 'mock' ? 'border-purple-600 bg-purple-600' : 'border-gray-300 bg-white'}`}>
+                      {paymentMethod === 'mock' && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                    </div>
+                    <div className="flex-1 flex items-center justify-between">
                       <div>
-                        <div className="font-medium text-gray-900">Credit/Debit Card (Mock)</div>
-                        <div className="text-sm text-gray-600">
+                        <div className="font-semibold text-gray-900 text-lg">Credit/Debit Card (Mock)</div>
+                        <div className="text-sm text-gray-500 mt-0.5">
                           Secure online payment via FakeGateway
                         </div>
                       </div>
-                      <CreditCard className={`h-6 w-6 ${paymentMethod === 'mock' ? 'text-purple-600' : 'text-gray-400'}`} />
+                      <div className={`p-3 rounded-xl ${paymentMethod === 'mock' ? 'bg-purple-100 text-purple-600' : 'bg-gray-50 text-gray-400'}`}>
+                        <CreditCard className="h-6 w-6" />
+                      </div>
                     </div>
-                  </label>
+                  </div>
 
-                  <label
-                    className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition ${
+                  <div
+                    onClick={() => setPaymentMethod('cod')}
+                    className={`relative flex items-center p-5 rounded-2xl cursor-pointer transition-all duration-300 ${
                       paymentMethod === 'cod'
-                        ? 'border-purple-600 bg-purple-50'
-                        : 'border-gray-200 hover:border-purple-300'
+                        ? 'bg-purple-50/50 border-2 border-purple-600 shadow-md ring-4 ring-purple-600/10'
+                        : 'bg-white border-2 border-gray-100 shadow-sm hover:border-purple-300 hover:shadow-md'
                     }`}
                   >
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="cod"
-                      checked={paymentMethod === 'cod'}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="w-4 h-4 text-purple-600 focus:ring-purple-500 border-gray-300"
-                    />
-                    <div className="ml-3 flex-1">
-                      <div className="font-medium text-gray-900">Cash on Delivery</div>
-                      <div className="text-sm text-gray-600">
+                    <div className={`flex items-center justify-center w-6 h-6 rounded-full border-2 mr-4 flex-shrink-0 ${paymentMethod === 'cod' ? 'border-purple-600 bg-purple-600' : 'border-gray-300 bg-white'}`}>
+                      {paymentMethod === 'cod' && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-semibold text-gray-900 text-lg">Cash on Delivery</div>
+                      <div className="text-sm text-gray-500 mt-0.5">
                         Pay with cash when your order is delivered
                       </div>
                     </div>
-                  </label>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Right Column - Order Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Summary</h2>
+              <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 md:p-8 sticky top-24 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-indigo-500"></div>
+                <h2 className="text-xl font-bold text-gray-900 mb-6">Order Summary</h2>
 
-                <div className="space-y-3 mb-6">
+                <div className="space-y-4 mb-6">
                   <div className="flex justify-between text-gray-600">
                     <span>Subtotal ({cartItems.length} items)</span>
-                    <span>₹{cartTotal.toLocaleString()}</span>
+                    <span className="font-medium text-gray-900">₹{cartTotal.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Shipping</span>
-                    <span>
+                    <span className="font-medium">
                       {calculateShipping() === 0 ? (
-                        <span className="text-green-600">FREE</span>
+                        <span className="text-green-600 bg-green-50 px-2 py-0.5 rounded-md">FREE</span>
                       ) : (
                         `₹${calculateShipping()}`
                       )}
@@ -351,18 +346,20 @@ const CheckoutPage = () => {
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Tax (18%)</span>
-                    <span>₹{calculateTax().toLocaleString()}</span>
+                    <span className="font-medium text-gray-900">₹{calculateTax().toLocaleString()}</span>
                   </div>
                   {cartDiscount > 0 && (
                     <div className="flex justify-between text-green-600">
                       <span>Discount</span>
-                      <span>-₹{cartDiscount.toLocaleString()}</span>
+                      <span className="font-medium">-₹{cartDiscount.toLocaleString()}</span>
                     </div>
                   )}
-                  <hr />
-                  <div className="flex justify-between font-semibold text-gray-900 text-lg">
-                    <span>Total</span>
-                    <span>₹{calculateTotal().toLocaleString()}</span>
+                  
+                  <div className="pt-4 mt-4 border-t-2 border-dashed border-gray-200">
+                    <div className="flex justify-between items-end">
+                      <span className="font-semibold text-gray-900 text-lg">Total</span>
+                      <span className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">₹{calculateTotal().toLocaleString()}</span>
+                    </div>
                   </div>
                 </div>
 
@@ -406,28 +403,34 @@ const CheckoutPage = () => {
                 )}
 
                 {/* Trust Badges */}
-                <div className="space-y-3 mb-6">
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
-                    <Truck className="h-4 w-4 text-purple-600" />
-                    <span>Free shipping on orders over ₹999</span>
+                <div className="bg-gray-50/80 rounded-xl p-4 space-y-3 mb-6 border border-gray-100">
+                  <div className="flex items-center space-x-3 text-sm text-gray-600">
+                    <div className="bg-purple-100 p-1.5 rounded-full text-purple-600">
+                      <Truck className="h-4 w-4" />
+                    </div>
+                    <span className="font-medium">Free shipping on orders over ₹999</span>
                   </div>
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
-                    <Shield className="h-4 w-4 text-purple-600" />
-                    <span>Secure checkout with Cash on Delivery</span>
+                  <div className="flex items-center space-x-3 text-sm text-gray-600">
+                    <div className="bg-purple-100 p-1.5 rounded-full text-purple-600">
+                      <Shield className="h-4 w-4" />
+                    </div>
+                    <span className="font-medium">Secure checkout & encryption</span>
                   </div>
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
-                    <Check className="h-4 w-4 text-purple-600" />
-                    <span>Easy returns and refunds</span>
+                  <div className="flex items-center space-x-3 text-sm text-gray-600">
+                    <div className="bg-purple-100 p-1.5 rounded-full text-purple-600">
+                      <Check className="h-4 w-4" />
+                    </div>
+                    <span className="font-medium">Easy returns and refunds</span>
                   </div>
                 </div>
 
                 <button
                   onClick={handlePlaceOrder}
                   disabled={isProcessing || !selectedAddress}
-                  className={`w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition font-semibold flex items-center justify-center space-x-2 ${
+                  className={`w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-4 rounded-xl shadow-lg hover:shadow-xl hover:from-purple-700 hover:to-indigo-700 transition-all font-bold text-lg flex items-center justify-center space-x-2 ${
                     isProcessing || !selectedAddress
-                      ? 'opacity-50 cursor-not-allowed'
-                      : ''
+                      ? 'opacity-50 cursor-not-allowed saturate-50'
+                      : 'hover:-translate-y-0.5'
                   }`}
                 >
                   {isProcessing ? (
