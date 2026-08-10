@@ -108,6 +108,9 @@ const CartPage = () => {
                     {item.product?.title}
                   </Link>
                   <p className="text-sm text-gray-600 mt-1">{item.product?.brand?.name}</p>
+                  {item.selectedSize && (
+                    <p className="text-sm text-gray-600 mt-1">Size: <span className="font-semibold">{item.selectedSize}</span></p>
+                  )}
                   
                   <div className="flex items-center justify-between mt-4">
                     <div className="flex items-center border border-gray-300 rounded-lg">

@@ -255,6 +255,9 @@ const CheckoutPage = () => {
                       <div className="flex-1">
                         <h3 className="font-medium text-gray-900">{item.product?.title}</h3>
                         <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
+                        {item.selectedSize && (
+                          <p className="text-sm text-gray-600">Size: <span className="font-medium text-gray-900">{item.selectedSize}</span></p>
+                        )}
                       </div>
                       <div className="text-right">
                         <p className="font-semibold text-gray-900">
