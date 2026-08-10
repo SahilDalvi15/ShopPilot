@@ -20,6 +20,7 @@ const orderItemSchema = new mongoose.Schema({
   productImage: String,
   brand: String,
   category: String,
+  selectedSize: String,
   quantity: {
     type: Number,
     required: [true, 'Quantity is required'],
