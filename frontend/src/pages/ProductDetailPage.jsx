@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useParams, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { productService } from '../services/productService';
-import { Heart, ShoppingCart, Star, Minus, Plus, Truck, Shield, RotateCcw, ChevronDown, ChevronUp, Share2, AlertCircle } from 'lucide-react';
+import { Heart, ShoppingCart, Star, Minus, Plus, Truck, Shield, RotateCcw, ChevronDown, ChevronUp, Share2, AlertCircle, X } from 'lucide-react';
 import { addToCart } from '../store/slices/cartSlice';
 import { addToWishlist, removeFromWishlist } from '../store/slices/wishlistSlice';
 import { selectIsAuthenticated } from '../store/slices/authSlice';
@@ -21,6 +21,8 @@ const ProductDetailPage = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [activeTab, setActiveTab] = useState('specs');
   const [expandedSpecs, setExpandedSpecs] = useState(false);
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const wishlistItems = useSelector((state) => state.wishlist.items);
 
@@ -30,6 +32,9 @@ const ProductDetailPage = () => {
   });
 
   const product = data?.data;
+  const isFashion = product?.category?.slug === 'fashion' || product?.category?.slug === 'sports-fitness';
+  const availableSizes = ['S', 'M', 'L', 'XL', 'XXL'];
+
   const { reviews, loading: reviewsLoading, submitting } = useSelector((state) => state.reviews);
 
   useEffect(() => {
@@ -70,8 +75,13 @@ const ProductDetailPage = () => {
       return;
     }
     
+    if (isFashion && !selectedSize) {
+      toastError('Size Required', 'Please select a size before adding to cart.');
+      return;
+    }
+    
     try {
-      await dispatch(addToCart({ productId: product.id, quantity })).unwrap();
+      await dispatch(addToCart({ productId: product.id, quantity, selectedSize })).unwrap();
       success('Added to Cart', `${product.title} was successfully added to your cart.`);
     } catch (err) {
       toastError('Error', err || 'Failed to add item to cart.');
@@ -253,6 +263,36 @@ const ProductDetailPage = () => {
                 Available as soon as <span className="font-bold">Tomorrow, 8 AM - 12 PM</span>.
               </p>
             </div>
+
+            {/* Size Selector for Fashion */}
+            {isFashion && (
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-bold text-gray-900">Select Size</h3>
+                  <button 
+                    onClick={() => setIsSizeChartOpen(true)}
+                    className="text-indigo-600 text-sm font-semibold hover:underline flex items-center gap-1"
+                  >
+                    Size Chart
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  {availableSizes.map(size => (
+                    <button
+                      key={size}
+                      onClick={() => setSelectedSize(size)}
+                      className={`w-12 h-12 rounded-lg font-bold border-2 transition-all flex items-center justify-center ${
+                        selectedSize === size 
+                          ? 'border-indigo-600 bg-indigo-50 text-indigo-700' 
+                          : 'border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Quick Specs Snippet */}
             {hasSpecs && (
@@ -449,6 +489,67 @@ const ProductDetailPage = () => {
         </div>
 
       </div>
+
+      {/* Size Chart Modal */}
+      {isSizeChartOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <h3 className="text-xl font-bold text-gray-900">Size Guide</h3>
+              <button onClick={() => setIsSizeChartOpen(false)} className="text-gray-400 hover:text-gray-600 transition p-2 hover:bg-gray-100 rounded-full">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6">
+              <p className="text-gray-600 mb-6 text-sm">Use this chart to find your correct size. Measurements are in inches.</p>
+              <div className="overflow-x-auto rounded-xl border border-gray-200">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-gray-50 text-gray-700">
+                    <tr>
+                      <th className="px-6 py-4 font-bold border-b border-gray-200">Size</th>
+                      <th className="px-6 py-4 font-bold border-b border-gray-200">Chest</th>
+                      <th className="px-6 py-4 font-bold border-b border-gray-200">Waist</th>
+                      <th className="px-6 py-4 font-bold border-b border-gray-200">Hips</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    <tr className="hover:bg-gray-50 transition">
+                      <td className="px-6 py-4 font-bold text-gray-900">S (Small)</td>
+                      <td className="px-6 py-4 text-gray-600">34 - 36</td>
+                      <td className="px-6 py-4 text-gray-600">28 - 30</td>
+                      <td className="px-6 py-4 text-gray-600">35 - 37</td>
+                    </tr>
+                    <tr className="hover:bg-gray-50 transition">
+                      <td className="px-6 py-4 font-bold text-gray-900">M (Medium)</td>
+                      <td className="px-6 py-4 text-gray-600">38 - 40</td>
+                      <td className="px-6 py-4 text-gray-600">32 - 34</td>
+                      <td className="px-6 py-4 text-gray-600">39 - 41</td>
+                    </tr>
+                    <tr className="hover:bg-gray-50 transition">
+                      <td className="px-6 py-4 font-bold text-gray-900">L (Large)</td>
+                      <td className="px-6 py-4 text-gray-600">42 - 44</td>
+                      <td className="px-6 py-4 text-gray-600">36 - 38</td>
+                      <td className="px-6 py-4 text-gray-600">43 - 45</td>
+                    </tr>
+                    <tr className="hover:bg-gray-50 transition">
+                      <td className="px-6 py-4 font-bold text-gray-900">XL (X-Large)</td>
+                      <td className="px-6 py-4 text-gray-600">46 - 48</td>
+                      <td className="px-6 py-4 text-gray-600">40 - 42</td>
+                      <td className="px-6 py-4 text-gray-600">47 - 49</td>
+                    </tr>
+                    <tr className="hover:bg-gray-50 transition">
+                      <td className="px-6 py-4 font-bold text-gray-900">XXL (2X-Large)</td>
+                      <td className="px-6 py-4 text-gray-600">50 - 52</td>
+                      <td className="px-6 py-4 text-gray-600">44 - 46</td>
+                      <td className="px-6 py-4 text-gray-600">51 - 53</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
