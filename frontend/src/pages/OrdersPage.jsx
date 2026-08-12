@@ -88,10 +88,10 @@ const OrdersPage = () => {
             <button
               key={f.key}
               onClick={() => setActiveFilter(f.key)}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+              className={`px-6 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
                 activeFilter === f.key
-                  ? 'bg-indigo-600 text-white shadow-md'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:border-indigo-300 hover:text-indigo-600'
+                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
+                  : 'bg-white text-gray-600 hover:bg-gray-50'
               }`}
             >
               {f.label}
@@ -129,14 +129,14 @@ const OrdersPage = () => {
               const isExpanded = expandedOrders[order.id];
 
               return (
-                <div key={order.id} className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-shadow">
+                <div key={order.id} className="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-lg transition-all duration-300 group">
                   {/* Order Header */}
-                  <div className="p-5 border-b border-gray-100">
+                  <div className="p-5 border-b border-gray-100 bg-gray-50/50">
                     <div className="flex items-center justify-between flex-wrap gap-3">
                       <div>
                         <div className="flex items-center gap-3 mb-1">
-                          <h3 className="font-bold text-gray-900 text-lg">{order.orderNumber}</h3>
-                          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${getStatusColor(order.orderStatus)}`}>
+                          <h3 className="font-bold text-gray-900 text-lg group-hover:text-purple-600 transition-colors">{order.orderNumber}</h3>
+                          <span className={`text-xs font-semibold px-3 py-1 rounded-full shadow-sm ${getStatusColor(order.orderStatus)}`}>
                             {order.orderStatus.replace(/_/g, ' ').toUpperCase()}
                           </span>
                         </div>
@@ -177,9 +177,9 @@ const OrdersPage = () => {
                           return (
                             <div key={step.key} className="flex items-center flex-1 last:flex-initial">
                               <div className="flex flex-col items-center">
-                                <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
                                   isCurrent
-                                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200 ring-4 ring-indigo-100'
+                                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-200 ring-4 ring-purple-100 animate-pulse'
                                     : isCompleted
                                       ? 'bg-green-500 text-white'
                                       : 'bg-gray-200 text-gray-400'
@@ -193,8 +193,8 @@ const OrdersPage = () => {
                                 </span>
                               </div>
                               {index < ORDER_STEPS.length - 1 && (
-                                <div className={`flex-1 h-1 mx-1 rounded-full transition-all ${
-                                  index < currentStepIndex ? 'bg-green-400' : 'bg-gray-200'
+                                <div className={`flex-1 h-1.5 mx-2 rounded-full transition-all duration-500 ${
+                                  index < currentStepIndex ? 'bg-gradient-to-r from-green-400 to-green-500 shadow-sm' : 'bg-gray-100'
                                 }`} />
                               )}
                             </div>
@@ -229,7 +229,7 @@ const OrdersPage = () => {
                               <p className="text-sm text-gray-500 mt-0.5">Size: <span className="font-medium text-gray-700">{item.selectedSize}</span></p>
                             )}
                           </div>
-                          <p className="font-semibold text-gray-900">₹{((item.price || 0) * item.quantity).toLocaleString()}</p>
+                          <p className="font-bold text-gray-900 text-lg">₹{((item.price || 0) * item.quantity).toLocaleString()}</p>
                         </div>
                       ))}
                     </div>
@@ -284,30 +284,32 @@ const OrdersPage = () => {
 
                       {/* Status History Timeline */}
                       {order.statusHistory && order.statusHistory.length > 0 && (
-                        <div className="p-5">
-                          <h4 className="font-semibold text-gray-900 mb-4">Status History</h4>
-                          <div className="space-y-0">
+                        <div className="p-6 bg-gray-50/50">
+                          <h4 className="font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-purple-500" /> Tracking History
+                          </h4>
+                          <div className="space-y-0 relative before:absolute before:inset-0 before:ml-2 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 before:to-transparent">
                             {[...order.statusHistory].reverse().map((history, index) => (
-                              <div key={index} className="flex gap-4">
-                                <div className="flex flex-col items-center">
-                                  <div className={`w-3 h-3 rounded-full mt-1.5 ${
-                                    index === 0 ? 'bg-indigo-600 ring-4 ring-indigo-100' : 'bg-gray-300'
-                                  }`} />
-                                  {index < order.statusHistory.length - 1 && (
-                                    <div className="w-0.5 h-10 bg-gray-200" />
-                                  )}
+                              <div key={index} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                                {/* Icon */}
+                                <div className={`flex items-center justify-center w-6 h-6 rounded-full border-4 border-white shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm ${
+                                  index === 0 ? 'bg-purple-600' : 'bg-gray-300'
+                                } z-10 mx-4 md:mx-0 absolute left-0 md:left-1/2 -translate-x-1/2 md:-translate-x-1/2`}>
                                 </div>
-                                <div className="pb-4">
-                                  <p className={`font-medium capitalize ${index === 0 ? 'text-indigo-600' : 'text-gray-700'}`}>
-                                    {history.status?.replace(/_/g, ' ')}
-                                  </p>
-                                  {history.note && <p className="text-sm text-gray-500">{history.note}</p>}
-                                  <p className="text-xs text-gray-400 mt-0.5">
-                                    {new Date(history.timestamp).toLocaleString('en-US', {
-                                      month: 'short', day: 'numeric', year: 'numeric',
-                                      hour: '2-digit', minute: '2-digit'
-                                    })}
-                                  </p>
+                                {/* Card */}
+                                <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2rem)] p-4 rounded-xl shadow-sm bg-white border border-gray-100 ml-12 md:ml-0">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <h5 className={`font-bold capitalize ${index === 0 ? 'text-purple-600' : 'text-gray-900'}`}>
+                                      {history.status?.replace(/_/g, ' ')}
+                                    </h5>
+                                    <time className="text-xs font-medium text-purple-500 bg-purple-50 px-2 py-1 rounded-full">
+                                      {new Date(history.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                    </time>
+                                  </div>
+                                  <p className="text-sm text-gray-600 mt-1">{history.note || 'Status updated'}</p>
+                                  <time className="text-xs text-gray-400 mt-2 block">
+                                    {new Date(history.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                  </time>
                                 </div>
                               </div>
                             ))}
