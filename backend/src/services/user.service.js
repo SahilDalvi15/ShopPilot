@@ -62,6 +62,59 @@ class UserService {
     };
   }
 
+  async updateSecuritySettings(userId, { currentPassword, newPassword, email }) {
+    const user = await User.findById(userId).select('+password');
+    if (!user) {
+      const error = new Error('User not found');
+      error.statusCode = 404;
+      error.code = 'USER_NOT_FOUND';
+      throw error;
+    }
+
+    // Verify current password
+    const isPasswordValid = await user.comparePassword(currentPassword);
+    if (!isPasswordValid) {
+      const error = new Error('Invalid current password');
+      error.statusCode = 401;
+      error.code = 'INVALID_PASSWORD';
+      throw error;
+    }
+
+    let isUpdated = false;
+
+    // Update email if provided and different
+    if (email && email !== user.email) {
+      const existingUser = await User.findOne({ email });
+      if (existingUser && existingUser._id.toString() !== userId.toString()) {
+        const error = new Error('Email is already in use by another account');
+        error.statusCode = 409;
+        error.code = 'EMAIL_EXISTS';
+        throw error;
+      }
+      user.email = email;
+      isUpdated = true;
+    }
+
+    // Update password if provided
+    if (newPassword) {
+      user.password = newPassword;
+      isUpdated = true;
+    }
+
+    if (isUpdated) {
+      await user.save();
+    }
+
+    return {
+      id: user._id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+      profilePicture: user.profilePicture
+    };
+  }
+
   async getAddresses(userId) {
     const addresses = await Address.find({ userId, isDeleted: false }).sort({ isDefault: -1, createdAt: -1 });
     return addresses.map(addr => ({

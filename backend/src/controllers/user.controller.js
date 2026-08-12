@@ -38,6 +38,38 @@ const updateProfile = async (req, res) => {
   }
 };
 
+const updateSecuritySettings = async (req, res) => {
+  try {
+    const { currentPassword, newPassword, email } = req.body;
+    
+    if (!currentPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Current password is required to update security settings',
+        error: { code: 'MISSING_PASSWORD' }
+      });
+    }
+
+    const updatedUser = await userService.updateSecuritySettings(req.user.id, {
+      currentPassword,
+      newPassword,
+      email
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Security settings updated successfully',
+      data: updatedUser
+    });
+  } catch (error) {
+    res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message || 'Failed to update security settings',
+      error: { code: error.code || 'UPDATE_SECURITY_ERROR' }
+    });
+  }
+};
+
 const uploadProfilePicture = async (req, res) => {
   try {
     // TODO: Implement file upload with Cloudinary
@@ -224,6 +256,7 @@ const adminDeleteUser = async (req, res) => {
 module.exports = {
   getProfile,
   updateProfile,
+  updateSecuritySettings,
   uploadProfilePicture,
   getAddresses,
   addAddress,

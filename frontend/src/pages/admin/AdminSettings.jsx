@@ -1,10 +1,13 @@
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Save, Store, Mail, Lock, Shield, Image as ImageIcon } from 'lucide-react';
 import { useToast } from '../../contexts/ToastContext';
+import { authService } from '../../services/auth.service';
 
 const AdminSettings = () => {
-  const { success } = useToast();
+  const { success, error } = useToast();
   const [activeTab, setActiveTab] = useState('general');
+  const { user } = useSelector((state) => state.auth);
 
   // Dummy state for UI demonstration
   const [generalSettings, setGeneralSettings] = useState({
@@ -15,11 +18,13 @@ const AdminSettings = () => {
   });
 
   const [securitySettings, setSecuritySettings] = useState({
-    adminEmail: 'admin@shoppilot.com',
+    adminEmail: user?.email || '',
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
   });
+  
+  const [isUpdatingSecurity, setIsUpdatingSecurity] = useState(false);
 
   const handleGeneralSubmit = (e) => {
     e.preventDefault();
@@ -27,10 +32,34 @@ const AdminSettings = () => {
     success('Settings Saved', 'General store settings have been updated.');
   };
 
-  const handleSecuritySubmit = (e) => {
+  const handleSecuritySubmit = async (e) => {
     e.preventDefault();
-    // Simulate save
-    success('Notice', 'Updating admin credentials is a premium feature currently in development.');
+    if (!securitySettings.currentPassword) {
+      return error('Error', 'Current password is required to save changes.');
+    }
+    if (securitySettings.newPassword && securitySettings.newPassword !== securitySettings.confirmPassword) {
+      return error('Error', 'New passwords do not match.');
+    }
+    
+    setIsUpdatingSecurity(true);
+    try {
+      await authService.updateSecurity({
+        currentPassword: securitySettings.currentPassword,
+        newPassword: securitySettings.newPassword || undefined,
+        email: securitySettings.adminEmail
+      });
+      success('Success', 'Security settings updated successfully.');
+      setSecuritySettings(prev => ({
+        ...prev,
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      }));
+    } catch (err) {
+      error('Error', err.response?.data?.message || 'Failed to update security settings.');
+    } finally {
+      setIsUpdatingSecurity(false);
+    }
   };
 
   return (
@@ -141,14 +170,6 @@ const AdminSettings = () => {
           {activeTab === 'security' && (
             <div className="max-w-2xl">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Security & Credentials</h2>
-              
-              <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg mb-6 flex items-start gap-3">
-                <Lock className="w-5 h-5 mt-0.5 text-yellow-600 shrink-0" />
-                <div className="text-sm">
-                  <strong className="font-semibold block mb-1">Coming Soon</strong>
-                  The ability to update admin email and password from the dashboard is currently under development. These fields are visually functional but saving is mocked.
-                </div>
-              </div>
 
               <form onSubmit={handleSecuritySubmit} className="space-y-6">
                 <div>
@@ -197,9 +218,14 @@ const AdminSettings = () => {
                 <div className="pt-4 border-t border-gray-100 flex justify-end">
                   <button
                     type="submit"
-                    className="flex items-center gap-2 bg-purple-600 text-white px-6 py-2.5 rounded-lg hover:bg-purple-700 transition font-medium"
+                    disabled={isUpdatingSecurity}
+                    className="flex items-center gap-2 bg-purple-600 text-white px-6 py-2.5 rounded-lg hover:bg-purple-700 transition font-medium disabled:opacity-50"
                   >
-                    <Save className="w-4 h-4" />
+                    {isUpdatingSecurity ? (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <Save className="w-4 h-4" />
+                    )}
                     Update Credentials
                   </button>
                 </div>

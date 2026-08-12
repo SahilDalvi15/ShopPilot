@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const { authenticate } = require('../middlewares/auth.middleware');
-const { getProfile, updateProfile, uploadProfilePicture, getAddresses, addAddress, updateAddress, deleteAddress, setDefaultAddress } = require('../controllers/user.controller');
+const { getProfile, updateProfile, updateSecuritySettings, uploadProfilePicture, getAddresses, addAddress, updateAddress, deleteAddress, setDefaultAddress } = require('../controllers/user.controller');
 
 router.get('/profile', authenticate, getProfile);
 router.put('/profile', authenticate, updateProfile);
+router.put('/security', authenticate, updateSecuritySettings);
 router.post('/profile-picture', authenticate, uploadProfilePicture);
 router.get('/addresses', authenticate, getAddresses);
 router.post('/addresses', authenticate, addAddress);
