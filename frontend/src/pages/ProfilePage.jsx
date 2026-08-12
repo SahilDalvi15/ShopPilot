@@ -182,6 +182,99 @@ const ProfilePage = () => {
                           value={formData.firstName}
                           onChange={handleInputChange}
                           className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:bg-white transition-all"
+                        />
+                      ) : (
+                        <div className="flex items-center space-x-2">
+                          <User className="h-5 w-5 text-gray-400" />
+                          <span className="text-gray-900">{user?.firstName || 'Not set'}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Last Name
+                      </label>
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          name="lastName"
+                          value={formData.lastName}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:bg-white transition-all"
+                        />
+                      ) : (
+                        <div className="flex items-center space-x-2">
+                          <User className="h-5 w-5 text-gray-400" />
+                          <span className="text-gray-900">{user?.lastName || 'Not set'}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Email
+                      </label>
+                      <div className="flex items-center space-x-2">
+                        <Mail className="h-5 w-5 text-gray-400" />
+                        <span className="text-gray-900">{user?.email}</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Phone Number
+                      </label>
+                      {isEditing ? (
+                        <input
+                          type="tel"
+                          name="phoneNumber"
+                          value={formData.phoneNumber}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:bg-white transition-all"
+                        />
+                      ) : (
+                        <div className="flex items-center space-x-2">
+                          <Phone className="h-5 w-5 text-gray-400" />
+                          <span className="text-gray-900">{user?.phoneNumber || 'Not set'}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Date of Birth
+                      </label>
+                      {isEditing ? (
+                        <input
+                          type="date"
+                          name="dateOfBirth"
+                          value={formData.dateOfBirth}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:bg-white transition-all"
+                        />
+                      ) : (
+                        <div className="flex items-center space-x-2">
+                          <Calendar className="h-5 w-5 text-gray-400" />
+                          <span className="text-gray-900">
+                            {user?.dateOfBirth
+                              ? new Date(user.dateOfBirth).toLocaleDateString()
+                              : 'Not set'}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Gender
+                      </label>
+                      {isEditing ? (
+                        <select
+                          name="gender"
+                          value={formData.gender}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:bg-white transition-all"
                         >
                           <option value="">Select Gender</option>
                           <option value="male">Male</option>
