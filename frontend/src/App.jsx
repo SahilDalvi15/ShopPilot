@@ -28,6 +28,7 @@ import AdminOrders from './pages/admin/AdminOrders';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminReviews from './pages/admin/AdminReviews';
+import GlobalLoader from './components/GlobalLoader';
 import './App.css';
 
 // Admin route guard component
@@ -64,8 +65,10 @@ function App() {
   }, [dispatch, isAuthenticated]);
 
   return (
-    <Routes>
-      <Route element={<MainLayout />}>
+    <>
+      <GlobalLoader />
+      <Routes>
+        <Route element={<MainLayout />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/verify-email" element={<VerifyEmailPage />} />
@@ -114,6 +117,7 @@ function App() {
         <Route path="settings" element={<AdminSettings />} />
       </Route>
     </Routes>
+    </>
   );
 }
 
