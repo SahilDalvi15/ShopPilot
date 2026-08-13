@@ -87,20 +87,17 @@ const ProductsPage = () => {
   };
 
   const handleFilterChange = (key, value) => {
-    setFilters(prev => {
-      const newFilters = { ...prev, [key]: value };
-      
-      // Sync with URL params
-      const newParams = new URLSearchParams(searchParams);
-      if (value === '' || value === false) {
-        newParams.delete(key);
-      } else {
-        newParams.set(key, value);
-      }
-      setSearchParams(newParams);
-      
-      return newFilters;
-    });
+    // Sync with URL params first
+    const newParams = new URLSearchParams(searchParams);
+    if (value === '' || value === false) {
+      newParams.delete(key);
+    } else {
+      newParams.set(key, value);
+    }
+    setSearchParams(newParams);
+
+    // Update local state
+    setFilters(prev => ({ ...prev, [key]: value }));
   };
 
   const clearFilters = () => {
