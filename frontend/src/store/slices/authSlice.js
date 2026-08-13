@@ -70,6 +70,18 @@ export const updateProfile = createAsyncThunk(
   }
 );
 
+export const uploadProfilePicture = createAsyncThunk(
+  'auth/uploadProfilePicture',
+  async (formData, { rejectWithValue }) => {
+    try {
+      const response = await authService.uploadProfilePicture(formData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to upload profile picture');
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -181,6 +193,20 @@ const authSlice = createSlice({
         state.user = action.payload.data || action.payload;
       })
       .addCase(updateProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Upload profile picture
+      .addCase(uploadProfilePicture.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(uploadProfilePicture.fulfilled, (state, action) => {
+        state.loading = false;
+        if (state.user && action.payload.data?.profilePicture) {
+          state.user.profilePicture = action.payload.data.profilePicture;
+        }
+      })
+      .addCase(uploadProfilePicture.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

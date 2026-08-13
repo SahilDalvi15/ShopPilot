@@ -1,19 +1,21 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { User, Mail, Phone, MapPin, Calendar, Edit, Camera, Lock, Bell, LogOut, X } from 'lucide-react';
-import { updateProfile } from '../store/slices/authSlice';
+import { User, Mail, Phone, MapPin, Calendar, Edit, Camera, Lock, Bell, LogOut, X, Upload } from 'lucide-react';
+import { updateProfile, uploadProfilePicture } from '../store/slices/authSlice';
 import { useToast } from '../contexts/ToastContext';
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
   const { success, error: toastError } = useToast();
+  const fileInputRef = useRef(null);
   
   const user = useSelector((state) => state.auth.user);
   const loading = useSelector((state) => state.auth.loading);
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const AVAILABLE_AVATARS = [
     '/avatars/avatar1.png',
@@ -34,6 +36,46 @@ const ProfilePage = () => {
   const selectAvatar = (avatarUrl) => {
     setFormData(prev => ({ ...prev, profilePicture: avatarUrl }));
     setIsAvatarModalOpen(false);
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toastError('Invalid File', 'Please select an image file (JPG, PNG, WebP).');
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toastError('File Too Large', 'Please select an image smaller than 2MB.');
+      return;
+    }
+
+    setIsUploading(true);
+    setIsAvatarModalOpen(false);
+    
+    const uploadData = new FormData();
+    uploadData.append('profilePicture', file);
+
+    try {
+      const resultAction = await dispatch(uploadProfilePicture(uploadData));
+      if (uploadProfilePicture.fulfilled.match(resultAction)) {
+        success('Profile Picture Updated', 'Your new profile picture has been saved.');
+        // Update local form data if in edit mode so it shows the new pic immediately
+        if (resultAction.payload?.data?.profilePicture) {
+          setFormData(prev => ({ ...prev, profilePicture: resultAction.payload.data.profilePicture }));
+        }
+      } else {
+        toastError('Upload Failed', resultAction.payload || 'Failed to upload picture.');
+      }
+    } catch (err) {
+      toastError('Upload Failed', 'An unexpected error occurred during upload.');
+    } finally {
+      setIsUploading(false);
+      // Reset input so same file can be selected again
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
   };
 
   const handleInputChange = (e) => {
@@ -123,7 +165,11 @@ const ProfilePage = () => {
                 {/* Profile Picture Section */}
                 <div className="flex items-center space-x-6 mb-8">
                   <div className="relative">
-                    {(isEditing ? formData.profilePicture : user?.profilePicture) ? (
+                    {isUploading ? (
+                      <div className="w-32 h-32 rounded-full border-4 border-white shadow-xl bg-gray-100 flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+                      </div>
+                    ) : (isEditing ? formData.profilePicture : user?.profilePicture) ? (
                       <img
                         src={isEditing ? formData.profilePicture : user?.profilePicture}
                         alt="Profile"
@@ -136,7 +182,7 @@ const ProfilePage = () => {
                         </span>
                       </div>
                     )}
-                    {isEditing && (
+                    {isEditing && !isUploading && (
                       <button
                         type="button"
                         onClick={() => setIsAvatarModalOpen(true)}
@@ -155,14 +201,14 @@ const ProfilePage = () => {
                     <p className="text-sm text-gray-500 mt-1">
                       Member since {new Date(user?.createdAt).toLocaleDateString()}
                     </p>
-                    {isEditing && (
+                    {isEditing && !isUploading && (
                       <button
                         type="button"
                         onClick={() => setIsAvatarModalOpen(true)}
                         className="mt-3 text-sm text-purple-600 hover:text-purple-700 font-medium flex items-center gap-1.5 hover:underline"
                       >
                         <Camera className="h-3.5 w-3.5" />
-                        Choose 3D Avatar
+                        Update Profile Picture
                       </button>
                     )}
                   </div>
@@ -471,6 +517,28 @@ const ProfilePage = () => {
             </div>
             
             <div className="p-8 bg-gray-50">
+              
+              <div className="mb-8 p-6 bg-white rounded-2xl border-2 border-dashed border-gray-200 text-center hover:border-purple-400 hover:bg-purple-50/50 transition-colors group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                <input 
+                  type="file" 
+                  className="hidden" 
+                  ref={fileInputRef} 
+                  accept="image/jpeg, image/png, image/webp" 
+                  onChange={handleFileUpload} 
+                />
+                <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                  <Upload className="w-6 h-6" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900">Upload Custom Photo</h3>
+                <p className="text-sm text-gray-500 mt-1">Upload a real photo of yourself (Max 2MB, JPG/PNG)</p>
+              </div>
+
+              <div className="flex items-center gap-4 mb-6">
+                <div className="h-px bg-gray-200 flex-1"></div>
+                <span className="text-sm font-medium text-gray-400">OR CHOOSE 3D AVATAR</span>
+                <div className="h-px bg-gray-200 flex-1"></div>
+              </div>
+
               <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                 {AVAILABLE_AVATARS.map((avatar, idx) => (
                   <div 

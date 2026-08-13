@@ -31,6 +31,15 @@ export const authService = {
     return response.data;
   },
 
+  uploadProfilePicture: async (formData) => {
+    const response = await apiClient.post('/users/profile-picture', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
   updateSecurity: async (securityData) => {
     const response = await apiClient.put('/users/security', securityData);
     return response.data;
