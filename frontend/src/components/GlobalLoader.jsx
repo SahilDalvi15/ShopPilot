@@ -9,18 +9,22 @@ const GlobalLoader = () => {
     return () => unsubscribe();
   }, []);
 
-  if (!state.visible) return null;
-
+  // Render the overlay loader instead of the top bar
   return (
-    <div className="fixed top-0 left-0 w-full h-1 z-[9999] bg-transparent pointer-events-none">
-      <div 
-        className="h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-500 shadow-[0_0_10px_rgba(99,102,241,0.8)] transition-all ease-out"
-        style={{ 
-          width: `${state.progress}%`,
-          transitionDuration: state.progress === 100 ? '200ms' : '500ms',
-          opacity: state.progress === 100 ? 0 : 1
-        }}
-      />
+    <div 
+      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-white/40 backdrop-blur-[2px] transition-opacity duration-300 ${
+        state.visible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+      }`}
+    >
+      <div className="flex flex-col items-center bg-white p-6 rounded-2xl shadow-xl border border-gray-100">
+        <div className="relative flex items-center justify-center mb-4">
+          <div className="absolute inset-0 border-4 border-indigo-100 rounded-full animate-ping opacity-75"></div>
+          <div className="w-12 h-12 rounded-full border-4 border-indigo-100 border-t-indigo-600 border-r-indigo-600 animate-spin relative z-10"></div>
+        </div>
+        <div className="text-indigo-900 font-bold tracking-widest uppercase text-xs animate-pulse">
+          Loading...
+        </div>
+      </div>
     </div>
   );
 };
