@@ -13,6 +13,7 @@ import {
   DollarSign,
   Box,
   UserCheck,
+  Star,
 } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -24,6 +25,7 @@ const AdminDashboard = () => {
     { path: '/admin/products', icon: Package, label: 'Products' },
     { path: '/admin/orders', icon: ShoppingCart, label: 'Orders' },
     { path: '/admin/users', icon: Users, label: 'Users' },
+    { path: '/admin/reviews', icon: Star, label: 'Reviews' },
     { path: '/admin/settings', icon: Settings, label: 'Settings' },
   ];
 
