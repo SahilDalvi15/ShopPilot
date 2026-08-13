@@ -35,12 +35,33 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Configure multer with Cloudinary storage
+// Configure multer with Cloudinary storage for products
 const multer = require('multer');
 const upload = multer({
   storage,
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter,
+});
+
+// Configure Cloudinary storage for User Profiles
+const profileStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'shoppilot/profiles',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+    transformation: [
+      { width: 400, height: 400, crop: 'fill', gravity: 'face' }, // Face detection and crop
+      { quality: 'auto' }, 
+    ],
+  },
+});
+
+const uploadProfile = multer({
+  storage: profileStorage,
+  limits: {
+    fileSize: 2 * 1024 * 1024, // 2MB limit for profiles
   },
   fileFilter,
 });
@@ -68,7 +89,9 @@ const deleteImages = async (publicIds) => {
 module.exports = {
   cloudinary,
   storage,
+  profileStorage,
   upload,
+  uploadProfile,
   deleteImage,
   deleteImages,
 };

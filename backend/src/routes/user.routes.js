@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const { authenticate } = require('../middlewares/auth.middleware');
+const { uploadProfile } = require('../config/cloudinary');
 const { getProfile, updateProfile, updateSecuritySettings, uploadProfilePicture, getAddresses, addAddress, updateAddress, deleteAddress, setDefaultAddress } = require('../controllers/user.controller');
 
 router.get('/profile', authenticate, getProfile);
 router.put('/profile', authenticate, updateProfile);
 router.put('/security', authenticate, updateSecuritySettings);
-router.post('/profile-picture', authenticate, uploadProfilePicture);
+router.post('/profile-picture', authenticate, uploadProfile.single('profilePicture'), uploadProfilePicture);
 router.get('/addresses', authenticate, getAddresses);
 router.post('/addresses', authenticate, addAddress);
 router.put('/addresses/:addressId', authenticate, updateAddress);

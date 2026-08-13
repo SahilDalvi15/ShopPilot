@@ -72,9 +72,17 @@ const updateSecuritySettings = async (req, res) => {
 
 const uploadProfilePicture = async (req, res) => {
   try {
-    // TODO: Implement file upload with Cloudinary
+    const profilePictureUrl = req.file?.path || req.body.profilePicture;
+    
+    if (!profilePictureUrl) {
+      return res.status(400).json({
+        success: false,
+        message: 'No profile picture provided'
+      });
+    }
+
     const profile = await userService.updateProfile(req.user.id, {
-      profilePicture: req.file?.path || req.body.profilePicture
+      profilePicture: profilePictureUrl
     });
     res.status(200).json({
       success: true,
