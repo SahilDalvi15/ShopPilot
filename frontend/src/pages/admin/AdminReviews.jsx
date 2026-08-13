@@ -9,8 +9,8 @@ import {
   ExternalLink,
   ShieldCheck
 } from 'lucide-react';
-import adminReviewService from '../../../services/adminReviewService';
-import { useToast } from '../../../contexts/ToastContext';
+import adminReviewService from '../../services/adminReviewService';
+import { useToast } from '../../contexts/ToastContext';
 import { Link } from 'react-router-dom';
 
 const AdminReviews = () => {
