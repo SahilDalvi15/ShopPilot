@@ -121,6 +121,22 @@ const templates = {
       </div>
     `,
   }),
+
+  emailVerification: (name, verifyLink) => ({
+    subject: 'Verify your ShopPilot Email Address',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h1 style="color: #7c3aed;">Verify Your Email</h1>
+        <p>Hi ${name},</p>
+        <p>Thank you for signing up for ShopPilot! To complete your registration and unlock all features, please verify your email address.</p>
+        <p>Click the button below to verify your email:</p>
+        <a href="${verifyLink}" style="background-color: #7c3aed; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; margin: 20px 0;">Verify Email Address</a>
+        <p>This link will expire in 24 hours.</p>
+        <p>If you didn't create an account with us, please ignore this email.</p>
+        <p>Best regards,<br>The ShopPilot Team</p>
+      </div>
+    `,
+  }),
 };
 
 // Send specific email types
@@ -147,6 +163,11 @@ const emailService = {
 
   sendOrderDeliveredEmail: async (email, name, orderDetails) => {
     const template = templates.orderDelivered(name, orderDetails);
+    return sendEmail({ to: email, ...template });
+  },
+
+  sendVerificationEmail: async (email, name, verifyLink) => {
+    const template = templates.emailVerification(name, verifyLink);
     return sendEmail({ to: email, ...template });
   },
 };

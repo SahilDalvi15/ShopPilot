@@ -39,8 +39,15 @@ class AuthService {
       // Don't fail registration if email fails
     }
 
-    // TODO: Send verification email
-    logger.info(`Verification token for ${email}: ${verificationToken}`);
+    // Send verification email
+    try {
+      const verifyLink = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
+      await emailService.sendVerificationEmail(email, `${firstName} ${lastName}`, verifyLink);
+      logger.info(`Verification email sent to ${email}`);
+    } catch (emailError) {
+      logger.error(`Failed to send verification email: ${emailError.message}`);
+      // Don't fail registration if email fails
+    }
 
     // Generate tokens
     const accessToken = generateAccessToken(user._id);
