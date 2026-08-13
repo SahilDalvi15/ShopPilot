@@ -1,12 +1,10 @@
 import axios from 'axios';
-import { store } from '../store/store';
-import { clearCredentials, setCredentials } from '../store/slices/authSlice';
 import { topLoader } from '../utils/TopLoaderController';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
 
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseURL: API_BASE_URL,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -17,7 +15,7 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     topLoader.start();
-    const token = store.getState().auth.accessToken;
+    const token = localStorage.getItem('accessToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
