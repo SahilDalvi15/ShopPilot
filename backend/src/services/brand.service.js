@@ -1,4 +1,5 @@
 const Brand = require('../models/Brand.model');
+const Product = require('../models/Product.model');
 const logger = require('../utils/logger');
 
 class BrandService {
@@ -96,14 +97,14 @@ class BrandService {
       throw error;
     }
 
-    // TODO: Check if brand has products
-    // const productCount = await Product.countDocuments({ brandId, isDeleted: false });
-    // if (productCount > 0) {
-    //   const error = new Error('Cannot delete brand with products');
-    //   error.statusCode = 400;
-    //   error.code = 'HAS_PRODUCTS';
-    //   throw error;
-    // }
+    // Check if brand has products
+    const productCount = await Product.countDocuments({ brandId, isDeleted: false });
+    if (productCount > 0) {
+      const error = new Error('Cannot delete brand with associated products');
+      error.statusCode = 400;
+      error.code = 'HAS_PRODUCTS';
+      throw error;
+    }
 
     brand.isDeleted = true;
     await brand.save();
