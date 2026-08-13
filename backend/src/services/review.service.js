@@ -56,6 +56,58 @@ class ReviewService {
     };
   }
 
+  async getAllReviews(query) {
+    const { page = 1, limit = 20, rating, status } = query;
+    const skip = (page - 1) * limit;
+
+    const queryObj = { isDeleted: false };
+    if (rating) {
+      queryObj.rating = parseInt(rating);
+    }
+
+    const reviews = await Review.find(queryObj)
+      .populate('userId', 'firstName lastName profilePicture email')
+      .populate('productId', 'title images')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    const total = await Review.countDocuments(queryObj);
+
+    const transformedReviews = reviews.map(review => ({
+      id: review._id,
+      productId: review.productId?._id,
+      productTitle: review.productId?.title,
+      productImage: review.productId?.images?.[0],
+      user: {
+        id: review.userId?._id,
+        firstName: review.userId?.firstName,
+        lastName: review.userId?.lastName,
+        email: review.userId?.email,
+        profilePicture: review.userId?.profilePicture
+      },
+      rating: review.rating,
+      title: review.title,
+      comment: review.comment,
+      images: review.images,
+      isVerifiedPurchase: review.isVerifiedPurchase,
+      helpfulCount: review.helpfulCount,
+      createdAt: review.createdAt
+    }));
+
+    return {
+      reviews: transformedReviews,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: skip + limit < total,
+        hasPrev: page > 1
+      }
+    };
+  }
+
   async createReview(userId, reviewData) {
     const { productId, rating, title, comment, images, orderId } = reviewData;
 

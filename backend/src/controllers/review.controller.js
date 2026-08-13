@@ -20,6 +20,26 @@ const getProductReviews = async (req, res) => {
   }
 };
 
+const getAllReviews = async (req, res) => {
+  try {
+    const result = await reviewService.getAllReviews(req.query);
+    res.status(200).json({
+      success: true,
+      message: 'All reviews retrieved successfully',
+      data: result.reviews,
+      pagination: result.pagination
+    });
+  } catch (error) {
+    res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message || 'Failed to retrieve all reviews',
+      error: {
+        code: error.code || 'GET_ALL_REVIEWS_ERROR'
+      }
+    });
+  }
+};
+
 const createReview = async (req, res) => {
   try {
     const review = await reviewService.createReview(req.user.id, req.body);
@@ -96,6 +116,7 @@ const markHelpful = async (req, res) => {
 
 module.exports = {
   getProductReviews,
+  getAllReviews,
   createReview,
   updateReview,
   deleteReview,
