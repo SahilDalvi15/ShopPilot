@@ -56,9 +56,12 @@ class OrderService {
     // Calculate order totals
     const subtotal = cart.subtotal;
     const discount = cart.totalDiscount;
-    const shippingCharge = 0; // TODO: Calculate based on shipping logic
-    const tax = 0; // TODO: Calculate based on tax logic
-    const totalAmount = subtotal - discount + shippingCharge + tax;
+    const cartTotal = subtotal - discount;
+    
+    const shippingCharge = cartTotal >= 999 ? 0 : 99;
+    const tax = Math.round(subtotal * 0.18); // 18% tax on subtotal
+    
+    const totalAmount = cartTotal + shippingCharge + tax;
 
     // Create order
     const order = await Order.create({
