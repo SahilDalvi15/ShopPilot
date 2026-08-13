@@ -35,6 +35,8 @@ const ProductsPage = () => {
     brand: searchParams.get('brand') || '',
     minPrice: '',
     maxPrice: '',
+    minRating: searchParams.get('minRating') || '',
+    inStock: searchParams.get('inStock') === 'true',
     sortBy: location.pathname === '/new-arrivals' ? 'createdAt' : 'createdAt',
     sortOrder: 'desc',
     isDeal: location.pathname === '/deals' ? 'true' : undefined
@@ -50,6 +52,8 @@ const ProductsPage = () => {
       category: searchParams.get('category') || '', 
       brand: searchParams.get('brand') || '', 
       search: searchParams.get('search') || '',
+      minRating: searchParams.get('minRating') || '',
+      inStock: searchParams.get('inStock') === 'true',
       isDeal: location.pathname === '/deals' ? 'true' : undefined,
       sortBy: location.pathname === '/new-arrivals' ? 'createdAt' : prev.sortBy
     }));
@@ -83,11 +87,24 @@ const ProductsPage = () => {
   };
 
   const handleFilterChange = (key, value) => {
-    setFilters({ ...filters, [key]: value });
+    setFilters(prev => {
+      const newFilters = { ...prev, [key]: value };
+      
+      // Sync with URL params
+      const newParams = new URLSearchParams(searchParams);
+      if (value === '' || value === false) {
+        newParams.delete(key);
+      } else {
+        newParams.set(key, value);
+      }
+      setSearchParams(newParams);
+      
+      return newFilters;
+    });
   };
 
   const clearFilters = () => {
-    setFilters({ ...filters, search: '', minPrice: '', maxPrice: '', category: '', brand: '' });
+    setFilters({ ...filters, search: '', minPrice: '', maxPrice: '', category: '', brand: '', minRating: '', inStock: false });
     setSearchParams({}); // Clear URL params
   };
 
@@ -230,6 +247,52 @@ const ProductsPage = () => {
             />
           </div>
         </div>
+      </div>
+
+      {/* Customer Ratings */}
+      <div>
+        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Customer Ratings</h3>
+        <div className="space-y-3">
+          {[4, 3, 2, 1].map((rating) => (
+            <label key={rating} className="flex items-center gap-3 cursor-pointer group">
+              <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${filters.minRating === String(rating) ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 group-hover:border-indigo-500'}`}>
+                {filters.minRating === String(rating) && <div className="w-2.5 h-2.5 bg-white rounded-sm" />}
+              </div>
+              <input 
+                type="radio" 
+                name="minRating"
+                className="hidden"
+                checked={filters.minRating === String(rating)}
+                onChange={() => handleFilterChange('minRating', String(rating))}
+              />
+              <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className={`w-4 h-4 ${i < rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
+                ))}
+                <span className="text-sm text-gray-600 ml-1">& Up</span>
+              </div>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Availability */}
+      <div>
+        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Availability</h3>
+        <label className="flex items-center gap-3 cursor-pointer group">
+          <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${filters.inStock ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 group-hover:border-indigo-500'}`}>
+            {filters.inStock && <div className="w-2.5 h-2.5 bg-white rounded-sm" />}
+          </div>
+          <input 
+            type="checkbox" 
+            className="hidden"
+            checked={filters.inStock}
+            onChange={(e) => handleFilterChange('inStock', e.target.checked)}
+          />
+          <span className={`text-sm ${filters.inStock ? 'font-medium text-gray-900' : 'text-gray-600 group-hover:text-gray-900'}`}>
+            In Stock Only
+          </span>
+        </label>
       </div>
 
       {/* Sort By */}
