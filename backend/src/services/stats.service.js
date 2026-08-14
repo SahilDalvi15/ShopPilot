@@ -50,6 +50,38 @@ class StatsService {
       revenue: `₹${((product.soldCount || 0) * product.price).toLocaleString()}`
     }));
 
+    // 7. Revenue Trend (last 7 days)
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    const revenueTrendAgg = await Order.aggregate([
+      { $match: { orderStatus: { $ne: 'cancelled' }, createdAt: { $gte: sevenDaysAgo } } },
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+          revenue: { $sum: '$totalAmount' },
+          orders: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    const revenueTrend = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
+      const found = revenueTrendAgg.find(r => r._id === dateStr);
+      revenueTrend.push({
+        name: dayName,
+        fullDate: dateStr,
+        revenue: found ? found.revenue : 0,
+        orders: found ? found.orders : 0
+      });
+    }
+
     return {
       overview: {
         totalRevenue: `₹${totalRevenue.toLocaleString()}`,
@@ -58,7 +90,8 @@ class StatsService {
         totalUsers: totalUsers.toLocaleString()
       },
       recentOrders,
-      topProducts
+      topProducts,
+      revenueTrend
     };
   }
 }
