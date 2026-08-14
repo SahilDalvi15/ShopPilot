@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Heart, Trash2, ShoppingCart, Star, ArrowRight } from 'lucide-react';
+import { Heart, Trash2, ShoppingCart, Star, ArrowRight, Share2, Copy } from 'lucide-react';
 import {
   fetchWishlist,
   removeFromWishlist,
@@ -10,9 +10,12 @@ import {
 import { addToCart as addToCartAction } from '../store/slices/cartSlice';
 import { useToast } from '../contexts/ToastContext';
 import WishlistItemSkeleton from '../components/skeletons/WishlistItemSkeleton';
+import { wishlistService } from '../services/wishlist.service';
 
 const WishlistPage = () => {
   const [selectedItems, setSelectedItems] = useState([]);
+  const [isSharing, setIsSharing] = useState(false);
+  const [shareLink, setShareLink] = useState('');
 
   const dispatch = useDispatch();
   const { items: wishlistItems, loading } = useSelector((state) => state.wishlist);
@@ -21,6 +24,23 @@ const WishlistPage = () => {
   useEffect(() => {
     dispatch(fetchWishlist());
   }, [dispatch]);
+
+  const handleShareWishlist = async () => {
+    try {
+      setIsSharing(true);
+      const res = await wishlistService.generateShareToken();
+      if (res.success && res.data.shareToken) {
+        const link = `${window.location.origin}/shared-wishlist/${res.data.shareToken}`;
+        setShareLink(link);
+        await navigator.clipboard.writeText(link);
+        success('Link Copied!', 'Share link copied to clipboard.');
+      }
+    } catch (err) {
+      toastError('Failed', 'Could not generate share link.');
+    } finally {
+      setIsSharing(false);
+    }
+  };
 
   const handleSelectAll = (e) => {
     if (e.target.checked) {
@@ -122,15 +142,31 @@ const WishlistPage = () => {
                 {wishlistItems.length} {wishlistItems.length === 1 ? 'item' : 'items'} saved for later
               </p>
             </div>
-            {selectedItems.length > 0 && (
-              <button
-                onClick={handleRemoveSelected}
-                className="flex items-center space-x-2 px-5 py-2.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-full font-bold transition-all duration-200"
-              >
-                <Trash2 className="h-4 w-4" />
-                <span>Remove Selected ({selectedItems.length})</span>
-              </button>
-            )}
+            <div className="flex items-center gap-3">
+              {wishlistItems.length > 0 && (
+                <button
+                  onClick={handleShareWishlist}
+                  disabled={isSharing}
+                  className="flex items-center space-x-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-indigo-600 rounded-full font-bold transition-all duration-200 shadow-sm"
+                >
+                  {isSharing ? (
+                    <div className="w-4 h-4 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Share2 className="h-4 w-4" />
+                  )}
+                  <span>Share Wishlist</span>
+                </button>
+              )}
+              {selectedItems.length > 0 && (
+                <button
+                  onClick={handleRemoveSelected}
+                  className="flex items-center space-x-2 px-5 py-2.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-full font-bold transition-all duration-200"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  <span>Remove Selected ({selectedItems.length})</span>
+                </button>
+              )}
+            </div>
           </div>
 
           {loading ? (
