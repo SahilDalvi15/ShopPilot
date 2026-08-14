@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { User, Mail, Phone, MapPin, Calendar, Edit, Camera, Lock, Bell, LogOut, X, Upload } from 'lucide-react';
-import { updateProfile, uploadProfilePicture } from '../store/slices/authSlice';
+import { updateProfile, uploadProfilePicture, updateSecuritySettings } from '../store/slices/authSlice';
 import { useToast } from '../contexts/ToastContext';
 
 const ProfilePage = () => {
@@ -16,6 +16,13 @@ const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState('profile');
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
 
   const AVAILABLE_AVATARS = [
     '/avatars/avatar1.png',
@@ -110,6 +117,31 @@ const ProfilePage = () => {
       profilePicture: user?.profilePicture || '',
     });
     setIsEditing(false);
+  };
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toastError('Validation Error', 'New passwords do not match.');
+      return;
+    }
+    
+    try {
+      const resultAction = await dispatch(updateSecuritySettings({
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword
+      }));
+      
+      if (updateSecuritySettings.fulfilled.match(resultAction)) {
+        success('Password Updated', 'Your password has been changed successfully.');
+        setIsPasswordModalOpen(false);
+        setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      } else {
+        toastError('Update Failed', resultAction.payload || 'Failed to update password.');
+      }
+    } catch (err) {
+      toastError('Update Failed', 'An unexpected error occurred.');
+    }
   };
 
   return (
@@ -374,7 +406,7 @@ const ProfilePage = () => {
             {activeTab === 'security' && (
               <div className="p-6">
                 <div className="space-y-6">
-                  {/* Change Password - Temporarily disabled as backend route does not exist
+                  {/* Change Password */}
                   <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-4">
                       <Lock className="h-6 w-6 text-purple-600" />
@@ -383,11 +415,13 @@ const ProfilePage = () => {
                         <p className="text-sm text-gray-600">Update your password to keep your account secure</p>
                       </div>
                     </div>
-                    <button className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition">
+                    <button 
+                      onClick={() => setIsPasswordModalOpen(true)}
+                      className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition"
+                    >
                       Change
                     </button>
                   </div>
-                  */}
 
                   <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-4">
@@ -560,6 +594,81 @@ const ProfilePage = () => {
                 ))}
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Change Password Modal */}
+      {isPasswordModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Change Password</h2>
+                <p className="text-sm text-gray-500 mt-1">Enter your current and new password below.</p>
+              </div>
+              <button 
+                onClick={() => setIsPasswordModalOpen(false)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            
+            <form onSubmit={handlePasswordSubmit} className="p-6">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+                  <input
+                    type="password"
+                    required
+                    value={passwordForm.currentPassword}
+                    onChange={(e) => setPasswordForm({...passwordForm, currentPassword: e.target.value})}
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:bg-white transition-all"
+                    placeholder="Enter current password"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                  <input
+                    type="password"
+                    required
+                    minLength={8}
+                    value={passwordForm.newPassword}
+                    onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:bg-white transition-all"
+                    placeholder="Enter new password (min 8 chars)"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+                  <input
+                    type="password"
+                    required
+                    value={passwordForm.confirmPassword}
+                    onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
+                    className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:bg-white transition-all"
+                    placeholder="Confirm new password"
+                  />
+                </div>
+              </div>
+              <div className="mt-6 flex justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setIsPasswordModalOpen(false)}
+                  className="px-4 py-2 text-gray-700 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all disabled:opacity-50"
+                >
+                  {loading ? 'Updating...' : 'Update Password'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

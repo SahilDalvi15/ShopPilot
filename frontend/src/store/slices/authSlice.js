@@ -82,6 +82,18 @@ export const uploadProfilePicture = createAsyncThunk(
   }
 );
 
+export const updateSecuritySettings = createAsyncThunk(
+  'auth/updateSecuritySettings',
+  async (securityData, { rejectWithValue }) => {
+    try {
+      const response = await authService.updateSecurity(securityData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to update security settings');
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -202,6 +214,17 @@ const authSlice = createSlice({
         }
       })
       .addCase(uploadProfilePicture.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Update security settings
+      .addCase(updateSecuritySettings.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateSecuritySettings.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(updateSecuritySettings.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
