@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Package, ShoppingCart, Users, DollarSign, TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import adminStatsService from '../../services/adminStatsService';
 
 const AdminStats = () => {
@@ -25,7 +26,7 @@ const AdminStats = () => {
     );
   }
 
-  const { overview, recentOrders, topProducts } = statsResponse.data;
+  const { overview, recentOrders, topProducts, revenueTrend } = statsResponse.data;
 
   const stats = [
     {
@@ -140,6 +141,57 @@ const AdminStats = () => {
             <p className="text-gray-600 mt-1">{stat.title}</p>
           </div>
         ))}
+      </div>
+
+      {/* Charts Section */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <h2 className="text-xl font-semibold text-gray-900 mb-6">Revenue Trend (Last 7 Days)</h2>
+        <div className="h-80 w-full">
+          {revenueTrend && revenueTrend.length > 0 ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={revenueTrend} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: '#64748b', fontSize: 12 }} 
+                  dy={10} 
+                />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: '#64748b', fontSize: 12 }} 
+                  tickFormatter={(value) => \`₹\${value.toLocaleString()}\`}
+                  width={80}
+                />
+                <Tooltip 
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  formatter={(value) => [\`₹\${value.toLocaleString()}\`, 'Revenue']}
+                  labelStyle={{ fontWeight: 'bold', color: '#1e293b' }}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="revenue" 
+                  stroke="#8b5cf6" 
+                  strokeWidth={3}
+                  fillOpacity={1} 
+                  fill="url(#colorRevenue)" 
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-500">
+              No revenue data available for the last 7 days.
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
