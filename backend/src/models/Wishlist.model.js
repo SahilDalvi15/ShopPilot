@@ -20,7 +20,13 @@ const wishlistSchema = new mongoose.Schema({
     ref: 'User',
     index: true
   },
-  items: [wishlistItemSchema]
+  items: [wishlistItemSchema],
+  shareToken: {
+    type: String,
+    unique: true,
+    sparse: true,
+    index: true
+  }
 }, {
   timestamps: true
 });
