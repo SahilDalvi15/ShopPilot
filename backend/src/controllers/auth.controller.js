@@ -3,6 +3,19 @@ const authService = require('../services/auth.service');
 const register = async (req, res) => {
   try {
     const result = await authService.register(req.body);
+    
+    // Set refresh token in httpOnly cookie
+    res.cookie('refreshToken', result.tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
+    // Remove refresh token from response
+    const { refreshToken, ...tokensWithoutRefresh } = result.tokens;
+    result.tokens = tokensWithoutRefresh;
+
     res.status(201).json({
       success: true,
       message: 'User registered successfully',
@@ -32,6 +45,10 @@ const login = async (req, res) => {
       sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
+
+    // Remove refresh token from response
+    const { refreshToken, ...tokensWithoutRefresh } = result.tokens;
+    result.tokens = tokensWithoutRefresh;
 
     res.status(200).json({
       success: true,
@@ -74,7 +91,7 @@ const logout = async (req, res) => {
 
 const refreshToken = async (req, res) => {
   try {
-    const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
+    const refreshToken = req.cookies.refreshToken;
     
     if (!refreshToken) {
       return res.status(401).json({
@@ -97,8 +114,7 @@ const refreshToken = async (req, res) => {
       success: true,
       message: 'Token refreshed successfully',
       data: {
-        accessToken: result.accessToken,
-        refreshToken: result.refreshToken
+        accessToken: result.accessToken
       }
     });
   } catch (error) {
