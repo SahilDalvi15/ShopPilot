@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Package, Truck, CheckCircle, XCircle, Clock, ChevronDown, ChevronUp, MapPin, Calendar, CreditCard, Box, PackageCheck } from 'lucide-react';
+import { Package, Truck, CheckCircle, XCircle, Clock, ChevronDown, ChevronUp, MapPin, Calendar, CreditCard, Box, PackageCheck, Download } from 'lucide-react';
 import { orderService } from '../services/order.service';
 import { useToast } from '../contexts/ToastContext';
 
@@ -37,6 +37,28 @@ const OrdersPage = () => {
       setCancellingOrderId(null);
     },
   });
+
+  const [downloadingInvoiceId, setDownloadingInvoiceId] = useState(null);
+
+  const handleDownloadInvoice = async (order) => {
+    setDownloadingInvoiceId(order.id);
+    try {
+      const blob = await orderService.downloadInvoice(order.id);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `invoice-${order.orderNumber}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      success('Invoice Downloaded', 'Your invoice has been downloaded successfully.');
+    } catch (err) {
+      toastError('Download Failed', 'Could not download the invoice.');
+    } finally {
+      setDownloadingInvoiceId(null);
+    }
+  };
 
   const orders = data?.data || [];
 
@@ -248,20 +270,32 @@ const OrdersPage = () => {
                       )}
                     </button>
 
-                    {['pending', 'confirmed'].includes(order.orderStatus) && (
-                      <button
-                        onClick={() => {
-                          if (window.confirm('Are you sure you want to cancel this order?')) {
-                            setCancellingOrderId(order.id);
-                            cancelOrderMutation.mutate(order.id);
-                          }
-                        }}
-                        disabled={cancellingOrderId === order.id}
-                        className="text-red-600 hover:text-red-700 font-medium text-sm disabled:opacity-50"
-                      >
-                        {cancellingOrderId === order.id ? 'Cancelling...' : 'Cancel Order'}
-                      </button>
-                    )}
+                    <div className="flex gap-4 items-center">
+                      {!isCancelled && (
+                        <button
+                          onClick={() => handleDownloadInvoice(order)}
+                          disabled={downloadingInvoiceId === order.id}
+                          className="text-gray-600 hover:text-indigo-600 font-medium text-sm flex items-center gap-1 transition-colors disabled:opacity-50"
+                        >
+                          <Download className="w-4 h-4" />
+                          {downloadingInvoiceId === order.id ? 'Downloading...' : 'Invoice'}
+                        </button>
+                      )}
+                      {['pending', 'confirmed'].includes(order.orderStatus) && (
+                        <button
+                          onClick={() => {
+                            if (window.confirm('Are you sure you want to cancel this order?')) {
+                              setCancellingOrderId(order.id);
+                              cancelOrderMutation.mutate(order.id);
+                            }
+                          }}
+                          disabled={cancellingOrderId === order.id}
+                          className="text-red-600 hover:text-red-700 font-medium text-sm disabled:opacity-50"
+                        >
+                          {cancellingOrderId === order.id ? 'Cancelling...' : 'Cancel Order'}
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   {/* Expanded Details */}
