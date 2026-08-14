@@ -68,7 +68,7 @@ const RelatedProducts = ({ categoryId, currentProductId }) => {
         {products.map((product) => (
           <div 
             key={product.id} 
-            onClick={() => navigate(`/product/${product.slug}`)}
+            onClick={() => navigate(`/products/${product.slug}`)}
             className="snap-start min-w-[280px] w-[280px] bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group cursor-pointer hover:shadow-xl transition-all flex flex-col"
           >
             <div className="relative w-full h-48 bg-gray-50">
