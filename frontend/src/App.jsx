@@ -14,11 +14,13 @@ import CategoriesPage from './pages/CategoriesPage';
 import BrandsPage from './pages/BrandsPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
 import OrdersPage from './pages/OrdersPage';
+import OrderDetailsPage from './pages/OrderDetailsPage';
+import WishlistPage from './pages/WishlistPage';
+import SharedWishlistPage from './pages/SharedWishlistPage';
 import ProfilePage from './pages/ProfilePage';
 import AddressesPage from './pages/AddressesPage';
-import WishlistPage from './pages/WishlistPage';
-import CheckoutPage from './pages/CheckoutPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminStats from './pages/admin/AdminStats';
@@ -74,6 +76,7 @@ function App() {
         <Route path="/verify-email" element={<VerifyEmailPage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/products/:slug" element={<ProductDetailPage />} />
+        <Route path="/shared-wishlist/:token" element={<SharedWishlistPage />} />
         <Route 
           path="/cart" 
           element={isAuthenticated ? <CartPage /> : <Navigate to="/login" replace />} 
