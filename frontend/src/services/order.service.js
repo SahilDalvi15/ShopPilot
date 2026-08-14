@@ -30,4 +30,11 @@ export const orderService = {
     const response = await apiClient.post(`/orders/${orderId}/return`, returnData);
     return response.data;
   },
+
+  downloadInvoice: async (orderId) => {
+    const response = await apiClient.get(`/orders/${orderId}/invoice`, {
+      responseType: 'blob',
+    });
+    return response.data;
+  },
 };
