@@ -25,4 +25,14 @@ export const wishlistService = {
     const response = await apiClient.post(`/wishlist/items/${productId}/move-to-cart`);
     return response.data;
   },
+
+  generateShareToken: async () => {
+    const response = await apiClient.post('/wishlist/share');
+    return response.data;
+  },
+
+  getSharedWishlist: async (token) => {
+    const response = await apiClient.get(`/wishlist/shared/${token}`);
+    return response.data;
+  },
 };
