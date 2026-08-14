@@ -120,11 +120,36 @@ const adminUpdateOrderStatus = async (req, res) => {
   }
 };
 
+const Order = require('../models/Order.model');
+const User = require('../models/User.model');
+const { generateInvoice } = require('../utils/pdfGenerator');
+
+const downloadInvoice = async (req, res) => {
+  try {
+    const order = await Order.findOne({ _id: req.params.orderId, userId: req.user.id }).populate('items');
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+    const user = await User.findById(req.user.id);
+    
+    // We pass the mongoose order and user doc to our PDF generator
+    generateInvoice(order, user, res);
+    
+    // Note: We don't send a JSON response because the response is the PDF stream itself.
+  } catch (error) {
+    console.error('Invoice Generation Error:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ success: false, message: 'Failed to generate invoice' });
+    }
+  }
+};
+
 module.exports = {
   createOrder,
   getOrders,
   getOrderById,
   cancelOrder,
   adminGetOrders,
-  adminUpdateOrderStatus
+  adminUpdateOrderStatus,
+  downloadInvoice
 };
