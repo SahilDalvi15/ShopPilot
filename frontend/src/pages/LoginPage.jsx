@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { login, clearError } from '../store/slices/authSlice';
 import { useToast } from '../contexts/ToastContext';
 import { LogIn, Mail, Lock, AlertCircle } from 'lucide-react';
@@ -146,9 +146,9 @@ const LoginPage = () => {
                   Remember me
                 </label>
               </div>
-              <a href="/forgot-password" className="text-sm text-indigo-600 hover:text-indigo-700 font-medium">
+              <Link to="/forgot-password" className="text-sm text-indigo-600 hover:text-indigo-700 font-medium">
                 Forgot password?
-              </a>
+              </Link>
             </div>
 
             <button
@@ -173,9 +173,9 @@ const LoginPage = () => {
           <div className="mt-6 text-center">
             <p className="text-gray-600">
               Don't have an account?{' '}
-              <a href="/register" className="text-indigo-600 hover:text-indigo-700 font-medium">
+              <Link to="/register" className="text-indigo-600 hover:text-indigo-700 font-medium">
                 Sign up
-              </a>
+              </Link>
             </p>
           </div>
         </div>
