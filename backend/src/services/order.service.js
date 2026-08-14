@@ -483,7 +483,7 @@ class OrderService {
   }
 
   async adminUpdateOrderStatus(orderId, status, adminId) {
-    const order = await Order.findById(orderId);
+    const order = await Order.findById(orderId).populate('userId');
     if (!order) {
       const error = new Error('Order not found');
       error.statusCode = 404;
@@ -523,9 +523,31 @@ class OrderService {
       }
     }
 
+    // Send Emails if shipped or delivered
+    try {
+      if (order.userId && order.userId.email) {
+        const customerName = `${order.userId.firstName} ${order.userId.lastName}`.trim();
+        
+        if (status === 'shipped') {
+          await emailService.sendOrderShippedEmail(order.userId.email, customerName, {
+            orderId: order.orderNumber,
+            trackingNumber: order._id.toString().substring(0, 10).toUpperCase(), // Mock tracking number
+            estimatedDelivery: order.estimatedDelivery ? new Date(order.estimatedDelivery).toLocaleDateString() : 'N/A'
+          });
+        } else if (status === 'delivered') {
+          await emailService.sendOrderDeliveredEmail(order.userId.email, customerName, {
+            orderId: order.orderNumber,
+            deliveredDate: new Date().toLocaleDateString()
+          });
+        }
+      }
+    } catch (emailErr) {
+      logger.error(`Failed to send order status email: ${emailErr.message}`);
+    }
+
     // Emit event
     try {
-      emitToUser(order.userId, 'order_updated', {
+      emitToUser(order.userId._id || order.userId, 'order_updated', {
         orderId: order._id,
         status: order.orderStatus,
         message: `Your order status has been updated to ${status}`
