@@ -75,9 +75,45 @@ const moveToCart = async (req, res) => {
   }
 };
 
+const generateShareToken = async (req, res) => {
+  try {
+    const result = await wishlistService.generateShareToken(req.user.id);
+    res.status(200).json({
+      success: true,
+      message: 'Share token generated successfully',
+      data: result
+    });
+  } catch (error) {
+    res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message || 'Failed to generate share token',
+      error: { code: error.code || 'GENERATE_SHARE_TOKEN_ERROR' }
+    });
+  }
+};
+
+const getSharedWishlist = async (req, res) => {
+  try {
+    const result = await wishlistService.getSharedWishlist(req.params.token);
+    res.status(200).json({
+      success: true,
+      message: 'Shared wishlist retrieved successfully',
+      data: result
+    });
+  } catch (error) {
+    res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message || 'Failed to retrieve shared wishlist',
+      error: { code: error.code || 'GET_SHARED_WISHLIST_ERROR' }
+    });
+  }
+};
+
 module.exports = {
   getWishlist,
   addToWishlist,
   removeFromWishlist,
-  moveToCart
+  moveToCart,
+  generateShareToken,
+  getSharedWishlist
 };

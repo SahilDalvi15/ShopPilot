@@ -2,6 +2,7 @@ const Wishlist = require('../models/Wishlist.model');
 const Product = require('../models/Product.model');
 const Cart = require('../models/Cart.model');
 const logger = require('../utils/logger');
+const crypto = require('crypto');
 
 class WishlistService {
   async getWishlist(userId) {
@@ -140,6 +141,59 @@ class WishlistService {
     logger.info(`Item ${productId} moved from wishlist to cart for user ${userId}`);
 
     return result;
+  }
+
+  async generateShareToken(userId) {
+    let wishlist = await Wishlist.findOne({ userId });
+    
+    if (!wishlist) {
+      wishlist = await Wishlist.create({ userId, items: [] });
+    }
+
+    // Generate token if it doesn't exist
+    if (!wishlist.shareToken) {
+      wishlist.shareToken = crypto.randomBytes(16).toString('hex');
+      await wishlist.save();
+    }
+
+    return { shareToken: wishlist.shareToken };
+  }
+
+  async getSharedWishlist(shareToken) {
+    const wishlist = await Wishlist.findOne({ shareToken })
+      .populate('userId', 'firstName lastName')
+      .populate('items.productId');
+
+    if (!wishlist) {
+      const error = new Error('Wishlist not found or invalid link');
+      error.statusCode = 404;
+      error.code = 'SHARED_WISHLIST_NOT_FOUND';
+      throw error;
+    }
+
+    // Transform items with product details
+    const transformedItems = wishlist.items
+      .filter(item => item.productId && item.productId.isActive && !item.productId.isDeleted)
+      .map(item => ({
+        productId: item.productId._id,
+        product: {
+          id: item.productId._id,
+          title: item.productId.title,
+          slug: item.productId.slug,
+          images: item.productId.images,
+          price: item.productId.price,
+          discount: item.productId.discount,
+          discountedPrice: item.productId.discountedPrice,
+          stock: item.productId.stock,
+          rating: item.productId.rating
+        },
+        addedAt: item.addedAt
+      }));
+
+    return {
+      ownerName: wishlist.userId ? `${wishlist.userId.firstName} ${wishlist.userId.lastName}`.trim() : 'Someone',
+      items: transformedItems
+    };
   }
 }
 
