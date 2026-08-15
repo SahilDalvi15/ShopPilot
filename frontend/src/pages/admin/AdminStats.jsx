@@ -168,12 +168,12 @@ const AdminStats = () => {
                   axisLine={false} 
                   tickLine={false} 
                   tick={{ fill: '#64748b', fontSize: 12 }} 
-                  tickFormatter={(value) => \`₹\${value.toLocaleString()}\`}
+                  tickFormatter={(value) => `₹${value.toLocaleString()}`}
                   width={80}
                 />
                 <Tooltip 
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  formatter={(value) => [\`₹\${value.toLocaleString()}\`, 'Revenue']}
+                  formatter={(value) => [`₹${value.toLocaleString()}`, 'Revenue']}
                   labelStyle={{ fontWeight: 'bold', color: '#1e293b' }}
                 />
                 <Area 
