@@ -1,22 +1,78 @@
-import { useState } from 'react';
-import { Star, Send, Sparkles } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Star, Send, Sparkles, ImagePlus, X, Loader2 } from 'lucide-react';
+import uploadService from '../services/uploadService';
+import { useToast } from '../contexts/ToastContext';
 
 const ReviewForm = ({ productId, onSubmit, loading }) => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [title, setTitle] = useState('');
   const [comment, setComment] = useState('');
+  const [images, setImages] = useState([]);
   const [isFocused, setIsFocused] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
+  const { error } = useToast();
 
-  const handleSubmit = (e) => {
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    
+    // Check max files (limit to 3)
+    if (images.length + files.length > 3) {
+      error('Limit Exceeded', 'You can only upload up to 3 images per review.');
+      return;
+    }
+
+    // Filter out non-images or too large files
+    const validFiles = files.filter(file => {
+      if (!file.type.startsWith('image/')) {
+        error('Invalid File', `${file.name} is not an image.`);
+        return false;
+      }
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        error('File Too Large', `${file.name} exceeds the 5MB limit.`);
+        return false;
+      }
+      return true;
+    });
+
+    setImages(prev => [...prev, ...validFiles]);
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const removeImage = (index) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (rating === 0 || !comment.trim()) return;
+
+    let uploadedImageUrls = [];
+    if (images.length > 0) {
+      setIsUploading(true);
+      try {
+        const formData = new FormData();
+        images.forEach(img => formData.append('images', img));
+        const response = await uploadService.uploadReviewImages(formData);
+        uploadedImageUrls = response.data.images;
+      } catch (err) {
+        error('Upload Failed', err.response?.data?.message || 'Failed to upload images.');
+        setIsUploading(false);
+        return; // Stop submission if upload fails
+      }
+      setIsUploading(false);
+    }
 
     onSubmit({
       productId,
       rating,
       title: title.trim(),
       comment: comment.trim(),
+      images: uploadedImageUrls,
     });
 
     // Reset form
@@ -24,6 +80,7 @@ const ReviewForm = ({ productId, onSubmit, loading }) => {
     setHover(0);
     setTitle('');
     setComment('');
+    setImages([]);
   };
 
   return (
@@ -109,17 +166,68 @@ const ReviewForm = ({ productId, onSubmit, loading }) => {
         </div>
       </div>
 
+      {/* Image Upload */}
+      <div className="mb-8">
+        <label className="block text-sm font-bold text-gray-700 mb-2">
+          Add Photos (Optional)
+        </label>
+        
+        {images.length > 0 && (
+          <div className="flex flex-wrap gap-3 mb-3">
+            {images.map((img, index) => (
+              <div key={index} className="relative group rounded-xl overflow-hidden border border-gray-200">
+                <img 
+                  src={URL.createObjectURL(img)} 
+                  alt={`Preview ${index}`} 
+                  className="w-20 h-20 object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeImage(index)}
+                  className="absolute inset-0 bg-black/40 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          ref={fileInputRef}
+          onChange={handleImageChange}
+        />
+        
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={images.length >= 3}
+          className="flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <ImagePlus className="w-4 h-4 text-purple-500" />
+          {images.length >= 3 ? 'Max 3 photos added' : 'Select Photos (Max 3)'}
+        </button>
+      </div>
+
       {/* Submit Button */}
       <button
         type="submit"
-        disabled={loading || rating === 0 || comment.trim().length < 20}
+        disabled={loading || isUploading || rating === 0 || comment.trim().length < 20}
         className="relative w-full group disabled:opacity-60 disabled:cursor-not-allowed overflow-hidden rounded-xl"
       >
         <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-indigo-600 transition-transform duration-300 group-hover:scale-105"></div>
         <div className="absolute inset-0 opacity-0 group-hover:opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] transition-opacity duration-300"></div>
         <div className="relative px-6 py-4 flex items-center justify-center gap-2 text-white font-bold tracking-wide">
-          <Send className={`w-5 h-5 ${!loading && 'group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300'}`} />
-          {loading ? 'Submitting Review...' : 'Submit Review'}
+          {isUploading ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <Send className={`w-5 h-5 ${(!loading && !isUploading) && 'group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300'}`} />
+          )}
+          {loading || isUploading ? (isUploading ? 'Uploading Photos...' : 'Submitting Review...') : 'Submit Review'}
         </div>
       </button>
     </form>

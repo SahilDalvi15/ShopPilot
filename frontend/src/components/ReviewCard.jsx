@@ -1,9 +1,10 @@
-import { Star, Calendar, ThumbsUp } from 'lucide-react';
+import { Star, Calendar, ThumbsUp, X } from 'lucide-react';
 import { useState } from 'react';
 
 const ReviewCard = ({ review, onHelpful }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [helpfulClicked, setHelpfulClicked] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const renderStars = (rating) => {
     return Array.from({ length: 5 }, (_, i) => (
@@ -122,7 +123,11 @@ const ReviewCard = ({ review, onHelpful }) => {
         {review.images && review.images.length > 0 && (
           <div className="flex gap-2">
             {review.images.slice(0, 3).map((image, index) => (
-              <div key={index} className="relative overflow-hidden rounded-xl border border-gray-200 group/img cursor-pointer">
+              <div 
+                key={index} 
+                className="relative overflow-hidden rounded-xl border border-gray-200 group/img cursor-pointer"
+                onClick={() => setSelectedImage(image)}
+              >
                 <img
                   src={image}
                   alt={`Review image ${index + 1}`}
@@ -134,6 +139,25 @@ const ReviewCard = ({ review, onHelpful }) => {
           </div>
         )}
       </div>
+
+      {/* Lightbox Modal */}
+      {selectedImage && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="relative max-w-4xl max-h-[90vh] w-full flex justify-center items-center">
+            <button 
+              onClick={() => setSelectedImage(null)}
+              className="absolute -top-12 right-0 sm:-right-12 sm:-top-12 text-white/70 hover:text-white transition-colors bg-white/10 hover:bg-white/20 p-2 rounded-full"
+            >
+              <X className="w-8 h-8" />
+            </button>
+            <img 
+              src={selectedImage} 
+              alt="Review full size" 
+              className="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

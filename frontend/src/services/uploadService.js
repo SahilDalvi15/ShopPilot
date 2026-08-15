@@ -20,6 +20,16 @@ const uploadService = {
     });
     return response.data;
   },
+
+  // Upload review images
+  uploadReviewImages: async (formData) => {
+    const response = await api.post('/upload/review-images', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
 };
 
 export default uploadService;
