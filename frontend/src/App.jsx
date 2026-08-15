@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectIsAuthenticated, selectCurrentUser } from './store/slices/authSlice';
+import { selectIsAuthenticated, selectCurrentUser, getCurrentUser } from './store/slices/authSlice';
 import { fetchCart } from './store/slices/cartSlice';
 import { fetchWishlist } from './store/slices/wishlistSlice';
 import Header from './components/Header';
@@ -18,7 +18,6 @@ import ProductDetailPage from './pages/ProductDetailPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import OrdersPage from './pages/OrdersPage';
-import OrderDetailsPage from './pages/OrderDetailsPage';
 import WishlistPage from './pages/WishlistPage';
 import SharedWishlistPage from './pages/SharedWishlistPage';
 import ProfilePage from './pages/ProfilePage';
@@ -59,6 +58,12 @@ const MainLayout = () => (
 function App() {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
+
+  useEffect(() => {
+    if (localStorage.getItem('accessToken')) {
+      dispatch(getCurrentUser());
+    }
+  }, [dispatch]);
 
   // Fetch cart and wishlist from backend whenever the user is authenticated
   useEffect(() => {
