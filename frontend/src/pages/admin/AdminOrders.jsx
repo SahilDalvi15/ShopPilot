@@ -60,6 +60,31 @@ const AdminOrders = () => {
     updateStatusMutation.mutate({ orderId, status: newStatus });
   };
 
+  const handleExport = () => {
+    if (!filteredOrders.length) return;
+    const headers = ['Order ID', 'Customer Name', 'Customer Email', 'Items', 'Total', 'Payment', 'Status', 'Date'];
+    const csvData = filteredOrders.map(order => [
+      order._id,
+      order.user?.name || 'Unknown',
+      order.user?.email || 'N/A',
+      order.items?.length || 0,
+      order.totalAmount,
+      order.paymentMethod || 'N/A',
+      order.status,
+      new Date(order.createdAt).toLocaleDateString()
+    ]);
+    const csvContent = [headers.join(','), ...csvData.map(row => row.map(cell => `"${cell}"`).join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `orders_export_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -68,7 +93,7 @@ const AdminOrders = () => {
           <h1 className="text-3xl font-bold text-gray-900">Orders</h1>
           <p className="text-gray-600 mt-2">Manage customer orders</p>
         </div>
-        <button className="flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition">
+        <button onClick={handleExport} className="flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition">
           <Download className="w-5 h-5" />
           Export
         </button>
