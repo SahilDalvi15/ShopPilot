@@ -43,6 +43,25 @@ const getProductBySlug = async (req, res) => {
   }
 };
 
+const getProductRecommendations = async (req, res) => {
+  try {
+    const recommendations = await productService.getProductRecommendations(req.params.productId);
+    res.status(200).json({
+      success: true,
+      message: 'Product recommendations retrieved successfully',
+      data: recommendations
+    });
+  } catch (error) {
+    res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message || 'Failed to retrieve recommendations',
+      error: {
+        code: error.code || 'GET_RECOMMENDATIONS_ERROR'
+      }
+    });
+  }
+};
+
 const createProduct = async (req, res) => {
   try {
     const product = await productService.createProduct(req.body, req.user.id);
@@ -102,6 +121,7 @@ const deleteProduct = async (req, res) => {
 module.exports = {
   getProducts,
   getProductBySlug,
+  getProductRecommendations,
   createProduct,
   updateProduct,
   deleteProduct

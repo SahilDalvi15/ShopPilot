@@ -2,8 +2,10 @@ const Product = require('../models/Product.model');
 const Brand = require('../models/Brand.model');
 const Category = require('../models/Category.model');
 const Inventory = require('../models/Inventory.model');
+const OrderItem = require('../models/OrderItem.model');
 const logger = require('../utils/logger');
 const elasticsearch = require('../config/elasticsearch');
+const mongoose = require('mongoose');
 
 class ProductService {
   async getProducts(query) {
@@ -378,6 +380,90 @@ class ProductService {
 
   async incrementViewCount(productId) {
     await Product.findByIdAndUpdate(productId, { $inc: { viewCount: 1 } });
+  }
+
+  async getProductRecommendations(productId) {
+    const product = await Product.findById(productId);
+    if (!product) {
+      const error = new Error('Product not found');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const limit = 10;
+    let recommendations = [];
+    const recommendedIds = new Set();
+    recommendedIds.add(product._id.toString());
+
+    try {
+      // 1. Frequently Bought Together
+      const fbtOrderItems = await OrderItem.aggregate([
+        { $match: { productId: new mongoose.Types.ObjectId(productId) } },
+        { $group: { _id: '$orderId' } }
+      ]);
+      const orderIds = fbtOrderItems.map(item => item._id);
+
+      if (orderIds.length > 0) {
+        const fbtProductsRaw = await OrderItem.aggregate([
+          { $match: { orderId: { $in: orderIds }, productId: { $ne: new mongoose.Types.ObjectId(productId) } } },
+          { $group: { _id: '$productId', count: { $sum: 1 } } },
+          { $sort: { count: -1 } },
+          { $limit: limit }
+        ]);
+
+        const fbtProductIds = fbtProductsRaw.map(p => p._id);
+        if (fbtProductIds.length > 0) {
+          const fbtProducts = await Product.find({ _id: { $in: fbtProductIds }, isActive: true, isDeleted: false })
+            .populate('brandId', 'name slug logo')
+            .populate('categoryId', 'name slug image');
+          
+          fbtProducts.forEach(p => {
+            if (!recommendedIds.has(p._id.toString())) {
+              recommendations.push(p);
+              recommendedIds.add(p._id.toString());
+            }
+          });
+        }
+      }
+
+      // 2. Similar Products (Same Category)
+      if (recommendations.length < limit) {
+        const similarProducts = await Product.find({
+          categoryId: product.categoryId,
+          _id: { $nin: Array.from(recommendedIds).map(id => new mongoose.Types.ObjectId(id)) },
+          isActive: true,
+          isDeleted: false
+        })
+          .populate('brandId', 'name slug logo')
+          .populate('categoryId', 'name slug image')
+          .sort({ soldCount: -1, rating: -1 })
+          .limit(limit - recommendations.length);
+
+        similarProducts.forEach(p => {
+          recommendations.push(p);
+          recommendedIds.add(p._id.toString());
+        });
+      }
+
+      // 3. Transform to standard format
+      return recommendations.map(p => ({
+        id: p._id,
+        title: p.title,
+        slug: p.slug,
+        brand: p.brandId ? { name: p.brandId.name } : null,
+        category: p.categoryId ? { name: p.categoryId.name } : null,
+        images: p.images,
+        price: p.price,
+        discount: p.discount,
+        discountedPrice: p.discountedPrice,
+        stock: p.stock,
+        rating: p.rating,
+        reviewCount: p.reviewCount
+      }));
+    } catch (error) {
+      logger.error(`Error fetching recommendations for product ${productId}: ${error.message}`);
+      return []; // Return empty array on error so UI doesn't break
+    }
   }
 }
 
