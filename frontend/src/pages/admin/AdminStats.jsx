@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { Package, ShoppingCart, Users, DollarSign, TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Package, ShoppingCart, Users, DollarSign, TrendingUp, TrendingDown, Loader2, Download } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, Legend } from 'recharts';
 import adminStatsService from '../../services/adminStatsService';
 
 const AdminStats = () => {
@@ -26,7 +26,38 @@ const AdminStats = () => {
     );
   }
 
-  const { overview, recentOrders, topProducts, revenueTrend } = statsResponse.data;
+  const { overview, recentOrders, topProducts, revenueTrend, orderDistribution, categorySales } = statsResponse.data;
+
+  const COLORS = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#6366f1', '#14b8a6'];
+
+  const handleExportCSV = () => {
+    if (!statsResponse?.data) return;
+    
+    // Create CSV content for Recent Orders
+    const headers = ['Order ID', 'Customer', 'Amount', 'Status', 'Date'];
+    const rows = statsResponse.data.recentOrders.map(order => 
+      [order.id, order.customer, order.amount.replace('₹', '').replace(/,/g, ''), order.status, new Date(order.date).toLocaleDateString()].join(',')
+    );
+    
+    const csvContent = [
+      'ShopPilot Admin Report',
+      'Generated: ' + new Date().toLocaleString(),
+      '',
+      '--- RECENT ORDERS ---',
+      headers.join(','),
+      ...rows
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `shoppilot_report_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const stats = [
     {
@@ -82,6 +113,16 @@ const AdminStats = () => {
 
   return (
     <div className="space-y-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+        <button
+          onClick={handleExportCSV}
+          className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl transition-all shadow-sm font-medium"
+        >
+          <Download className="w-4 h-4" /> Export Report
+        </button>
+      </div>
+
       {/* Welcome Banner */}
       <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
         <div className="relative z-10">
@@ -191,6 +232,73 @@ const AdminStats = () => {
               No revenue data available for the last 7 days.
             </div>
           )}
+        </div>
+      </div>
+
+      {/* New Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Sales by Category Donut Chart */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">Sales by Category</h2>
+          <div className="h-80 w-full">
+            {categorySales && categorySales.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={categorySales}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={80}
+                    outerRadius={120}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {categorySales.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    formatter={(value) => [`₹${value.toLocaleString()}`, 'Revenue']}
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  />
+                  <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-500">
+                No category sales data available.
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Order Status Distribution Bar Chart */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">Order Distribution</h2>
+          <div className="h-80 w-full">
+            {orderDistribution && orderDistribution.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={orderDistribution} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} width={40} />
+                  <Tooltip
+                    cursor={{ fill: '#f8fafc' }}
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  />
+                  <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={40}>
+                    {orderDistribution.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-500">
+                No order distribution data available.
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
