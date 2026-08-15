@@ -10,6 +10,8 @@ import { addToWishlist, removeFromWishlist } from '../store/slices/wishlistSlice
 import { useToast } from '../contexts/ToastContext';
 import { Search, Grid, List, Heart, ShoppingCart, Star, SlidersHorizontal, X } from 'lucide-react';
 import ProductCardSkeleton from '../components/skeletons/ProductCardSkeleton';
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
 
 const ProductsPage = () => {
   const location = useLocation();
@@ -44,6 +46,30 @@ const ProductsPage = () => {
   
   const [viewMode, setViewMode] = useState('grid');
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+
+  useEffect(() => {
+    if (filters.search.length >= 2) {
+      const delayDebounceFn = setTimeout(async () => {
+        setIsSearching(true);
+        try {
+          const res = await productService.getSearchSuggestions(filters.search);
+          setSuggestions(res.data?.suggestions || []);
+          setShowSuggestions(true);
+        } catch (error) {
+          console.error('Failed to get suggestions', error);
+        } finally {
+          setIsSearching(false);
+        }
+      }, 300);
+      return () => clearTimeout(delayDebounceFn);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [filters.search]);
 
   // Sync state when URL params or path changes
   useEffect(() => {
@@ -84,6 +110,27 @@ const ProductsPage = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
+  };
+
+  const handleCheckboxChange = (key, value) => {
+    setFilters(prev => {
+      const currentValues = prev[key] ? prev[key].split(',') : [];
+      let newValues;
+      if (currentValues.includes(value)) {
+        newValues = currentValues.filter(v => v !== value);
+      } else {
+        newValues = [...currentValues, value];
+      }
+      const newValueStr = newValues.join(',');
+      const newParams = new URLSearchParams(searchParams);
+      if (newValueStr === '') {
+        newParams.delete(key);
+      } else {
+        newParams.set(key, newValueStr);
+      }
+      setSearchParams(newParams);
+      return { ...prev, [key]: newValueStr };
+    });
   };
 
   const handleFilterChange = (key, value) => {
@@ -153,38 +200,27 @@ const ProductsPage = () => {
       <div>
         <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Categories</h3>
         <div className="space-y-3">
-          <label className="flex items-center gap-3 cursor-pointer group">
-            <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${filters.category === '' ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 group-hover:border-indigo-500'}`}>
-              {filters.category === '' && <div className="w-2.5 h-2.5 bg-white rounded-sm" />}
-            </div>
-            <input 
-              type="radio" 
-              name="category"
-              className="hidden"
-              checked={filters.category === ''}
-              onChange={() => handleFilterChange('category', '')}
-            />
-            <span className={`text-sm ${filters.category === '' ? 'font-medium text-gray-900' : 'text-gray-600 group-hover:text-gray-900'}`}>
-              All Categories
-            </span>
-          </label>
-          {categoriesData?.data?.map((cat) => (
-            <label key={cat.id || cat._id} className="flex items-center gap-3 cursor-pointer group">
-              <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${filters.category === (cat.id || cat._id) ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 group-hover:border-indigo-500'}`}>
-                {filters.category === (cat.id || cat._id) && <div className="w-2.5 h-2.5 bg-white rounded-sm" />}
-              </div>
-              <input 
-                type="radio" 
-                name="category"
-                className="hidden"
-                checked={filters.category === (cat.id || cat._id)}
-                onChange={() => handleFilterChange('category', cat.id || cat._id)}
-              />
-              <span className={`text-sm ${filters.category === (cat.id || cat._id) ? 'font-medium text-gray-900' : 'text-gray-600 group-hover:text-gray-900'}`}>
-                {cat.name}
-              </span>
-            </label>
-          ))}
+          {categoriesData?.data?.map((cat) => {
+            const isChecked = filters.category.split(',').includes(cat.id || cat._id);
+            return (
+              <label key={cat.id || cat._id} className="flex items-center gap-3 cursor-pointer group">
+                <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${isChecked ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 group-hover:border-indigo-500'}`}>
+                  {isChecked && <div className="w-3 h-3 bg-white rounded-sm text-white flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="w-full h-full"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </div>}
+                </div>
+                <input 
+                  type="checkbox"
+                  className="hidden"
+                  checked={isChecked}
+                  onChange={() => handleCheckboxChange('category', cat.id || cat._id)}
+                />
+                <span className={`text-sm ${isChecked ? 'font-medium text-gray-900' : 'text-gray-600 group-hover:text-gray-900'}`}>
+                  {cat.name}
+                </span>
+              </label>
+            );
+          })}
         </div>
       </div>
 
@@ -192,56 +228,49 @@ const ProductsPage = () => {
       <div>
         <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Brands</h3>
         <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => handleFilterChange('brand', '')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
-              filters.brand === ''
-                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-indigo-200'
-                : 'bg-white text-gray-600 border border-gray-200 hover:border-indigo-300 hover:text-indigo-600'
-            }`}
-          >
-            All Brands
-          </button>
-          {brandsData?.data?.map((brand) => (
-            <button
-              key={brand.id || brand._id}
-              onClick={() => handleFilterChange('brand', brand.id || brand._id)}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
-                filters.brand === (brand.id || brand._id)
-                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-indigo-200'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:border-indigo-300 hover:text-indigo-600'
-              }`}
-            >
-              {brand.name}
-            </button>
-          ))}
+          {brandsData?.data?.map((brand) => {
+            const isChecked = filters.brand.split(',').includes(brand.id || brand._id);
+            return (
+              <button
+                key={brand.id || brand._id}
+                onClick={() => handleCheckboxChange('brand', brand.id || brand._id)}
+                className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                  isChecked
+                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-indigo-200'
+                    : 'bg-white text-gray-600 border border-gray-200 hover:border-indigo-300 hover:text-indigo-600'
+                }`}
+              >
+                {brand.name}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Price Range */}
       <div>
         <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Price Range</h3>
-        <div className="flex items-center gap-3">
-          <div className="relative flex-1 group">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-600 transition-colors">₹</span>
-            <input
-              type="number"
-              placeholder="Min"
-              value={filters.minPrice}
-              onChange={(e) => handleFilterChange('minPrice', e.target.value)}
-              className="w-full pl-8 pr-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 transition-all shadow-sm"
-            />
-          </div>
-          <span className="text-gray-400 font-medium">-</span>
-          <div className="relative flex-1 group">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-600 transition-colors">₹</span>
-            <input
-              type="number"
-              placeholder="Max"
-              value={filters.maxPrice}
-              onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
-              className="w-full pl-8 pr-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 transition-all shadow-sm"
-            />
+        <div className="px-2 pt-2">
+          <Slider
+            range
+            min={0}
+            max={100000}
+            step={100}
+            value={[filters.minPrice ? parseInt(filters.minPrice) : 0, filters.maxPrice ? parseInt(filters.maxPrice) : 100000]}
+            onChange={(value) => {
+              handleFilterChange('minPrice', value[0].toString());
+              handleFilterChange('maxPrice', value[1].toString());
+            }}
+            trackStyle={{ backgroundColor: '#4f46e5', height: 6 }}
+            railStyle={{ backgroundColor: '#e5e7eb', height: 6 }}
+            handleStyle={[
+              { borderColor: '#4f46e5', height: 20, width: 20, marginTop: -7, opacity: 1 },
+              { borderColor: '#4f46e5', height: 20, width: 20, marginTop: -7, opacity: 1 }
+            ]}
+          />
+          <div className="flex items-center justify-between mt-6 text-sm font-medium text-gray-600">
+            <div className="bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-lg">₹ {filters.minPrice || 0}</div>
+            <div className="bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-lg">₹ {filters.maxPrice || 100000}</div>
           </div>
         </div>
       </div>
@@ -338,17 +367,49 @@ const ProductsPage = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <form onSubmit={handleSearch} className="flex-1 md:w-80">
+            <form onSubmit={handleSearch} className="flex-1 md:w-80 relative">
               <div className="relative group">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-indigo-600 transition-colors" />
                 <input
                   type="text"
                   value={filters.search}
                   onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                  onFocus={() => setShowSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                   placeholder="Search products..."
                   className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-2xl text-sm focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 transition-all shadow-sm"
                 />
+                {isSearching && (
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                    <div className="w-4 h-4 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
               </div>
+              
+              {/* Autocomplete Dropdown */}
+              {showSuggestions && filters.search.length >= 2 && suggestions.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
+                  {suggestions.map((sug, idx) => (
+                    <div 
+                      key={idx}
+                      onClick={() => navigate(`/products/${sug.slug}`)}
+                      className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center gap-3 border-b border-gray-50 last:border-0"
+                    >
+                      {sug.image ? (
+                        <img src={sug.image} alt={sug.title} className="w-10 h-10 rounded-lg object-cover bg-gray-100" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                          <Search className="w-4 h-4 text-gray-400" />
+                        </div>
+                      )}
+                      <div>
+                        <div className="text-sm font-semibold text-gray-900">{sug.title}</div>
+                        {sug.brand && <div className="text-xs text-gray-500">{sug.brand}</div>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </form>
 
             {/* Mobile Filters Toggle */}
@@ -415,6 +476,58 @@ const ProductsPage = () => {
 
           {/* Products Grid */}
           <div className="flex-1 min-w-0">
+            {/* Active Filters Row */}
+            {(filters.category || filters.brand || filters.minPrice || filters.maxPrice || filters.minRating || filters.inStock) && (
+              <div className="flex items-center gap-2 flex-wrap mb-6 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                <span className="text-sm font-bold text-gray-700 mr-2">Active Filters:</span>
+                
+                {filters.category && filters.category.split(',').map(catId => {
+                  const cat = categoriesData?.data?.find(c => (c.id || c._id) === catId);
+                  return cat ? (
+                    <span key={catId} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
+                      {cat.name}
+                      <button onClick={() => handleCheckboxChange('category', catId)} className="hover:bg-indigo-200 rounded-full p-0.5 transition-colors"><X className="w-3 h-3" /></button>
+                    </span>
+                  ) : null;
+                })}
+
+                {filters.brand && filters.brand.split(',').map(brandId => {
+                  const brand = brandsData?.data?.find(b => (b.id || b._id) === brandId);
+                  return brand ? (
+                    <span key={brandId} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-100">
+                      {brand.name}
+                      <button onClick={() => handleCheckboxChange('brand', brandId)} className="hover:bg-purple-200 rounded-full p-0.5 transition-colors"><X className="w-3 h-3" /></button>
+                    </span>
+                  ) : null;
+                })}
+
+                {(filters.minPrice || filters.maxPrice) && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-100">
+                    ₹{filters.minPrice || 0} - ₹{filters.maxPrice || '100k+'}
+                    <button onClick={() => { handleFilterChange('minPrice', ''); handleFilterChange('maxPrice', ''); }} className="hover:bg-green-200 rounded-full p-0.5 transition-colors"><X className="w-3 h-3" /></button>
+                  </span>
+                )}
+
+                {filters.minRating && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-yellow-50 text-yellow-700 border border-yellow-100">
+                    {filters.minRating}+ Stars
+                    <button onClick={() => handleFilterChange('minRating', '')} className="hover:bg-yellow-200 rounded-full p-0.5 transition-colors"><X className="w-3 h-3" /></button>
+                  </span>
+                )}
+
+                {filters.inStock && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
+                    In Stock
+                    <button onClick={() => handleFilterChange('inStock', false)} className="hover:bg-blue-200 rounded-full p-0.5 transition-colors"><X className="w-3 h-3" /></button>
+                  </span>
+                )}
+
+                <button onClick={clearFilters} className="text-xs font-bold text-gray-500 hover:text-red-600 transition-colors ml-auto underline">
+                  Clear All
+                </button>
+              </div>
+            )}
+            
             {isLoading ? (
               <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
                 {[...Array(6)].map((_, i) => (
