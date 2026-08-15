@@ -33,11 +33,11 @@ class ProductService {
     };
 
     if (category) {
-      queryObj.categoryId = category;
+      queryObj.categoryId = { $in: category.split(',') };
     }
 
     if (brand) {
-      queryObj.brandId = brand;
+      queryObj.brandId = { $in: brand.split(',') };
     }
 
     if (search) {
