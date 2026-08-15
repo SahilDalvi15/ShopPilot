@@ -1,6 +1,7 @@
 const Order = require('../models/Order.model');
 const Product = require('../models/Product.model');
 const User = require('../models/User.model');
+const OrderItem = require('../models/OrderItem.model');
 
 class StatsService {
   async getAdminStats() {
@@ -82,6 +83,41 @@ class StatsService {
       });
     }
 
+    // 8. Order Status Distribution
+    const orderDistributionRaw = await Order.aggregate([
+      { $group: { _id: '$orderStatus', count: { $sum: 1 } } }
+    ]);
+    const orderDistribution = orderDistributionRaw.map(d => ({
+      name: d._id.charAt(0).toUpperCase() + d._id.slice(1).replace('_', ' '),
+      value: d.count
+    }));
+
+    // 9. Sales by Category
+    const categorySalesRaw = await OrderItem.aggregate([
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'orderId',
+          foreignField: '_id',
+          as: 'order'
+        }
+      },
+      { $unwind: '$order' },
+      { $match: { 'order.orderStatus': { $ne: 'cancelled' } } },
+      {
+        $group: {
+          _id: '$category',
+          value: { $sum: '$subtotal' }
+        }
+      },
+      { $sort: { value: -1 } }
+    ]);
+    
+    const categorySales = categorySalesRaw.map(c => ({
+      name: c._id || 'Uncategorized',
+      value: c.value
+    }));
+
     return {
       overview: {
         totalRevenue: `₹${totalRevenue.toLocaleString()}`,
@@ -91,7 +127,9 @@ class StatsService {
       },
       recentOrders,
       topProducts,
-      revenueTrend
+      revenueTrend,
+      orderDistribution,
+      categorySales
     };
   }
 }
