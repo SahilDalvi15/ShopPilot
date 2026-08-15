@@ -1,21 +1,57 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Save, Store, Mail, Lock, Shield, Image as ImageIcon } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '../../contexts/ToastContext';
 import { authService } from '../../services/auth.service';
+import { settingService } from '../../services/settingService';
 
 const AdminSettings = () => {
   const { success, error } = useToast();
   const [activeTab, setActiveTab] = useState('general');
   const { user } = useSelector((state) => state.auth);
 
-  // Dummy state for UI demonstration
-  const [generalSettings, setGeneralSettings] = useState({
-    storeName: 'ShopPilot',
-    contactEmail: 'support@shoppilot.com',
-    currency: 'INR',
-    logoUrl: 'https://shoppilot.com/logo.png',
+  const queryClient = useQueryClient();
+
+  const { data: settingsData, isLoading } = useQuery({
+    queryKey: ['adminSettings'],
+    queryFn: settingService.getSettings,
   });
+
+  const updateSettingsMutation = useMutation({
+    mutationFn: settingService.updateSettings,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminSettings'] });
+      success('Settings Saved', 'General store settings have been updated.');
+    },
+    onError: (err) => {
+      error('Error', err.response?.data?.message || 'Failed to update settings');
+    }
+  });
+
+  const [generalSettings, setGeneralSettings] = useState({
+    storeName: '',
+    contactEmail: '',
+    currency: 'INR',
+    logoUrl: '',
+    taxRate: 18,
+    shippingCharge: 50,
+    freeShippingThreshold: 500
+  });
+
+  useEffect(() => {
+    if (settingsData?.data) {
+      setGeneralSettings({
+        storeName: settingsData.data.storeName || '',
+        contactEmail: settingsData.data.contactEmail || '',
+        currency: settingsData.data.currency || 'INR',
+        logoUrl: settingsData.data.logoUrl || '',
+        taxRate: settingsData.data.taxRate ?? 18,
+        shippingCharge: settingsData.data.shippingCharge ?? 50,
+        freeShippingThreshold: settingsData.data.freeShippingThreshold ?? 500
+      });
+    }
+  }, [settingsData]);
 
   const [securitySettings, setSecuritySettings] = useState({
     adminEmail: user?.email || '',
@@ -28,8 +64,7 @@ const AdminSettings = () => {
 
   const handleGeneralSubmit = (e) => {
     e.preventDefault();
-    // Simulate save
-    success('Settings Saved', 'General store settings have been updated.');
+    updateSettingsMutation.mutate(generalSettings);
   };
 
   const handleSecuritySubmit = async (e) => {
@@ -154,12 +189,47 @@ const AdminSettings = () => {
                   </select>
                 </div>
 
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Tax Rate (%)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={generalSettings.taxRate}
+                      onChange={(e) => setGeneralSettings({ ...generalSettings, taxRate: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Shipping Charge ({generalSettings.currency === 'INR' ? '₹' : generalSettings.currency === 'USD' ? '$' : '€'})</label>
+                    <input
+                      type="number"
+                      value={generalSettings.shippingCharge}
+                      onChange={(e) => setGeneralSettings({ ...generalSettings, shippingCharge: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Free Shipping Threshold</label>
+                    <input
+                      type="number"
+                      value={generalSettings.freeShippingThreshold}
+                      onChange={(e) => setGeneralSettings({ ...generalSettings, freeShippingThreshold: e.target.value })}
+                      className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                    />
+                  </div>
+                </div>
+
                 <div className="pt-4 border-t border-gray-100 flex justify-end">
                   <button
-                    type="submit"
-                    className="flex items-center gap-2 bg-purple-600 text-white px-6 py-2.5 rounded-lg hover:bg-purple-700 transition font-medium"
+                    disabled={updateSettingsMutation.isPending}
+                    className="flex items-center gap-2 bg-purple-600 text-white px-6 py-2.5 rounded-lg hover:bg-purple-700 transition font-medium disabled:opacity-50"
                   >
-                    <Save className="w-4 h-4" />
+                    {updateSettingsMutation.isPending ? (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <Save className="w-4 h-4" />
+                    )}
                     Save Settings
                   </button>
                 </div>
