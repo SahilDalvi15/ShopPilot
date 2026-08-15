@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { fetchCart, removeFromCart, updateCartItem, applyCouponAsync, removeCouponAsync } from '../store/slices/cartSlice';
+import { useQuery } from '@tanstack/react-query';
+import { settingService } from '../services/settingService';
 import { useToast } from '../contexts/ToastContext';
 import { Trash2, Plus, Minus, ShoppingBag, Tag, X } from 'lucide-react';
 
@@ -15,6 +17,19 @@ const CartPage = () => {
   const appliedCoupon = useSelector((state) => state.cart.appliedCoupon);
   const loading = useSelector((state) => state.cart.loading);
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+
+  const { data: settingsData } = useQuery({
+    queryKey: ['settings'],
+    queryFn: settingService.getSettings,
+    staleTime: 5 * 60 * 1000 // 5 minutes
+  });
+  
+  const settings = settingsData?.data || { taxRate: 18, shippingCharge: 50, freeShippingThreshold: 500, currency: 'INR' };
+  
+  const cartTotalBeforeTax = totalAmount; // This is subtotal - discount
+  const shipping = cartTotalBeforeTax >= settings.freeShippingThreshold ? 0 : settings.shippingCharge;
+  const tax = Math.round(subtotal * (settings.taxRate / 100));
+  const finalTotal = cartTotalBeforeTax + shipping + tax;
 
   const [couponCode, setCouponCode] = useState('');
 
@@ -173,13 +188,20 @@ const CartPage = () => {
                 
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
-                  <span className="text-green-600">Free</span>
+                  <span className={shipping === 0 ? "text-green-600" : ""}>
+                    {shipping === 0 ? 'Free' : `₹${shipping.toLocaleString()}`}
+                  </span>
+                </div>
+                
+                <div className="flex justify-between text-gray-600">
+                  <span>Tax ({settings.taxRate}%)</span>
+                  <span>₹{tax.toLocaleString()}</span>
                 </div>
                 
                 <div className="border-t border-gray-200 pt-3">
                   <div className="flex justify-between font-semibold text-gray-900">
                     <span>Total</span>
-                    <span>₹{totalAmount.toLocaleString()}</span>
+                    <span>₹{finalTotal.toLocaleString()}</span>
                   </div>
                 </div>
               </div>

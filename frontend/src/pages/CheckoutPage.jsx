@@ -6,6 +6,8 @@ import { fetchAddresses } from '../store/slices/addressSlice';
 import { clearCart, applyCouponAsync, removeCouponAsync } from '../store/slices/cartSlice';
 import { orderService } from '../services/order.service';
 import { useToast } from '../contexts/ToastContext';
+import { useQuery } from '@tanstack/react-query';
+import { settingService } from '../services/settingService';
 import AddressCardSkeleton from '../components/skeletons/AddressCardSkeleton';
 import MockPaymentModal from '../components/MockPaymentModal';
 
@@ -25,6 +27,14 @@ const CheckoutPage = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMockModalOpen, setIsMockModalOpen] = useState(false);
 
+  const { data: settingsData } = useQuery({
+    queryKey: ['settings'],
+    queryFn: settingService.getSettings,
+    staleTime: 5 * 60 * 1000 // 5 minutes
+  });
+  
+  const settings = settingsData?.data || { taxRate: 18, shippingCharge: 50, freeShippingThreshold: 500, currency: 'INR' };
+
   useEffect(() => {
     dispatch(fetchAddresses());
   }, [dispatch]);
@@ -42,11 +52,11 @@ const CheckoutPage = () => {
   };
 
   const calculateShipping = () => {
-    return cartTotal >= 999 ? 0 : 99;
+    return cartTotal >= settings.freeShippingThreshold ? 0 : settings.shippingCharge;
   };
 
   const calculateTax = () => {
-    return Math.round(calculateSubtotal() * 0.18);
+    return Math.round(calculateSubtotal() * (settings.taxRate / 100));
   };
 
   const calculateTotal = () => {
@@ -345,7 +355,7 @@ const CheckoutPage = () => {
                     </span>
                   </div>
                   <div className="flex justify-between text-gray-600">
-                    <span>Tax (18%)</span>
+                    <span>Tax ({settings.taxRate}%)</span>
                     <span className="font-medium text-gray-900">₹{calculateTax().toLocaleString()}</span>
                   </div>
                   {cartDiscount > 0 && (
@@ -408,7 +418,7 @@ const CheckoutPage = () => {
                     <div className="bg-purple-100 p-1.5 rounded-full text-purple-600">
                       <Truck className="h-4 w-4" />
                     </div>
-                    <span className="font-medium">Free shipping on orders over ₹999</span>
+                    <span className="font-medium">Free shipping on orders over ₹{settings.freeShippingThreshold}</span>
                   </div>
                   <div className="flex items-center space-x-3 text-sm text-gray-600">
                     <div className="bg-purple-100 p-1.5 rounded-full text-purple-600">
