@@ -490,6 +490,11 @@ const ProductDetailPage = () => {
 
       </div>
 
+      {/* Related Products */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <RelatedProducts currentProductId={product.id} />
+      </div>
+
       {/* Size Chart Modal */}
       {isSizeChartOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">

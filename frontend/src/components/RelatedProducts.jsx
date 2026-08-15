@@ -8,7 +8,7 @@ import { selectIsAuthenticated } from '../store/slices/authSlice';
 import { useToast } from '../contexts/ToastContext';
 import { useNavigate } from 'react-router-dom';
 
-const RelatedProducts = ({ categoryId, currentProductId }) => {
+const RelatedProducts = ({ currentProductId }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { success, error: toastError } = useToast();
@@ -16,12 +16,12 @@ const RelatedProducts = ({ categoryId, currentProductId }) => {
   const wishlistItems = useSelector((state) => state.wishlist.items);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['related-products', categoryId],
-    queryFn: () => productService.getProducts({ category: categoryId, limit: 10 }),
-    enabled: !!categoryId
+    queryKey: ['related-products', currentProductId],
+    queryFn: () => productService.getProductRecommendations(currentProductId),
+    enabled: !!currentProductId
   });
 
-  const products = data?.data?.filter(p => p.id !== currentProductId) || [];
+  const products = data?.data || [];
 
   if (isLoading || products.length === 0) return null;
 
@@ -63,7 +63,7 @@ const RelatedProducts = ({ categoryId, currentProductId }) => {
 
   return (
     <div className="py-8 border-t border-gray-200">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Related products with free delivery</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">Frequently Bought Together & Similar Items</h2>
       <div className="flex overflow-x-auto pb-6 gap-6 snap-x hide-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {products.map((product) => (
           <div 

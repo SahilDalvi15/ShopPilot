@@ -11,6 +11,11 @@ export const productService = {
     return response.data;
   },
 
+  getProductRecommendations: async (productId) => {
+    const response = await api.get(`/products/${productId}/recommendations`);
+    return response.data;
+  },
+
   createProduct: async (productData) => {
     const response = await api.post('/products', productData);
     return response.data;
