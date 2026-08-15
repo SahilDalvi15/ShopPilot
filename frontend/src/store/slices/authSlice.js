@@ -3,8 +3,8 @@ import { authService } from '../../services/auth.service';
 
 const initialState = {
   user: null,
-  token: null,
-  isAuthenticated: false,
+  token: localStorage.getItem('accessToken') || null,
+  isAuthenticated: !!localStorage.getItem('accessToken'),
   loading: false,
   error: null,
 };
