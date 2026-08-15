@@ -29,6 +29,30 @@ router.post('/images', authenticate, authorize(['admin', 'super_admin']), (req, 
   });
 });
 
+// Upload review images (max 5, accessible to any authenticated user)
+router.post('/review-images', authenticate, (req, res, next) => {
+  uploadMultiple(req, res, (err) => {
+    handleUploadError(err, req, res, next);
+  });
+}, (req, res) => {
+  if (!req.files || req.files.length === 0) {
+    return res.status(400).json({
+      success: false,
+      message: 'No files uploaded',
+    });
+  }
+
+  const imageUrls = req.files.map((file) => file.path);
+
+  res.status(200).json({
+    success: true,
+    message: 'Review images uploaded successfully',
+    data: {
+      images: imageUrls,
+      count: imageUrls.length,
+    },
+  });
+});
 // Upload single image
 router.post('/image', authenticate, authorize(['admin', 'super_admin']), (req, res, next) => {
   uploadSingle(req, res, (err) => {

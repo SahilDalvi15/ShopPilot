@@ -26,9 +26,12 @@ const reviewSchema = new mongoose.Schema({
   title: String,
   comment: {
     type: String,
-    required: [true, 'Comment is required']
+    trim: true,
+    maxlength: [1000, 'Comment cannot exceed 1000 characters']
   },
-  images: [String],
+  images: [{
+    type: String
+  }],
   isVerifiedPurchase: {
     type: Boolean,
     default: false,
