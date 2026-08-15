@@ -5,6 +5,7 @@ const Address = require('../models/Address.model');
 const Product = require('../models/Product.model');
 const Inventory = require('../models/Inventory.model');
 const User = require('../models/User.model');
+const Setting = require('../models/Setting.model');
 const logger = require('../utils/logger');
 const emailService = require('./emailService');
 const { emitToUser, emitToAdmins } = require('../config/socket');
@@ -58,8 +59,14 @@ class OrderService {
     const discount = cart.totalDiscount;
     const cartTotal = subtotal - discount;
     
-    const shippingCharge = cartTotal >= 999 ? 0 : 99;
-    const tax = Math.round(subtotal * 0.18); // 18% tax on subtotal
+    let settings = await Setting.findOne();
+    if (!settings) {
+      settings = { taxRate: 18, shippingCharge: 50, freeShippingThreshold: 500 };
+    }
+
+    const shippingCharge = cartTotal >= settings.freeShippingThreshold ? 0 : settings.shippingCharge;
+    const tax = Math.round(subtotal * (settings.taxRate / 100));
+
     
     const totalAmount = cartTotal + shippingCharge + tax;
 
