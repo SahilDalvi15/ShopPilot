@@ -31,6 +31,7 @@ const paymentRoutes = require('./routes/payment.routes');
 const uploadRoutes = require('./routes/upload.routes');
 const searchRoutes = require('./routes/search.routes');
 const statsRoutes = require('./routes/stats.routes');
+const settingRoutes = require('./routes/setting.routes');
 
 const app = express();
 
@@ -91,6 +92,7 @@ app.use('/api/v1/payments', paymentRoutes);
 app.use('/api/v1/upload', uploadRoutes);
 app.use('/api/v1/search', searchRoutes);
 app.use('/api/v1/stats', statsRoutes);
+app.use('/api/v1/settings', settingRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
