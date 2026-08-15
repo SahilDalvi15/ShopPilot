@@ -25,4 +25,10 @@ export const productService = {
     const response = await api.delete(`/products/${productId}`);
     return response.data;
   },
+
+  getSearchSuggestions: async (query) => {
+    if (!query || query.length < 2) return { data: { suggestions: [] } };
+    const response = await api.get('/search/suggestions', { params: { q: query } });
+    return response.data;
+  },
 };
