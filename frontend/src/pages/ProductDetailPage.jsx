@@ -11,7 +11,9 @@ import { selectIsAuthenticated } from '../store/slices/authSlice';
 import ReviewForm from '../components/ReviewForm';
 import ReviewList from '../components/ReviewList';
 import RelatedProducts from '../components/RelatedProducts';
+import RecentlyViewed from '../components/RecentlyViewed';
 import { fetchProductReviews, createReview, markReviewHelpful } from '../store/slices/reviewSlice';
+import { addRecentlyViewed } from '../store/slices/recentSlice';
 import { useToast } from '../contexts/ToastContext';
 
 const ProductDetailPage = () => {
@@ -42,9 +44,19 @@ const ProductDetailPage = () => {
   useEffect(() => {
     if (product?.id) {
       dispatch(fetchProductReviews(product.id));
+      dispatch(addRecentlyViewed({
+        id: product.id,
+        title: product.title,
+        price: product.price,
+        discountedPrice: product.discountedPrice,
+        discount: product.discount,
+        images: product.images,
+        slug: product.slug,
+        rating: product.rating
+      }));
       window.scrollTo(0, 0); // Scroll to top when product changes
     }
-  }, [dispatch, product?.id]);
+  }, [dispatch, product?.id, product]);
 
   const handleQuantityChange = (change) => {
     const newQuantity = quantity + change;
@@ -573,6 +585,9 @@ const ProductDetailPage = () => {
           </div>
         </div>
       )}
+      
+      {/* Recently Viewed Carousel */}
+      <RecentlyViewed currentProductId={product.id} />
     </div>
   );
 };
