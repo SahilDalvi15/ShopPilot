@@ -31,6 +31,8 @@ import AdminOrders from './pages/admin/AdminOrders';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminReviews from './pages/admin/AdminReviews';
+import ComparePage from './pages/ComparePage';
+import CompareWidget from './components/CompareWidget';
 import GlobalLoader from './components/GlobalLoader';
 import './App.css';
 
@@ -48,10 +50,11 @@ const AdminRoute = ({ children }) => {
 const MainLayout = () => (
   <div className="min-h-screen flex flex-col">
     <Header />
-    <main className="flex-1">
+    <main className="flex-1 relative">
       <Outlet />
     </main>
     <Footer />
+    <CompareWidget />
   </div>
 );
 
@@ -85,6 +88,7 @@ function App() {
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/products/:slug" element={<ProductDetailPage />} />
+        <Route path="/compare" element={<ComparePage />} />
         <Route path="/shared-wishlist/:token" element={<SharedWishlistPage />} />
         <Route 
           path="/cart" 
