@@ -903,3 +903,30 @@
   transform: translateY(-1px);
   box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
 }
+
+/* =============================================
+   DARK MODE OVERRIDES
+   ============================================= */
+
+.dark .trust-badges { background: #0f172a; border-bottom-color: #1e293b; }
+.dark .trust-badge__title { color: #f8fafc; }
+.dark .section-header__title { color: #f8fafc; }
+.dark .section-categories { background: #020617; }
+.dark .section-featured { background: #0f172a; }
+.dark .product-card { background: #1e293b; border-color: #334155; }
+.dark .product-card:hover { border-color: #475569; }
+.dark .product-card__image-wrapper { background: #0f172a; }
+.dark .product-card__action { background: #1e293b; color: #cbd5e1; }
+.dark .product-card__action:hover { background: #7c3aed; color: white; }
+.dark .product-card__title { color: #f8fafc; }
+.dark .product-card__price { color: #f8fafc; }
+.dark .promo-banner { background: #020617; }
+.dark .section-new-arrivals { background: #0f172a; }
+.dark .new-arrival-card { background: #1e293b; border-color: #334155; }
+.dark .new-arrival-card:hover { border-color: #475569; }
+.dark .new-arrival-card__title { color: #f8fafc; }
+.dark .new-arrival-card__price { color: #f8fafc; }
+.dark .newsletter { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); }
+.dark .newsletter__title { color: #f8fafc; }
+.dark .newsletter__input { background: #1e293b; border-color: #334155; color: white; }
+.dark .newsletter__input:focus { border-color: #7c3aed; }
