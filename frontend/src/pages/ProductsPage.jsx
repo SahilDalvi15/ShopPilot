@@ -7,8 +7,9 @@ import { categoryService } from '../services/category.service';
 import { brandService } from '../services/brand.service';
 import { addToCart } from '../store/slices/cartSlice';
 import { addToWishlist, removeFromWishlist } from '../store/slices/wishlistSlice';
+import { addToCompare, selectCompareItems } from '../store/slices/compareSlice';
 import { useToast } from '../contexts/ToastContext';
-import { Search, Grid, List, Heart, ShoppingCart, Star, SlidersHorizontal, X } from 'lucide-react';
+import { Search, Grid, List, Heart, ShoppingCart, Star, SlidersHorizontal, X, ArrowRightLeft } from 'lucide-react';
 import ProductCardSkeleton from '../components/skeletons/ProductCardSkeleton';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
@@ -21,6 +22,7 @@ const ProductsPage = () => {
   const { success, error: toastError } = useToast();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const wishlistItems = useSelector((state) => state.wishlist.items);
+  const compareItems = useSelector(selectCompareItems);
   
   const getPageTitle = () => {
     switch (location.pathname) {
@@ -191,6 +193,17 @@ const ProductsPage = () => {
       }
     } catch (err) {
       toastError('Error', err || 'Failed to update wishlist.');
+    }
+  };
+
+  const handleToggleCompare = (e, product) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      dispatch(addToCompare(product));
+      success('Added to Compare', `${product.title} added to comparison.`);
+    } catch (err) {
+      toastError('Limit Reached', err.message);
     }
   };
 
@@ -602,6 +615,15 @@ const ProductsPage = () => {
                                 : 'text-gray-400'
                             }`} 
                           />
+                        </button>
+
+                        {/* Compare Button */}
+                        <button 
+                          onClick={(e) => handleToggleCompare(e, product)}
+                          className={`absolute top-16 right-4 p-2.5 bg-white/90 backdrop-blur-md rounded-full shadow-sm hover:bg-white hover:scale-110 active:scale-95 transition-all z-10 ${compareItems.some(item => item.id === product.id) ? 'text-indigo-600' : 'text-gray-400'}`}
+                          title="Add to Compare"
+                        >
+                          <ArrowRightLeft className="w-4 h-4" />
                         </button>
                       </div>
                       
