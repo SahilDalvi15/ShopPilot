@@ -3,9 +3,10 @@ import { useQuery } from '@tanstack/react-query';
 import { useParams, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { productService } from '../services/productService';
-import { Heart, ShoppingCart, Star, Minus, Plus, Truck, Shield, RotateCcw, ChevronDown, ChevronUp, Share2, AlertCircle, X } from 'lucide-react';
+import { Heart, ShoppingCart, Star, Minus, Plus, Truck, Shield, RotateCcw, ChevronDown, ChevronUp, Share2, AlertCircle, X, ArrowRightLeft } from 'lucide-react';
 import { addToCart } from '../store/slices/cartSlice';
 import { addToWishlist, removeFromWishlist } from '../store/slices/wishlistSlice';
+import { addToCompare, selectCompareItems } from '../store/slices/compareSlice';
 import { selectIsAuthenticated } from '../store/slices/authSlice';
 import ReviewForm from '../components/ReviewForm';
 import ReviewList from '../components/ReviewList';
@@ -25,6 +26,7 @@ const ProductDetailPage = () => {
   const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const wishlistItems = useSelector((state) => state.wishlist.items);
+  const compareItems = useSelector(selectCompareItems);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['product', slug],
@@ -106,6 +108,15 @@ const ProductDetailPage = () => {
       }
     } catch (err) {
       toastError('Error', err || 'Failed to update wishlist.');
+    }
+  };
+
+  const handleToggleCompare = () => {
+    try {
+      dispatch(addToCompare(product));
+      success('Added to Compare', `${product.title} added to comparison.`);
+    } catch (err) {
+      toastError('Limit Reached', err.message);
     }
   };
 
@@ -194,7 +205,14 @@ const ProductDetailPage = () => {
                   className={`w-6 h-6 ${wishlistItems?.some(item => item._id === product.id) ? 'text-red-500 fill-current' : 'text-gray-500 hover:text-red-500'}`} 
                 />
               </button>
-              <button className="absolute top-4 right-16 p-3 bg-white/80 backdrop-blur-md rounded-full shadow-md hover:bg-white transition-all z-10">
+              <button 
+                onClick={handleToggleCompare}
+                className={`absolute top-20 right-4 p-3 bg-white/80 backdrop-blur-md rounded-full shadow-md hover:bg-white transition-all z-10 ${compareItems.some(item => item.id === product.id) ? 'text-indigo-600' : 'text-gray-500'}`}
+                title="Add to Compare"
+              >
+                <ArrowRightLeft className="w-5 h-5" />
+              </button>
+              <button className="absolute top-4 right-20 p-3 bg-white/80 backdrop-blur-md rounded-full shadow-md hover:bg-white transition-all z-10">
                 <Share2 className="w-5 h-5 text-gray-500" />
               </button>
             </div>
