@@ -211,14 +211,14 @@ const ProductsPage = () => {
     <div className="space-y-8">
       {/* Categories */}
       <div>
-        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Categories</h3>
+        <h3 className="text-sm font-bold text-gray-900 dark:text-slate-100 uppercase tracking-wider mb-4">Categories</h3>
         <div className="space-y-3">
           {categoriesData?.data?.map((cat) => {
             const isChecked = filters.category.split(',').includes(cat.id || cat._id);
             return (
               <label key={cat.id || cat._id} className="flex items-center gap-3 cursor-pointer group">
-                <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${isChecked ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 group-hover:border-indigo-500'}`}>
-                  {isChecked && <div className="w-3 h-3 bg-white rounded-sm text-white flex items-center justify-center">
+                <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${isChecked ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 dark:border-slate-600 group-hover:border-indigo-500'}`}>
+                  {isChecked && <div className="w-3 h-3 bg-white dark:bg-slate-800 rounded-sm text-white flex items-center justify-center">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="w-full h-full"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   </div>}
                 </div>
@@ -228,7 +228,7 @@ const ProductsPage = () => {
                   checked={isChecked}
                   onChange={() => handleCheckboxChange('category', cat.id || cat._id)}
                 />
-                <span className={`text-sm ${isChecked ? 'font-medium text-gray-900' : 'text-gray-600 group-hover:text-gray-900'}`}>
+                <span className={`text-sm ${isChecked ? 'font-medium text-gray-900 dark:text-slate-100' : 'text-gray-600 dark:text-slate-400 group-hover:text-gray-900 dark:text-slate-100'}`}>
                   {cat.name}
                 </span>
               </label>
@@ -239,7 +239,7 @@ const ProductsPage = () => {
 
       {/* Brands */}
       <div>
-        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Brands</h3>
+        <h3 className="text-sm font-bold text-gray-900 dark:text-slate-100 uppercase tracking-wider mb-4">Brands</h3>
         <div className="flex flex-wrap gap-2">
           {brandsData?.data?.map((brand) => {
             const isChecked = filters.brand.split(',').includes(brand.id || brand._id);
@@ -250,7 +250,7 @@ const ProductsPage = () => {
                 className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
                   isChecked
                     ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-indigo-200'
-                    : 'bg-white text-gray-600 border border-gray-200 hover:border-indigo-300 hover:text-indigo-600'
+                    : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 hover:border-indigo-300 hover:text-indigo-600'
                 }`}
               >
                 {brand.name}
@@ -262,7 +262,7 @@ const ProductsPage = () => {
 
       {/* Price Range */}
       <div>
-        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Price Range</h3>
+        <h3 className="text-sm font-bold text-gray-900 dark:text-slate-100 uppercase tracking-wider mb-4">Price Range</h3>
         <div className="px-2 pt-2">
           <Slider
             range
@@ -281,21 +281,21 @@ const ProductsPage = () => {
               { borderColor: '#4f46e5', height: 20, width: 20, marginTop: -7, opacity: 1 }
             ]}
           />
-          <div className="flex items-center justify-between mt-6 text-sm font-medium text-gray-600">
-            <div className="bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-lg">₹ {filters.minPrice || 0}</div>
-            <div className="bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-lg">₹ {filters.maxPrice || 100000}</div>
+          <div className="flex items-center justify-between mt-6 text-sm font-medium text-gray-600 dark:text-slate-400">
+            <div className="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 px-3 py-1.5 rounded-lg">₹ {filters.minPrice || 0}</div>
+            <div className="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 px-3 py-1.5 rounded-lg">₹ {filters.maxPrice || 100000}</div>
           </div>
         </div>
       </div>
 
       {/* Customer Ratings */}
       <div>
-        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Customer Ratings</h3>
+        <h3 className="text-sm font-bold text-gray-900 dark:text-slate-100 uppercase tracking-wider mb-4">Customer Ratings</h3>
         <div className="space-y-3">
           {[4, 3, 2, 1].map((rating) => (
             <label key={rating} className="flex items-center gap-3 cursor-pointer group">
-              <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${filters.minRating === String(rating) ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 group-hover:border-indigo-500'}`}>
-                {filters.minRating === String(rating) && <div className="w-2.5 h-2.5 bg-white rounded-sm" />}
+              <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${filters.minRating === String(rating) ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 dark:border-slate-600 group-hover:border-indigo-500'}`}>
+                {filters.minRating === String(rating) && <div className="w-2.5 h-2.5 bg-white dark:bg-slate-800 rounded-sm" />}
               </div>
               <input 
                 type="radio" 
@@ -308,7 +308,7 @@ const ProductsPage = () => {
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className={`w-4 h-4 ${i < rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
                 ))}
-                <span className="text-sm text-gray-600 ml-1">& Up</span>
+                <span className="text-sm text-gray-600 dark:text-slate-400 ml-1">& Up</span>
               </div>
             </label>
           ))}
@@ -317,10 +317,10 @@ const ProductsPage = () => {
 
       {/* Availability */}
       <div>
-        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Availability</h3>
+        <h3 className="text-sm font-bold text-gray-900 dark:text-slate-100 uppercase tracking-wider mb-4">Availability</h3>
         <label className="flex items-center gap-3 cursor-pointer group">
-          <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${filters.inStock ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 group-hover:border-indigo-500'}`}>
-            {filters.inStock && <div className="w-2.5 h-2.5 bg-white rounded-sm" />}
+          <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${filters.inStock ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 dark:border-slate-600 group-hover:border-indigo-500'}`}>
+            {filters.inStock && <div className="w-2.5 h-2.5 bg-white dark:bg-slate-800 rounded-sm" />}
           </div>
           <input 
             type="checkbox" 
@@ -328,7 +328,7 @@ const ProductsPage = () => {
             checked={filters.inStock}
             onChange={(e) => handleFilterChange('inStock', e.target.checked)}
           />
-          <span className={`text-sm ${filters.inStock ? 'font-medium text-gray-900' : 'text-gray-600 group-hover:text-gray-900'}`}>
+          <span className={`text-sm ${filters.inStock ? 'font-medium text-gray-900 dark:text-slate-100' : 'text-gray-600 dark:text-slate-400 group-hover:text-gray-900 dark:text-slate-100'}`}>
             In Stock Only
           </span>
         </label>
@@ -336,7 +336,7 @@ const ProductsPage = () => {
 
       {/* Sort By */}
       <div>
-        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Sort By</h3>
+        <h3 className="text-sm font-bold text-gray-900 dark:text-slate-100 uppercase tracking-wider mb-4">Sort By</h3>
         <select
           value={`${filters.sortBy}-${filters.sortOrder}`}
           onChange={(e) => {
@@ -344,7 +344,7 @@ const ProductsPage = () => {
             handleFilterChange('sortBy', sortBy);
             handleFilterChange('sortOrder', sortOrder);
           }}
-          className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 transition-all shadow-sm cursor-pointer"
+          className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 transition-all shadow-sm cursor-pointer"
         >
           <option value="createdAt-desc">Newest First</option>
           <option value="createdAt-asc">Oldest First</option>
@@ -360,7 +360,7 @@ const ProductsPage = () => {
           clearFilters();
           setIsMobileFiltersOpen(false);
         }}
-        className="w-full py-3 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors flex items-center justify-center gap-2 mt-4"
+        className="w-full py-3 text-sm font-bold text-gray-600 dark:text-slate-400 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors flex items-center justify-center gap-2 mt-4"
       >
         <X className="w-4 h-4" /> Reset Filters
       </button>
@@ -368,14 +368,14 @@ const ProductsPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50/50 pb-12">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900/50 pb-12">
       {/* Main Container */}
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         {/* Page Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{getPageTitle()}</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100 tracking-tight">{getPageTitle()}</h1>
             <p className="text-gray-500 mt-1">Discover our collection of premium products</p>
           </div>
 
@@ -390,7 +390,7 @@ const ProductsPage = () => {
                   onFocus={() => setShowSuggestions(true)}
                   onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                   placeholder="Search products..."
-                  className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-2xl text-sm focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 transition-all shadow-sm"
+                  className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl text-sm focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 transition-all shadow-sm"
                 />
                 {isSearching && (
                   <div className="absolute right-4 top-1/2 -translate-y-1/2">
@@ -401,12 +401,12 @@ const ProductsPage = () => {
               
               {/* Autocomplete Dropdown */}
               {showSuggestions && filters.search.length >= 2 && suggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-100 dark:border-slate-700 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
                   {suggestions.map((sug, idx) => (
                     <div 
                       key={idx}
                       onClick={() => navigate(`/products/${sug.slug}`)}
-                      className="px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center gap-3 border-b border-gray-50 last:border-0"
+                      className="px-4 py-3 hover:bg-gray-50 dark:bg-slate-900 cursor-pointer flex items-center gap-3 border-b border-gray-50 last:border-0"
                     >
                       {sug.image ? (
                         <img src={sug.image} alt={sug.title} className="w-10 h-10 rounded-lg object-cover bg-gray-100" />
@@ -416,7 +416,7 @@ const ProductsPage = () => {
                         </div>
                       )}
                       <div>
-                        <div className="text-sm font-semibold text-gray-900">{sug.title}</div>
+                        <div className="text-sm font-semibold text-gray-900 dark:text-slate-100">{sug.title}</div>
                         {sug.brand && <div className="text-xs text-gray-500">{sug.brand}</div>}
                       </div>
                     </div>
@@ -428,22 +428,22 @@ const ProductsPage = () => {
             {/* Mobile Filters Toggle */}
             <button
               onClick={() => setIsMobileFiltersOpen(true)}
-              className="lg:hidden p-3 bg-white border border-gray-200 rounded-2xl text-gray-700 hover:bg-gray-50 shadow-sm transition-colors"
+              className="lg:hidden p-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:bg-slate-900 shadow-sm transition-colors"
             >
               <SlidersHorizontal className="w-5 h-5" />
             </button>
 
             {/* View Mode Toggle (Desktop) */}
-            <div className="hidden sm:flex items-center gap-1 bg-white border border-gray-200 p-1 rounded-2xl shadow-sm">
+            <div className="hidden sm:flex items-center gap-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-1 rounded-2xl shadow-sm">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-2 rounded-xl transition-colors ${viewMode === 'grid' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-500 hover:bg-gray-50'}`}
+                className={`p-2 rounded-xl transition-colors ${viewMode === 'grid' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-500 hover:bg-gray-50 dark:bg-slate-900'}`}
               >
                 <Grid className="w-5 h-5" />
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-2 rounded-xl transition-colors ${viewMode === 'list' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-500 hover:bg-gray-50'}`}
+                className={`p-2 rounded-xl transition-colors ${viewMode === 'list' ? 'bg-indigo-50 text-indigo-600' : 'text-gray-500 hover:bg-gray-50 dark:bg-slate-900'}`}
               >
                 <List className="w-5 h-5" />
               </button>
@@ -456,10 +456,10 @@ const ProductsPage = () => {
           
           {/* Desktop Sidebar */}
           <div className="hidden lg:block w-72 shrink-0">
-            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 sticky top-24">
-              <div className="flex items-center gap-2 mb-6 pb-6 border-b border-gray-100">
+            <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-700 p-6 sticky top-24">
+              <div className="flex items-center gap-2 mb-6 pb-6 border-b border-gray-100 dark:border-slate-700">
                 <SlidersHorizontal className="w-5 h-5 text-indigo-600" />
-                <h2 className="font-bold text-gray-900 text-lg">Filters</h2>
+                <h2 className="font-bold text-gray-900 dark:text-slate-100 text-lg">Filters</h2>
               </div>
               {renderFilters()}
             </div>
@@ -471,13 +471,13 @@ const ProductsPage = () => {
             <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={() => setIsMobileFiltersOpen(false)} />
             
             {/* Drawer */}
-            <div className={`absolute top-0 right-0 bottom-0 w-[85%] max-w-sm bg-white shadow-2xl transition-transform duration-300 ease-out flex flex-col ${isMobileFiltersOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-              <div className="flex items-center justify-between p-6 border-b border-gray-100">
+            <div className={`absolute top-0 right-0 bottom-0 w-[85%] max-w-sm bg-white dark:bg-slate-800 shadow-2xl transition-transform duration-300 ease-out flex flex-col ${isMobileFiltersOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+              <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-slate-700">
                 <div className="flex items-center gap-2">
                   <SlidersHorizontal className="w-5 h-5 text-indigo-600" />
-                  <h2 className="font-bold text-gray-900 text-lg">Filters</h2>
+                  <h2 className="font-bold text-gray-900 dark:text-slate-100 text-lg">Filters</h2>
                 </div>
-                <button onClick={() => setIsMobileFiltersOpen(false)} className="p-2 bg-gray-100 rounded-full text-gray-500 hover:text-gray-900 transition-colors">
+                <button onClick={() => setIsMobileFiltersOpen(false)} className="p-2 bg-gray-100 rounded-full text-gray-500 hover:text-gray-900 dark:text-slate-100 transition-colors">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -491,8 +491,8 @@ const ProductsPage = () => {
           <div className="flex-1 min-w-0">
             {/* Active Filters Row */}
             {(filters.category || filters.brand || filters.minPrice || filters.maxPrice || filters.minRating || filters.inStock) && (
-              <div className="flex items-center gap-2 flex-wrap mb-6 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-                <span className="text-sm font-bold text-gray-700 mr-2">Active Filters:</span>
+              <div className="flex items-center gap-2 flex-wrap mb-6 bg-white dark:bg-slate-800 p-4 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm">
+                <span className="text-sm font-bold text-gray-700 dark:text-slate-300 mr-2">Active Filters:</span>
                 
                 {filters.category && filters.category.split(',').map(catId => {
                   const cat = categoriesData?.data?.find(c => (c.id || c._id) === catId);
@@ -555,11 +555,11 @@ const ProductsPage = () => {
                 <p className="font-medium">Error loading products: {error.message}</p>
               </div>
             ) : products.length === 0 ? (
-              <div className="text-center py-24 bg-white rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center">
+              <div className="text-center py-24 bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-700 flex flex-col items-center">
                 <div className="w-24 h-24 bg-indigo-50 rounded-full flex items-center justify-center mb-6">
                   <Search className="w-10 h-10 text-indigo-400" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">No products found</h3>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-3">No products found</h3>
                 <p className="text-gray-500 max-w-md mx-auto mb-8 text-lg">
                   We couldn't find any products matching your current filters. Try adjusting your search criteria.
                 </p>
@@ -577,10 +577,10 @@ const ProductsPage = () => {
                     <div
                       key={product.id}
                       onClick={() => navigate(`/products/${product.slug}`)}
-                      className={`bg-white rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden border border-gray-100 group flex cursor-pointer ${viewMode === 'list' ? 'flex-col sm:flex-row' : 'flex-col'}`}
+                      className={`bg-white dark:bg-slate-800 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden border border-gray-100 dark:border-slate-700 group flex cursor-pointer ${viewMode === 'list' ? 'flex-col sm:flex-row' : 'flex-col'}`}
                     >
                       {/* Product Image Area */}
-                      <div className={`relative bg-gray-50 overflow-hidden ${viewMode === 'list' ? 'w-full sm:w-64 shrink-0' : 'w-full aspect-[4/3]'}`}>
+                      <div className={`relative bg-gray-50 dark:bg-slate-900 overflow-hidden ${viewMode === 'list' ? 'w-full sm:w-64 shrink-0' : 'w-full aspect-[4/3]'}`}>
                         <img
                           src={product.images[0] || '/placeholder.jpg'}
                           alt={product.title}
@@ -606,7 +606,7 @@ const ProductsPage = () => {
                         {/* Wishlist Button */}
                         <button 
                           onClick={(e) => handleToggleWishlist(e, product)}
-                          className="absolute top-4 right-4 p-2.5 bg-white/90 backdrop-blur-md rounded-full shadow-sm hover:bg-white hover:scale-110 active:scale-95 transition-all z-10"
+                          className="absolute top-4 right-4 p-2.5 bg-white dark:bg-slate-800/90 backdrop-blur-md rounded-full shadow-sm hover:bg-white dark:bg-slate-800 hover:scale-110 active:scale-95 transition-all z-10"
                         >
                           <Heart 
                             className={`w-4 h-4 ${
@@ -620,7 +620,7 @@ const ProductsPage = () => {
                         {/* Compare Button */}
                         <button 
                           onClick={(e) => handleToggleCompare(e, product)}
-                          className={`absolute top-16 right-4 p-2.5 bg-white/90 backdrop-blur-md rounded-full shadow-sm hover:bg-white hover:scale-110 active:scale-95 transition-all z-10 ${compareItems.some(item => item.id === product.id) ? 'text-indigo-600' : 'text-gray-400'}`}
+                          className={`absolute top-16 right-4 p-2.5 bg-white dark:bg-slate-800/90 backdrop-blur-md rounded-full shadow-sm hover:bg-white dark:bg-slate-800 hover:scale-110 active:scale-95 transition-all z-10 ${compareItems.some(item => item.id === product.id) ? 'text-indigo-600' : 'text-gray-400'}`}
                           title="Add to Compare"
                         >
                           <ArrowRightLeft className="w-4 h-4" />
@@ -628,18 +628,18 @@ const ProductsPage = () => {
                       </div>
                       
                       {/* Product Details Area */}
-                      <div className="p-6 flex flex-col flex-grow bg-white relative">
+                      <div className="p-6 flex flex-col flex-grow bg-white dark:bg-slate-800 relative">
                         <div className="flex items-center justify-between mb-3">
                           <span className="text-xs font-bold text-indigo-600 bg-indigo-50/80 px-2.5 py-1 rounded-md uppercase tracking-wider">
                             {product.brand?.name || 'Brand'}
                           </span>
                           <div className="flex items-center text-yellow-500">
                             <Star className="w-4 h-4 fill-current" />
-                            <span className="text-sm font-bold text-gray-700 ml-1.5">{product.rating}</span>
+                            <span className="text-sm font-bold text-gray-700 dark:text-slate-300 ml-1.5">{product.rating}</span>
                           </div>
                         </div>
                         
-                        <h3 className="font-bold text-gray-900 text-lg mb-2 line-clamp-2 leading-tight group-hover:text-indigo-600 transition-colors">
+                        <h3 className="font-bold text-gray-900 dark:text-slate-100 text-lg mb-2 line-clamp-2 leading-tight group-hover:text-indigo-600 transition-colors">
                           {product.title}
                         </h3>
                         
@@ -656,12 +656,12 @@ const ProductsPage = () => {
                                 <span className="text-xs font-medium text-gray-400 line-through mb-0.5">
                                   ₹{(product.price || 0).toLocaleString()}
                                 </span>
-                                <span className="text-2xl font-black text-gray-900 tracking-tight">
+                                <span className="text-2xl font-black text-gray-900 dark:text-slate-100 tracking-tight">
                                   ₹{(product.discountedPrice || 0).toLocaleString()}
                                 </span>
                               </>
                             ) : (
-                              <span className="text-2xl font-black text-gray-900 tracking-tight">
+                              <span className="text-2xl font-black text-gray-900 dark:text-slate-100 tracking-tight">
                                 ₹{(product.price || 0).toLocaleString()}
                               </span>
                             )}
@@ -690,7 +690,7 @@ const ProductsPage = () => {
                     <button
                       onClick={() => fetchNextPage()}
                       disabled={isFetchingNextPage}
-                      className="bg-white border border-gray-200 text-gray-700 hover:border-indigo-600 hover:text-indigo-600 px-8 py-3.5 rounded-full font-bold shadow-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 group"
+                      className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 hover:border-indigo-600 hover:text-indigo-600 px-8 py-3.5 rounded-full font-bold shadow-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 group"
                     >
                       {isFetchingNextPage ? (
                         <>
