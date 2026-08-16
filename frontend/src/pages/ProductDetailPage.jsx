@@ -12,6 +12,7 @@ import ReviewForm from '../components/ReviewForm';
 import ReviewList from '../components/ReviewList';
 import RelatedProducts from '../components/RelatedProducts';
 import RecentlyViewed from '../components/RecentlyViewed';
+import ProductRecommendations from '../components/ProductRecommendations';
 import { fetchProductReviews, createReview, markReviewHelpful } from '../store/slices/reviewSlice';
 import { addRecentlyViewed } from '../store/slices/recentSlice';
 import { useToast } from '../contexts/ToastContext';
@@ -585,6 +586,9 @@ const ProductDetailPage = () => {
           </div>
         </div>
       )}
+      
+      {/* AI Recommendations */}
+      <ProductRecommendations currentProductId={product.id} />
       
       {/* Recently Viewed Carousel */}
       <RecentlyViewed currentProductId={product.id} />
