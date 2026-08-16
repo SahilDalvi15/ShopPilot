@@ -6,6 +6,7 @@ import addressReducer from './slices/addressSlice';
 import paymentReducer from './slices/paymentSlice';
 import reviewReducer from './slices/reviewSlice';
 import compareReducer from './slices/compareSlice';
+import recentReducer from './slices/recentSlice';
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     payment: paymentReducer,
     reviews: reviewReducer,
     compare: compareReducer,
+    recent: recentReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
