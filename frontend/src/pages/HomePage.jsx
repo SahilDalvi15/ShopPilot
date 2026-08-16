@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { productService } from '../services/product.service';
 import { categoryService } from '../services/category.service';
+import RecentlyViewed from '../components/RecentlyViewed';
 
 // Category icon/image mapping
 const categoryImages = {
@@ -311,6 +312,9 @@ const HomePage = () => {
           </div>
         </section>
       )}
+
+      {/* Recently Viewed */}
+      <RecentlyViewed />
 
       {/* Newsletter */}
       <section className="newsletter">
