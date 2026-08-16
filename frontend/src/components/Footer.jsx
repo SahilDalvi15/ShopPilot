@@ -156,16 +156,16 @@ const Footer = () => {
             <div className="mb-4 md:mb-0">
               <h4 className="text-white font-semibold mb-2">Payment Methods</h4>
               <div className="flex space-x-4">
-                <div className="bg-white rounded px-3 py-1 text-gray-800 text-sm font-bold">
+                <div className="bg-white dark:bg-slate-800 rounded px-3 py-1 text-gray-800 dark:text-slate-200 text-sm font-bold">
                   VISA
                 </div>
-                <div className="bg-white rounded px-3 py-1 text-gray-800 text-sm font-bold">
+                <div className="bg-white dark:bg-slate-800 rounded px-3 py-1 text-gray-800 dark:text-slate-200 text-sm font-bold">
                   MasterCard
                 </div>
-                <div className="bg-white rounded px-3 py-1 text-gray-800 text-sm font-bold">
+                <div className="bg-white dark:bg-slate-800 rounded px-3 py-1 text-gray-800 dark:text-slate-200 text-sm font-bold">
                   Razorpay
                 </div>
-                <div className="bg-white rounded px-3 py-1 text-gray-800 text-sm font-bold">
+                <div className="bg-white dark:bg-slate-800 rounded px-3 py-1 text-gray-800 dark:text-slate-200 text-sm font-bold">
                   UPI
                 </div>
               </div>

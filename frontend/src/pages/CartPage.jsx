@@ -83,11 +83,11 @@ const CartPage = () => {
 
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center">
         <div className="text-center">
           <ShoppingBag className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Your cart is empty</h2>
-          <p className="text-gray-600 mb-4">Add items to get started</p>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-slate-100 mb-2">Your cart is empty</h2>
+          <p className="text-gray-600 dark:text-slate-400 mb-4">Add items to get started</p>
           <Link
             to="/products"
             className="inline-flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
@@ -100,15 +100,15 @@ const CartPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Shopping Cart</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100 mb-8">Shopping Cart</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
             {cartItems.map((item) => (
-              <div key={item.productId} className="bg-white rounded-lg shadow-sm p-4 flex gap-4">
+              <div key={item.productId} className="bg-white dark:bg-slate-800 rounded-lg shadow-sm p-4 flex gap-4">
                 <img
                   src={item.product?.images[0] || '/placeholder.jpg'}
                   alt={item.product?.title}
@@ -118,35 +118,35 @@ const CartPage = () => {
                 <div className="flex-1">
                   <Link
                     to={`/products/${item.product?.slug}`}
-                    className="font-semibold text-gray-900 hover:text-indigo-600 line-clamp-2"
+                    className="font-semibold text-gray-900 dark:text-slate-100 hover:text-indigo-600 line-clamp-2"
                   >
                     {item.product?.title}
                   </Link>
-                  <p className="text-sm text-gray-600 mt-1">{item.product?.brand?.name}</p>
+                  <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">{item.product?.brand?.name}</p>
                   {item.selectedSize && (
-                    <p className="text-sm text-gray-600 mt-1">Size: <span className="font-semibold">{item.selectedSize}</span></p>
+                    <p className="text-sm text-gray-600 dark:text-slate-400 mt-1">Size: <span className="font-semibold">{item.selectedSize}</span></p>
                   )}
                   
                   <div className="flex items-center justify-between mt-4">
-                    <div className="flex items-center border border-gray-300 rounded-lg">
+                    <div className="flex items-center border border-gray-300 dark:border-slate-600 rounded-lg">
                       <button
                         onClick={() => handleQuantityChange(item.productId, item.quantity - 1)}
                         disabled={item.quantity <= 1}
-                        className="p-1 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-1 hover:bg-gray-50 dark:bg-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Minus className="w-4 h-4" />
                       </button>
                       <span className="px-3 py-1 text-sm">{item.quantity}</span>
                       <button
                         onClick={() => handleQuantityChange(item.productId, item.quantity + 1)}
-                        className="p-1 hover:bg-gray-50"
+                        className="p-1 hover:bg-gray-50 dark:bg-slate-900"
                       >
                         <Plus className="w-4 h-4" />
                       </button>
                     </div>
 
                     <div className="text-right">
-                      <p className="font-semibold text-gray-900">
+                      <p className="font-semibold text-gray-900 dark:text-slate-100">
                         ₹{item.subtotal.toLocaleString()}
                       </p>
                       {item.discountedPrice && item.discountedPrice < item.price && (
@@ -170,11 +170,11 @@ const CartPage = () => {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
+            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm p-6 sticky top-4">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">Order Summary</h2>
 
               <div className="space-y-3 mb-6">
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between text-gray-600 dark:text-slate-400">
                   <span>Subtotal</span>
                   <span>₹{subtotal.toLocaleString()}</span>
                 </div>
@@ -186,20 +186,20 @@ const CartPage = () => {
                   </div>
                 )}
                 
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between text-gray-600 dark:text-slate-400">
                   <span>Shipping</span>
                   <span className={shipping === 0 ? "text-green-600" : ""}>
                     {shipping === 0 ? 'Free' : `₹${shipping.toLocaleString()}`}
                   </span>
                 </div>
                 
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between text-gray-600 dark:text-slate-400">
                   <span>Tax ({settings.taxRate}%)</span>
                   <span>₹{tax.toLocaleString()}</span>
                 </div>
                 
-                <div className="border-t border-gray-200 pt-3">
-                  <div className="flex justify-between font-semibold text-gray-900">
+                <div className="border-t border-gray-200 dark:border-slate-700 pt-3">
+                  <div className="flex justify-between font-semibold text-gray-900 dark:text-slate-100">
                     <span>Total</span>
                     <span>₹{finalTotal.toLocaleString()}</span>
                   </div>
@@ -209,7 +209,7 @@ const CartPage = () => {
               {/* Coupon Section */}
               {!appliedCoupon ? (
                 <form onSubmit={handleApplyCoupon} className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                     Have a coupon?
                   </label>
                   <div className="flex gap-2">
@@ -218,11 +218,11 @@ const CartPage = () => {
                       value={couponCode}
                       onChange={(e) => setCouponCode(e.target.value)}
                       placeholder="Enter coupon code"
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm uppercase focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      className="flex-1 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm uppercase focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     />
                     <button
                       type="submit"
-                      className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors flex items-center gap-2"
+                      className="px-4 py-2 bg-gray-100 text-gray-700 dark:text-slate-300 rounded-lg font-medium hover:bg-gray-200 transition-colors flex items-center gap-2"
                     >
                       <Tag className="w-4 h-4" />
                       Apply

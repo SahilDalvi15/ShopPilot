@@ -24,7 +24,7 @@ const RecentlyViewed = ({ currentProductId }) => {
   };
 
   return (
-    <div className="py-12 border-t border-gray-100 bg-gray-50/50">
+    <div className="py-12 border-t border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
@@ -34,7 +34,7 @@ const RecentlyViewed = ({ currentProductId }) => {
               <Clock className="w-6 h-6 text-indigo-600" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Recently Viewed</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Recently Viewed</h2>
               <p className="text-sm text-gray-500 font-medium">Pick up right where you left off</p>
             </div>
           </div>
@@ -43,13 +43,13 @@ const RecentlyViewed = ({ currentProductId }) => {
           <div className="hidden md:flex items-center gap-2">
             <button 
               onClick={() => scroll('left')}
-              className="p-2 rounded-full border border-gray-200 bg-white text-gray-600 hover:text-indigo-600 hover:border-indigo-200 shadow-sm transition-all active:scale-95"
+              className="p-2 rounded-full border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 hover:text-indigo-600 hover:border-indigo-200 shadow-sm transition-all active:scale-95"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button 
               onClick={() => scroll('right')}
-              className="p-2 rounded-full border border-gray-200 bg-white text-gray-600 hover:text-indigo-600 hover:border-indigo-200 shadow-sm transition-all active:scale-95"
+              className="p-2 rounded-full border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 hover:text-indigo-600 hover:border-indigo-200 shadow-sm transition-all active:scale-95"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
@@ -66,10 +66,10 @@ const RecentlyViewed = ({ currentProductId }) => {
               <div 
                 key={product.id}
                 onClick={() => navigate(`/products/${product.slug}`)}
-                className="w-48 sm:w-56 shrink-0 snap-start bg-white rounded-2xl p-3 border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-indigo-100 transition-all cursor-pointer flex flex-col group/card"
+                className="w-48 sm:w-56 shrink-0 snap-start bg-white dark:bg-slate-800 rounded-2xl p-3 border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-indigo-100 transition-all cursor-pointer flex flex-col group/card"
               >
                 {/* Image */}
-                <div className="w-full aspect-[4/5] bg-gray-50 rounded-xl overflow-hidden mb-4 relative">
+                <div className="w-full aspect-[4/5] bg-gray-50 dark:bg-slate-900 rounded-xl overflow-hidden mb-4 relative">
                   <img 
                     src={product.images?.[0] || 'https://via.placeholder.com/200'} 
                     alt={product.title}
@@ -84,12 +84,12 @@ const RecentlyViewed = ({ currentProductId }) => {
                 
                 {/* Details */}
                 <div className="flex flex-col flex-1 px-1">
-                  <h3 className="font-bold text-gray-900 text-sm line-clamp-2 leading-tight mb-2 group-hover/card:text-indigo-600 transition-colors">
+                  <h3 className="font-bold text-gray-900 dark:text-slate-100 text-sm line-clamp-2 leading-tight mb-2 group-hover/card:text-indigo-600 transition-colors">
                     {product.title}
                   </h3>
                   
                   <div className="mt-auto flex items-baseline gap-2">
-                    <span className="font-black text-gray-900">
+                    <span className="font-black text-gray-900 dark:text-slate-100">
                       ₹{product.discountedPrice || product.price}
                     </span>
                     {product.discount > 0 && (

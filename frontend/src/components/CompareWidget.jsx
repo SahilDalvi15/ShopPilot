@@ -12,13 +12,13 @@ const CompareWidget = () => {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 p-4 pointer-events-none">
-      <div className="max-w-4xl mx-auto bg-white/90 backdrop-blur-md shadow-2xl rounded-2xl border border-purple-100 p-4 pointer-events-auto transform transition-all duration-500 translate-y-0 opacity-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="max-w-4xl mx-auto bg-white dark:bg-slate-800/90 backdrop-blur-md shadow-2xl rounded-2xl border border-purple-100 p-4 pointer-events-auto transform transition-all duration-500 translate-y-0 opacity-100 flex flex-col sm:flex-row items-center justify-between gap-4">
         
         {/* Left Side: Selected Items */}
         <div className="flex items-center gap-4 flex-1 overflow-x-auto pb-2 sm:pb-0 hide-scrollbar">
-          <div className="flex items-center gap-2 shrink-0 pr-4 border-r border-gray-200">
+          <div className="flex items-center gap-2 shrink-0 pr-4 border-r border-gray-200 dark:border-slate-700">
             <ArrowRightLeft className="w-5 h-5 text-indigo-600" />
-            <span className="font-bold text-gray-900 hidden sm:block">Compare</span>
+            <span className="font-bold text-gray-900 dark:text-slate-100 hidden sm:block">Compare</span>
             <span className="bg-indigo-100 text-indigo-700 text-xs font-bold px-2 py-1 rounded-full">
               {compareItems.length}/3
             </span>
@@ -27,7 +27,7 @@ const CompareWidget = () => {
           <div className="flex gap-3">
             {compareItems.map((item) => (
               <div key={item.id} className="relative group shrink-0">
-                <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-200 bg-white">
+                <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800">
                   <img 
                     src={item.images?.[0] || 'https://via.placeholder.com/150'} 
                     alt={item.title} 
@@ -48,7 +48,7 @@ const CompareWidget = () => {
             {[...Array(3 - compareItems.length)].map((_, i) => (
               <div 
                 key={`empty-${i}`} 
-                className="w-12 h-12 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 flex items-center justify-center shrink-0"
+                className="w-12 h-12 rounded-xl border-2 border-dashed border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900/50 flex items-center justify-center shrink-0"
               >
                 <span className="text-gray-400 text-lg">+</span>
               </div>
