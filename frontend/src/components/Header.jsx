@@ -11,10 +11,13 @@ import {
   LogOut,
   Settings,
   LayoutDashboard,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { logout } from '../store/slices/authSlice';
 import { selectCartCount } from '../store/slices/cartSlice';
 import { selectWishlistCount } from '../store/slices/wishlistSlice';
+import { useTheme } from '../contexts/ThemeContext';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -26,6 +29,7 @@ const Header = () => {
   const user = useSelector((state) => state.auth.user);
   const cartCount = useSelector(selectCartCount);
   const wishlistCount = useSelector(selectWishlistCount);
+  const { isDarkMode, toggleDarkMode } = useTheme();
 
   const handleLogout = () => {
     dispatch(logout());
@@ -41,7 +45,7 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white shadow-md sticky top-0 z-50">
+    <header className="bg-white dark:bg-slate-900 shadow-md sticky top-0 z-50 transition-colors duration-300">
       {/* Top Bar */}
       <div className="bg-gray-900 text-white text-sm py-2">
         <div className="container mx-auto px-4 flex justify-between items-center">
@@ -70,7 +74,7 @@ const Header = () => {
             <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">S</span>
             </div>
-            <span className="text-2xl font-bold text-gray-800">ShopPilot</span>
+            <span className="text-2xl font-bold text-gray-800 dark:text-white transition-colors duration-300">ShopPilot</span>
           </Link>
 
           {/* Search Bar - Desktop */}
@@ -81,9 +85,9 @@ const Header = () => {
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600"
+                className="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
               />
-              <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+              <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400 dark:text-gray-500" />
               <button
                 type="submit"
                 className="absolute right-2 top-1.5 bg-purple-600 text-white px-4 py-1 rounded-md hover:bg-purple-700 transition"
@@ -95,12 +99,21 @@ const Header = () => {
 
           {/* Navigation Icons */}
           <div className="flex items-center space-x-4">
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleDarkMode}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition text-gray-700 dark:text-gray-200"
+              aria-label="Toggle Dark Mode"
+            >
+              {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
+
             {/* Wishlist */}
             <Link
               to="/wishlist"
-              className="relative p-2 hover:bg-gray-100 rounded-full transition"
+              className="relative p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition text-gray-700 dark:text-gray-200"
             >
-              <Heart className="h-6 w-6 text-gray-700" />
+              <Heart className="h-6 w-6" />
               {wishlistCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   {wishlistCount}
@@ -111,9 +124,9 @@ const Header = () => {
             {/* Cart */}
             <Link
               to="/cart"
-              className="relative p-2 hover:bg-gray-100 rounded-full transition"
+              className="relative p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition text-gray-700 dark:text-gray-200"
             >
-              <ShoppingCart className="h-6 w-6 text-gray-700" />
+              <ShoppingCart className="h-6 w-6" />
               {cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   {cartCount}
@@ -123,14 +136,14 @@ const Header = () => {
 
             {/* User Menu */}
             <div className="relative group">
-              <button className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-full transition">
+              <button className="flex items-center space-x-2 p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition text-gray-700 dark:text-gray-200">
                 {isAuthenticated ? (
                   <>
                     {user?.profilePicture ? (
                       <img
                         src={user.profilePicture}
                         alt="Profile"
-                        className="w-8 h-8 rounded-full object-cover border-2 border-purple-300"
+                        className="w-8 h-8 rounded-full object-cover border-2 border-purple-300 dark:border-purple-600"
                       />
                     ) : (
                       <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
@@ -141,33 +154,33 @@ const Header = () => {
                     )}
                   </>
                 ) : (
-                  <User className="h-6 w-6 text-gray-700" />
+                  <User className="h-6 w-6" />
                 )}
               </button>
 
               {/* Dropdown Menu */}
               {isAuthenticated && (
                 <div className="absolute right-0 top-full pt-2 w-48 hidden group-hover:block z-50">
-                  <div className="bg-white rounded-lg shadow-lg py-2 border border-gray-100">
-                    <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100 transition">
+                  <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg py-2 border border-gray-100 dark:border-slate-700 text-gray-700 dark:text-gray-200">
+                    <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-slate-700 transition">
                       My Profile
                     </Link>
-                    <Link to="/orders" className="block px-4 py-2 hover:bg-gray-100 transition">
+                    <Link to="/orders" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-slate-700 transition">
                       My Orders
                     </Link>
-                    <Link to="/addresses" className="block px-4 py-2 hover:bg-gray-100 transition">
+                    <Link to="/addresses" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-slate-700 transition">
                       Addresses
                     </Link>
                     {['admin', 'super_admin'].includes(user?.role) && (
-                      <Link to="/admin" className="block px-4 py-2 hover:bg-gray-100 transition text-purple-600 font-medium flex items-center space-x-2">
+                      <Link to="/admin" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-slate-700 transition text-purple-600 dark:text-purple-400 font-medium flex items-center space-x-2">
                         <LayoutDashboard className="h-4 w-4" />
                         <span>Admin Dashboard</span>
                       </Link>
                     )}
-                    <hr className="my-2" />
+                    <hr className="my-2 border-gray-200 dark:border-slate-700" />
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100 transition flex items-center space-x-2"
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-slate-700 transition flex items-center space-x-2"
                     >
                       <LogOut className="h-4 w-4" />
                       <span>Logout</span>
@@ -178,11 +191,11 @@ const Header = () => {
 
               {!isAuthenticated && (
                 <div className="absolute right-0 top-full pt-2 w-48 hidden group-hover:block z-50">
-                  <div className="bg-white rounded-lg shadow-lg py-2 border border-gray-100">
-                    <Link to="/login" className="block px-4 py-2 hover:bg-gray-100 transition">
+                  <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg py-2 border border-gray-100 dark:border-slate-700 text-gray-700 dark:text-gray-200">
+                    <Link to="/login" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-slate-700 transition">
                       Login
                     </Link>
-                    <Link to="/register" className="block px-4 py-2 hover:bg-gray-100 transition">
+                    <Link to="/register" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-slate-700 transition">
                       Register
                     </Link>
                   </div>
