@@ -18,6 +18,7 @@ import { logout } from '../store/slices/authSlice';
 import { selectCartCount } from '../store/slices/cartSlice';
 import { selectWishlistCount } from '../store/slices/wishlistSlice';
 import { useTheme } from '../contexts/ThemeContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -30,6 +31,7 @@ const Header = () => {
   const cartCount = useSelector(selectCartCount);
   const wishlistCount = useSelector(selectWishlistCount);
   const { isDarkMode, toggleDarkMode } = useTheme();
+  const { currency, setCurrency, availableCurrencies } = useCurrency();
 
   const handleLogout = () => {
     dispatch(logout());
@@ -99,6 +101,19 @@ const Header = () => {
 
           {/* Navigation Icons */}
           <div className="flex items-center space-x-4">
+            {/* Currency Selector */}
+            <select
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
+              className="bg-transparent text-sm font-medium text-gray-700 dark:text-gray-200 border-none focus:ring-0 cursor-pointer outline-none"
+            >
+              {availableCurrencies.map((c) => (
+                <option key={c} value={c} className="text-gray-900 dark:text-gray-900">
+                  {c}
+                </option>
+              ))}
+            </select>
+
             {/* Theme Toggle */}
             <button
               onClick={toggleDarkMode}
