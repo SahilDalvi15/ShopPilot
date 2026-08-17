@@ -4,6 +4,7 @@ import { selectCompareItems, removeFromCompare, clearCompare } from '../store/sl
 import { addToCart } from '../store/slices/cartSlice';
 import { useToast } from '../contexts/ToastContext';
 import { ArrowLeft, Trash2, ShoppingCart, Star, Check, X, ArrowRightLeft } from 'lucide-react';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 const ComparePage = () => {
   const dispatch = useDispatch();
@@ -12,6 +13,7 @@ const ComparePage = () => {
   
   const compareItems = useSelector(selectCompareItems);
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const { formatPrice } = useCurrency();
 
   const handleAddToCart = async (product) => {
     if (!isAuthenticated) {
@@ -118,14 +120,14 @@ const ComparePage = () => {
                     <div className="mb-4">
                       {item.discount > 0 ? (
                         <div className="flex items-baseline gap-2">
-                          <span className="text-2xl font-black text-gray-900 dark:text-slate-100 tracking-tight">₹{item.discountedPrice}</span>
-                          <span className="text-sm text-gray-400 line-through font-medium">₹{item.price}</span>
+                          <span className="text-2xl font-black text-gray-900 dark:text-slate-100 tracking-tight">{formatPrice(item.discountedPrice)}</span>
+                          <span className="text-sm text-gray-400 line-through font-medium">{formatPrice(item.price)}</span>
                           <span className="text-xs font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-full border border-red-100">
                             -{item.discount}%
                           </span>
                         </div>
                       ) : (
-                        <span className="text-2xl font-black text-gray-900 dark:text-slate-100 tracking-tight">₹{item.price}</span>
+                        <span className="text-2xl font-black text-gray-900 dark:text-slate-100 tracking-tight">{formatPrice(item.price)}</span>
                       )}
                     </div>
 

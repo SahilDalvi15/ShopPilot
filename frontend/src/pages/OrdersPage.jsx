@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Package, Truck, CheckCircle, XCircle, Clock, ChevronDown, ChevronUp, MapPin, Calendar, CreditCard, Box, PackageCheck, Download } from 'lucide-react';
 import { orderService } from '../services/order.service';
 import { useToast } from '../contexts/ToastContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 const ORDER_STEPS = [
   { key: 'pending', label: 'Order Placed', icon: Clock },
@@ -19,6 +20,7 @@ const OrdersPage = () => {
   const [activeFilter, setActiveFilter] = useState('all');
   const queryClient = useQueryClient();
   const { success, error: toastError } = useToast();
+  const { formatPrice } = useCurrency();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['orders'],
@@ -180,7 +182,7 @@ const OrdersPage = () => {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-xl font-bold text-gray-900">₹{order.totalAmount?.toLocaleString()}</p>
+                        <p className="text-xl font-bold text-gray-900">{formatPrice(order.totalAmount)}</p>
                         <p className={`text-xs font-medium ${order.paymentStatus === 'success' ? 'text-green-600' : 'text-yellow-600'}`}>
                           Payment {order.paymentStatus?.toUpperCase()}
                         </p>
@@ -246,12 +248,12 @@ const OrdersPage = () => {
                           />
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-gray-900 truncate">{item.product?.title || 'Product Unavailable'}</p>
-                            <p className="text-sm text-gray-500">Qty: {item.quantity} × ₹{(item.price || 0).toLocaleString()}</p>
+                            <p className="text-sm text-gray-500">Qty: {item.quantity} × {formatPrice(item.price || 0)}</p>
                             {item.selectedSize && (
                               <p className="text-sm text-gray-500 mt-0.5">Size: <span className="font-medium text-gray-700">{item.selectedSize}</span></p>
                             )}
                           </div>
-                          <p className="font-bold text-gray-900 text-lg">₹{((item.price || 0) * item.quantity).toLocaleString()}</p>
+                          <p className="font-bold text-gray-900 text-lg">{formatPrice((item.price || 0) * item.quantity)}</p>
                         </div>
                       ))}
                     </div>

@@ -11,6 +11,7 @@ import { addToCart as addToCartAction } from '../store/slices/cartSlice';
 import { useToast } from '../contexts/ToastContext';
 import WishlistItemSkeleton from '../components/skeletons/WishlistItemSkeleton';
 import { wishlistService } from '../services/wishlist.service';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 const WishlistPage = () => {
   const [selectedItems, setSelectedItems] = useState([]);
@@ -20,6 +21,7 @@ const WishlistPage = () => {
   const dispatch = useDispatch();
   const { items: wishlistItems, loading } = useSelector((state) => state.wishlist);
   const { success, error: toastError } = useToast();
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     dispatch(fetchWishlist());
@@ -294,12 +296,12 @@ const WishlistPage = () => {
                         {/* Price */}
                         <div className="flex items-end space-x-3 mt-4">
                           <span className="text-2xl font-black text-gray-900 tracking-tight">
-                            ₹{(item.discountedPrice || item.price).toLocaleString()}
+                            {formatPrice(item.discountedPrice || item.price)}
                           </span>
                           {item.discount > 0 && (
                             <>
                               <span className="text-sm text-gray-400 line-through mb-1">
-                                ₹{item.price.toLocaleString()}
+                                {formatPrice(item.price)}
                               </span>
                               <span className="text-xs font-bold text-green-700 bg-green-100 px-2 py-1 rounded-md mb-1">
                                 {item.discount}% OFF
@@ -364,12 +366,12 @@ const WishlistPage = () => {
                     
                     <div className="flex justify-between items-center text-gray-600">
                       <span>Total Value</span>
-                      <span className="text-gray-900 font-bold">₹{calculateTotal().toLocaleString()}</span>
+                      <span className="text-gray-900 font-bold">{formatPrice(calculateTotal())}</span>
                     </div>
                     
                     <div className="flex justify-between items-center bg-green-50/50 p-3 rounded-xl border border-green-100/50">
                       <span className="text-green-700">Your Savings</span>
-                      <span className="text-green-700 font-bold">₹{calculateSavings().toLocaleString()}</span>
+                      <span className="text-green-700 font-bold">{formatPrice(calculateSavings())}</span>
                     </div>
                   </div>
                   
@@ -377,7 +379,7 @@ const WishlistPage = () => {
                     <div className="flex justify-between items-end mb-8">
                       <span className="text-gray-500 font-bold uppercase tracking-wider text-xs">Total</span>
                       <span className="text-3xl font-black text-gray-900 tracking-tight">
-                        ₹{calculateTotal().toLocaleString()}
+                        {formatPrice(calculateTotal())}
                       </span>
                     </div>
                     
