@@ -8,6 +8,7 @@ import { SocketProvider } from './contexts/SocketContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import ErrorBoundary from './components/ErrorBoundary'
 import './index.css'
+import { GoogleOAuthProvider } from '@react-oauth/google'
 import App from './App.jsx'
 import store from './store/store'
 import queryClient from './lib/react-query'
@@ -22,8 +23,10 @@ createRoot(document.getElementById('root')).render(
             <SocketProvider>
               <ThemeProvider>
                 <ToastProvider>
-                  <App />
-                  <ToastContainer />
+                  <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || 'dummy_client_id'}>
+                    <App />
+                    <ToastContainer />
+                  </GoogleOAuthProvider>
                 </ToastProvider>
               </ThemeProvider>
             </SocketProvider>

@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { register, clearError } from '../store/slices/authSlice';
+import { register, googleLogin, clearError } from '../store/slices/authSlice';
 import { useToast } from '../contexts/ToastContext';
+import { useGoogleLogin } from '@react-oauth/google';
 import { UserPlus, Mail, Lock, User, Phone, AlertCircle } from 'lucide-react';
 
 const RegisterPage = () => {
@@ -38,6 +39,21 @@ const RegisterPage = () => {
       dispatch(clearError());
     }
   };
+
+  const handleGoogleSignup = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      const result = await dispatch(googleLogin(tokenResponse.credential || tokenResponse.access_token || tokenResponse.id_token));
+      if (googleLogin.fulfilled.match(result)) {
+        success('Welcome to ShopPilot!', 'You have successfully signed up with Google.');
+        navigate('/products');
+      } else {
+        toastError('Google Signup Failed', result.payload || 'Please try again.');
+      }
+    },
+    onError: () => {
+      toastError('Google Signup Failed', 'An error occurred during Google sign up.');
+    }
+  });
 
   const validateForm = () => {
     const newErrors = {};
@@ -267,6 +283,24 @@ const RegisterPage = () => {
                   Create Account
                 </>
               )}
+            </button>
+
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Or sign up with</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => handleGoogleSignup()}
+              className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+            >
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+              Sign up with Google
             </button>
           </form>
 

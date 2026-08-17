@@ -67,6 +67,44 @@ const login = async (req, res) => {
   }
 };
 
+const googleAuth = async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (!token) {
+      return res.status(400).json({ success: false, message: 'Google token is required' });
+    }
+
+    const result = await authService.googleAuth(token);
+    
+    // Set refresh token in httpOnly cookie
+    res.cookie('refreshToken', result.tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
+    // Remove refresh token from response
+    const { refreshToken, ...tokensWithoutRefresh } = result.tokens;
+    result.tokens = tokensWithoutRefresh;
+
+    res.status(200).json({
+      success: true,
+      message: 'Google login successful',
+      data: result
+    });
+  } catch (error) {
+    res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message || 'Google login failed',
+      error: {
+        code: error.code || 'GOOGLE_LOGIN_ERROR',
+        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      }
+    });
+  }
+};
+
 const logout = async (req, res) => {
   try {
     await authService.logout(req.user.id);
@@ -190,5 +228,6 @@ module.exports = {
   refreshToken,
   forgotPassword,
   resetPassword,
-  verifyEmail
+  verifyEmail,
+  googleAuth
 };

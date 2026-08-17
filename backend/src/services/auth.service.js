@@ -3,6 +3,9 @@ const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = requir
 const { setCache, getCache, deleteCache } = require('../utils/redis');
 const logger = require('../utils/logger');
 const emailService = require('./emailService');
+const { OAuth2Client } = require('google-auth-library');
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || 'dummy_client_id');
 
 // Main authentication service handling registration, login, and token management
 class AuthService {
@@ -122,6 +125,84 @@ class AuthService {
         role: user.role,
         isEmailVerified: user.isEmailVerified,
         profilePicture: user.profilePicture
+      },
+      tokens: {
+        accessToken,
+        refreshToken
+      }
+    };
+  }
+
+  async googleAuth(idToken) {
+    let payload;
+    try {
+      const ticket = await googleClient.verifyIdToken({
+        idToken,
+        audience: process.env.GOOGLE_CLIENT_ID || 'dummy_client_id',
+      });
+      payload = ticket.getPayload();
+    } catch (error) {
+      const err = new Error('Invalid Google token');
+      err.statusCode = 401;
+      err.code = 'INVALID_GOOGLE_TOKEN';
+      throw err;
+    }
+
+    const { sub: googleId, email, given_name: firstName, family_name: lastName, picture: profilePicture, email_verified } = payload;
+
+    if (!email_verified) {
+      const err = new Error('Google email is not verified');
+      err.statusCode = 401;
+      throw err;
+    }
+
+    let user = await User.findOne({ email });
+
+    if (user) {
+      if (user.authProvider !== 'google') {
+        // Optionally update authProvider or googleId
+        user.googleId = googleId;
+        user.authProvider = 'google';
+        if (!user.profilePicture) user.profilePicture = profilePicture;
+        await user.save();
+      }
+    } else {
+      user = await User.create({
+        email,
+        firstName: firstName || 'Google',
+        lastName: lastName || 'User',
+        googleId,
+        authProvider: 'google',
+        isEmailVerified: true,
+        profilePicture
+      });
+    }
+
+    if (!user.isActive) {
+      const error = new Error('Account is deactivated');
+      error.statusCode = 401;
+      error.code = 'ACCOUNT_DEACTIVATED';
+      throw error;
+    }
+
+    user.lastLogin = new Date();
+    
+    const accessToken = generateAccessToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
+
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    return {
+      user: {
+        id: user._id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        isEmailVerified: user.isEmailVerified,
+        profilePicture: user.profilePicture,
+        authProvider: user.authProvider
       },
       tokens: {
         accessToken,
