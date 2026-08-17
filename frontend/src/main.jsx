@@ -6,6 +6,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { ToastProvider } from './contexts/ToastContext'
 import { SocketProvider } from './contexts/SocketContext'
 import { ThemeProvider } from './contexts/ThemeContext'
+import { CurrencyProvider } from './contexts/CurrencyContext'
 import ErrorBoundary from './components/ErrorBoundary'
 import './index.css'
 import { GoogleOAuthProvider } from '@react-oauth/google'
@@ -22,12 +23,14 @@ createRoot(document.getElementById('root')).render(
           <QueryClientProvider client={queryClient}>
             <SocketProvider>
               <ThemeProvider>
-                <ToastProvider>
-                  <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || 'dummy_client_id'}>
-                    <App />
-                    <ToastContainer />
-                  </GoogleOAuthProvider>
-                </ToastProvider>
+                <CurrencyProvider>
+                  <ToastProvider>
+                    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || 'dummy_client_id'}>
+                      <App />
+                      <ToastContainer />
+                    </GoogleOAuthProvider>
+                  </ToastProvider>
+                </CurrencyProvider>
               </ThemeProvider>
             </SocketProvider>
           </QueryClientProvider>
