@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { settingService } from '../services/settingService';
 import AddressCardSkeleton from '../components/skeletons/AddressCardSkeleton';
 import MockPaymentModal from '../components/MockPaymentModal';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ const CheckoutPage = () => {
   const cartDiscount = useSelector((state) => state.cart.totalDiscount);
   const appliedCoupon = useSelector((state) => state.cart.appliedCoupon);
   const { addresses, loading: addressesLoading } = useSelector((state) => state.address);
+  const { formatPrice } = useCurrency();
 
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('cod');
@@ -271,7 +273,7 @@ const CheckoutPage = () => {
                       </div>
                       <div className="text-right">
                         <p className="font-semibold text-gray-900">
-                          ₹{(item.price || 0).toLocaleString()}
+                          {formatPrice(item.price || 0)}
                         </p>
                       </div>
                     </div>
@@ -342,7 +344,7 @@ const CheckoutPage = () => {
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between text-gray-600">
                     <span>Subtotal ({cartItems.length} items)</span>
-                    <span className="font-medium text-gray-900">₹{cartTotal.toLocaleString()}</span>
+                    <span className="font-medium text-gray-900">{formatPrice(cartTotal)}</span>
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Shipping</span>
@@ -350,25 +352,25 @@ const CheckoutPage = () => {
                       {calculateShipping() === 0 ? (
                         <span className="text-green-600 bg-green-50 px-2 py-0.5 rounded-md">FREE</span>
                       ) : (
-                        `₹${calculateShipping()}`
+                        formatPrice(calculateShipping())
                       )}
                     </span>
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Tax ({settings.taxRate}%)</span>
-                    <span className="font-medium text-gray-900">₹{calculateTax().toLocaleString()}</span>
+                    <span className="font-medium text-gray-900">{formatPrice(calculateTax())}</span>
                   </div>
                   {cartDiscount > 0 && (
                     <div className="flex justify-between text-green-600">
                       <span>Discount</span>
-                      <span className="font-medium">-₹{cartDiscount.toLocaleString()}</span>
+                      <span className="font-medium">-{formatPrice(cartDiscount)}</span>
                     </div>
                   )}
                   
                   <div className="pt-4 mt-4 border-t-2 border-dashed border-gray-200">
                     <div className="flex justify-between items-end">
                       <span className="font-semibold text-gray-900 text-lg">Total</span>
-                      <span className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">₹{calculateTotal().toLocaleString()}</span>
+                      <span className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">{formatPrice(calculateTotal())}</span>
                     </div>
                   </div>
                 </div>
@@ -418,7 +420,7 @@ const CheckoutPage = () => {
                     <div className="bg-purple-100 p-1.5 rounded-full text-purple-600">
                       <Truck className="h-4 w-4" />
                     </div>
-                    <span className="font-medium">Free shipping on orders over ₹{settings.freeShippingThreshold}</span>
+                    <span className="font-medium">Free shipping on orders over {formatPrice(settings.freeShippingThreshold)}</span>
                   </div>
                   <div className="flex items-center space-x-3 text-sm text-gray-600">
                     <div className="bg-purple-100 p-1.5 rounded-full text-purple-600">

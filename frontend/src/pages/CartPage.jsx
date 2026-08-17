@@ -5,6 +5,7 @@ import { fetchCart, removeFromCart, updateCartItem, applyCouponAsync, removeCoup
 import { useQuery } from '@tanstack/react-query';
 import { settingService } from '../services/settingService';
 import { useToast } from '../contexts/ToastContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import { Trash2, Plus, Minus, ShoppingBag, Tag, X } from 'lucide-react';
 
 const CartPage = () => {
@@ -17,6 +18,7 @@ const CartPage = () => {
   const appliedCoupon = useSelector((state) => state.cart.appliedCoupon);
   const loading = useSelector((state) => state.cart.loading);
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const { formatPrice } = useCurrency();
 
   const { data: settingsData } = useQuery({
     queryKey: ['settings'],
@@ -147,11 +149,11 @@ const CartPage = () => {
 
                     <div className="text-right">
                       <p className="font-semibold text-gray-900 dark:text-slate-100">
-                        ₹{item.subtotal.toLocaleString()}
+                        {formatPrice(item.subtotal)}
                       </p>
                       {item.discountedPrice && item.discountedPrice < item.price && (
                         <p className="text-sm text-gray-500 line-through">
-                          ₹{(item.price * item.quantity).toLocaleString()}
+                          {formatPrice(item.price * item.quantity)}
                         </p>
                       )}
                     </div>
@@ -176,32 +178,32 @@ const CartPage = () => {
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-gray-600 dark:text-slate-400">
                   <span>Subtotal</span>
-                  <span>₹{subtotal.toLocaleString()}</span>
+                  <span>{formatPrice(subtotal)}</span>
                 </div>
                 
                 {totalDiscount > 0 && (
                   <div className="flex justify-between text-green-600">
                     <span>Discount</span>
-                    <span>-₹{totalDiscount.toLocaleString()}</span>
+                    <span>-{formatPrice(totalDiscount)}</span>
                   </div>
                 )}
                 
                 <div className="flex justify-between text-gray-600 dark:text-slate-400">
                   <span>Shipping</span>
                   <span className={shipping === 0 ? "text-green-600" : ""}>
-                    {shipping === 0 ? 'Free' : `₹${shipping.toLocaleString()}`}
+                    {shipping === 0 ? 'Free' : formatPrice(shipping)}
                   </span>
                 </div>
                 
                 <div className="flex justify-between text-gray-600 dark:text-slate-400">
                   <span>Tax ({settings.taxRate}%)</span>
-                  <span>₹{tax.toLocaleString()}</span>
+                  <span>{formatPrice(tax)}</span>
                 </div>
                 
                 <div className="border-t border-gray-200 dark:border-slate-700 pt-3">
                   <div className="flex justify-between font-semibold text-gray-900 dark:text-slate-100">
                     <span>Total</span>
-                    <span>₹{finalTotal.toLocaleString()}</span>
+                    <span>{formatPrice(finalTotal)}</span>
                   </div>
                 </div>
               </div>
@@ -235,7 +237,7 @@ const CartPage = () => {
                     <Tag className="w-4 h-4 text-green-600" />
                     <div>
                       <p className="text-sm font-medium text-green-900">{appliedCoupon.code}</p>
-                      <p className="text-xs text-green-700">₹{appliedCoupon.discountAmount} off</p>
+                      <p className="text-xs text-green-700">{formatPrice(appliedCoupon.discountAmount)} off</p>
                     </div>
                   </div>
                   <button
