@@ -2,12 +2,14 @@ import { useQuery } from '@tanstack/react-query';
 import { Package, ShoppingCart, Users, DollarSign, TrendingUp, TrendingDown, Loader2, Download } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, Legend } from 'recharts';
 import adminStatsService from '../../services/adminStatsService';
+import { useCurrency } from '../../contexts/CurrencyContext';
 
 const AdminStats = () => {
   const { data: statsResponse, isLoading, isError, error } = useQuery({
     queryKey: ['adminStats'],
     queryFn: adminStatsService.getAdminStats,
   });
+  const { formatPrice } = useCurrency();
 
   if (isLoading) {
     return (
@@ -36,7 +38,7 @@ const AdminStats = () => {
     // Create CSV content for Recent Orders
     const headers = ['Order ID', 'Customer', 'Amount', 'Status', 'Date'];
     const rows = statsResponse.data.recentOrders.map(order => 
-      [order.id, order.customer, order.amount.replace('₹', '').replace(/,/g, ''), order.status, new Date(order.date).toLocaleDateString()].join(',')
+      [order.id, order.customer, order.amount, order.status, new Date(order.date).toLocaleDateString()].join(',')
     );
     
     const csvContent = [
@@ -62,7 +64,7 @@ const AdminStats = () => {
   const stats = [
     {
       title: 'Total Revenue',
-      value: overview.totalRevenue,
+      value: formatPrice(overview.totalRevenue),
       change: '0%', // Simplified for now
       trend: 'up',
       icon: DollarSign,
@@ -209,12 +211,12 @@ const AdminStats = () => {
                   axisLine={false} 
                   tickLine={false} 
                   tick={{ fill: '#64748b', fontSize: 12 }} 
-                  tickFormatter={(value) => `₹${value.toLocaleString()}`}
+                  tickFormatter={(value) => formatPrice(value)}
                   width={80}
                 />
                 <Tooltip 
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                  formatter={(value) => [`₹${value.toLocaleString()}`, 'Revenue']}
+                  formatter={(value) => [formatPrice(value), 'Revenue']}
                   labelStyle={{ fontWeight: 'bold', color: '#1e293b' }}
                 />
                 <Area 
@@ -258,7 +260,7 @@ const AdminStats = () => {
                     ))}
                   </Pie>
                   <Tooltip 
-                    formatter={(value) => [`₹${value.toLocaleString()}`, 'Revenue']}
+                    formatter={(value) => [formatPrice(value), 'Revenue']}
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                   />
                   <Legend verticalAlign="bottom" height={36} iconType="circle" />
@@ -322,7 +324,7 @@ const AdminStats = () => {
                     <p className="text-sm text-gray-500">{new Date(order.date).toLocaleDateString()} {new Date(order.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-gray-900">{order.amount}</p>
+                    <p className="font-semibold text-gray-900">{formatPrice(order.amount)}</p>
                     <span
                       className={`inline-block px-2 py-1 text-xs font-medium rounded-full mt-1 capitalize ${getStatusColor(order.status)}`}
                     >
@@ -366,7 +368,7 @@ const AdminStats = () => {
                       <p className="text-sm text-gray-500">{product.sales} sold</p>
                     </div>
                   </div>
-                  <p className="font-semibold text-gray-900">{product.revenue}</p>
+                  <p className="font-semibold text-gray-900">{formatPrice(product.revenue)}</p>
                 </div>
               ))
             ) : (

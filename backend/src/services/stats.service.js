@@ -33,7 +33,7 @@ class StatsService {
     const recentOrders = recentOrdersRaw.map(order => ({
       id: order.orderNumber,
       customer: order.userId ? `${order.userId.firstName} ${order.userId.lastName}`.trim() : 'Unknown',
-      amount: `₹${order.totalAmount.toLocaleString()}`,
+      amount: order.totalAmount,
       status: order.orderStatus,
       // Simple relative time calculation (you could use moment.js or date-fns in production)
       date: order.createdAt
@@ -48,7 +48,7 @@ class StatsService {
     const topProducts = topProductsRaw.map(product => ({
       name: product.title,
       sales: product.soldCount || 0,
-      revenue: `₹${((product.soldCount || 0) * product.price).toLocaleString()}`
+      revenue: (product.soldCount || 0) * product.price
     }));
 
     // 7. Revenue Trend (last 7 days)
@@ -120,7 +120,7 @@ class StatsService {
 
     return {
       overview: {
-        totalRevenue: `₹${totalRevenue.toLocaleString()}`,
+        totalRevenue,
         totalOrders: totalOrders.toLocaleString(),
         totalProducts: totalProducts.toLocaleString(),
         totalUsers: totalUsers.toLocaleString()

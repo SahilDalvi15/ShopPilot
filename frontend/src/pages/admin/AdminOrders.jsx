@@ -3,12 +3,14 @@ import { Search, Filter, Eye, Download, MoreVertical, Loader2 } from 'lucide-rea
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import adminOrderService from '../../services/adminOrderService';
 import { useToast } from '../../contexts/ToastContext';
+import { useCurrency } from '../../contexts/CurrencyContext';
 
 const AdminOrders = () => {
   const queryClient = useQueryClient();
   const { success, error: toastError } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const { formatPrice } = useCurrency();
 
   // Fetch orders
   const { data: response, isLoading, error } = useQuery({
@@ -166,7 +168,7 @@ const AdminOrders = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-gray-700">{order.items?.length || 0}</td>
-                    <td className="px-6 py-4 font-semibold text-gray-900">₹{order.totalAmount?.toLocaleString() || 0}</td>
+                    <td className="px-6 py-4 font-semibold text-gray-900">{formatPrice(order.totalAmount || 0)}</td>
                     <td className="px-6 py-4 text-gray-700 capitalize">{order.paymentMethod || 'N/A'}</td>
                     <td className="px-6 py-4">
                       <select

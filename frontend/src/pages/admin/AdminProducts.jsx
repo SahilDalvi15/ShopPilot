@@ -4,6 +4,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import adminProductService from '../../services/adminProductService';
 import { useToast } from '../../contexts/ToastContext';
+import { useCurrency } from '../../contexts/CurrencyContext';
 
 const AdminProducts = () => {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ const AdminProducts = () => {
   const { success, error: toastError } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const { formatPrice } = useCurrency();
 
   // Fetch products
   const { data: response, isLoading, error } = useQuery({
@@ -146,7 +148,7 @@ const AdminProducts = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-gray-700 capitalize">{product.category?.name || product.category}</td>
-                    <td className="px-6 py-4 font-semibold text-gray-900">₹{product.price.toLocaleString()}</td>
+                    <td className="px-6 py-4 font-semibold text-gray-900">{formatPrice(product.price)}</td>
                     <td className="px-6 py-4 text-gray-700">{product.stock}</td>
                     <td className="px-6 py-4">
                       <span className={`px-3 py-1.5 text-xs font-semibold rounded-full ${getStatusColor(product.stock)}`}>

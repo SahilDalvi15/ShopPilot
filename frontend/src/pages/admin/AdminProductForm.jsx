@@ -5,11 +5,13 @@ import { useQuery } from '@tanstack/react-query';
 import adminProductService from '../../services/adminProductService';
 import ImageUpload from '../../components/ImageUpload';
 import { useToast } from '../../contexts/ToastContext';
+import { useCurrency } from '../../contexts/CurrencyContext';
 
 const AdminProductForm = ({ isEdit = false }) => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { success, error: toastError } = useToast();
+  const { settings } = useCurrency();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
@@ -226,7 +228,7 @@ const AdminProductForm = ({ isEdit = false }) => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
-                    Price (₹) *
+                    Price ({settings?.currency === 'USD' ? '$' : settings?.currency === 'EUR' ? '€' : '₹'}) *
                   </label>
                   <input
                     type="number"
