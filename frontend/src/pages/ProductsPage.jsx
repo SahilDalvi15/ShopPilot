@@ -13,6 +13,7 @@ import { Search, Grid, List, Heart, ShoppingCart, Star, SlidersHorizontal, X, Ar
 import ProductCardSkeleton from '../components/skeletons/ProductCardSkeleton';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 const ProductsPage = () => {
   const location = useLocation();
@@ -23,6 +24,7 @@ const ProductsPage = () => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const wishlistItems = useSelector((state) => state.wishlist.items);
   const compareItems = useSelector(selectCompareItems);
+  const { formatPrice, currencySymbol } = useCurrency();
   
   const getPageTitle = () => {
     switch (location.pathname) {
@@ -282,8 +284,8 @@ const ProductsPage = () => {
             ]}
           />
           <div className="flex items-center justify-between mt-6 text-sm font-medium text-gray-600 dark:text-slate-400">
-            <div className="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 px-3 py-1.5 rounded-lg">₹ {filters.minPrice || 0}</div>
-            <div className="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 px-3 py-1.5 rounded-lg">₹ {filters.maxPrice || 100000}</div>
+            <div className="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 px-3 py-1.5 rounded-lg">{formatPrice(filters.minPrice || 0)}</div>
+            <div className="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 px-3 py-1.5 rounded-lg">{formatPrice(filters.maxPrice || 100000)}</div>
           </div>
         </div>
       </div>
@@ -516,7 +518,7 @@ const ProductsPage = () => {
 
                 {(filters.minPrice || filters.maxPrice) && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-100">
-                    ₹{filters.minPrice || 0} - ₹{filters.maxPrice || '100k+'}
+                    {formatPrice(filters.minPrice || 0)} - {formatPrice(filters.maxPrice || 100000)}
                     <button onClick={() => { handleFilterChange('minPrice', ''); handleFilterChange('maxPrice', ''); }} className="hover:bg-green-200 rounded-full p-0.5 transition-colors"><X className="w-3 h-3" /></button>
                   </span>
                 )}
@@ -654,15 +656,15 @@ const ProductsPage = () => {
                             {product.discount > 0 ? (
                               <>
                                 <span className="text-xs font-medium text-gray-400 line-through mb-0.5">
-                                  ₹{(product.price || 0).toLocaleString()}
+                                  {formatPrice(product.price || 0)}
                                 </span>
                                 <span className="text-2xl font-black text-gray-900 dark:text-slate-100 tracking-tight">
-                                  ₹{(product.discountedPrice || 0).toLocaleString()}
+                                  {formatPrice(product.discountedPrice || 0)}
                                 </span>
                               </>
                             ) : (
                               <span className="text-2xl font-black text-gray-900 dark:text-slate-100 tracking-tight">
-                                ₹{(product.price || 0).toLocaleString()}
+                                {formatPrice(product.price || 0)}
                               </span>
                             )}
                           </div>

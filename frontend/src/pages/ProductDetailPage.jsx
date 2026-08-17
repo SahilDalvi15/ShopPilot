@@ -16,6 +16,7 @@ import ProductRecommendations from '../components/ProductRecommendations';
 import { fetchProductReviews, createReview, markReviewHelpful } from '../store/slices/reviewSlice';
 import { addRecentlyViewed } from '../store/slices/recentSlice';
 import { useToast } from '../contexts/ToastContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 const ProductDetailPage = () => {
   const { slug } = useParams();
@@ -30,6 +31,7 @@ const ProductDetailPage = () => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const wishlistItems = useSelector((state) => state.wishlist.items);
   const compareItems = useSelector(selectCompareItems);
+  const { formatPrice } = useCurrency();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['product', slug],
@@ -270,18 +272,17 @@ const ProductDetailPage = () => {
               
               <div className="flex items-end gap-3 mb-2">
                 <span className="text-4xl font-bold text-gray-900 dark:text-slate-100 leading-none">
-                  <span className="text-2xl align-top">₹</span>
-                  {(product.discountedPrice || product.price).toLocaleString()}
+                  {formatPrice(product.discountedPrice || product.price)}
                 </span>
                 {product.discount > 0 && (
                   <span className="text-lg text-gray-500 line-through mb-1">
-                    M.R.P: ₹{product.price.toLocaleString()}
+                    M.R.P: {formatPrice(product.price)}
                   </span>
                 )}
               </div>
               <p className="text-sm text-gray-500">Inclusive of all taxes</p>
               <p className="text-sm text-gray-700 dark:text-slate-300 mt-2 font-medium">
-                <span className="font-bold">EMI</span> starts at ₹{(product.discountedPrice / 12).toFixed(0)}. No Cost EMI available.
+                <span className="font-bold">EMI</span> starts at {formatPrice(product.discountedPrice / 12)}. No Cost EMI available.
               </p>
             </div>
 

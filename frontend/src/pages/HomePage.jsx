@@ -21,6 +21,7 @@ import {
 import { productService } from '../services/product.service';
 import { categoryService } from '../services/category.service';
 import RecentlyViewed from '../components/RecentlyViewed';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 // Category icon/image mapping
 const categoryImages = {
@@ -65,6 +66,7 @@ const heroBanners = [
 const HomePage = () => {
   const navigate = useNavigate();
   const [currentBanner, setCurrentBanner] = useState(0);
+  const { formatPrice, currencySymbol } = useCurrency();
 
   // Auto-rotate banners
   useEffect(() => {
@@ -165,7 +167,7 @@ const HomePage = () => {
               </div>
               <div>
                 <h4 className="trust-badge__title">Free Shipping</h4>
-                <p className="trust-badge__text">On orders over ₹999</p>
+                <p className="trust-badge__text">On orders over {formatPrice(999)}</p>
               </div>
             </div>
             <div className="trust-badge">
@@ -343,6 +345,7 @@ const HomePage = () => {
 
 // Product Card Component
 const ProductCard = ({ product, navigate }) => {
+  const { formatPrice } = useCurrency();
   const discountedPrice = product.discount
     ? product.price - (product.price * product.discount) / 100
     : product.price;
@@ -391,9 +394,9 @@ const ProductCard = ({ product, navigate }) => {
           <span className="product-card__reviews">({product.reviewCount || 0})</span>
         </div>
         <div className="product-card__pricing">
-          <span className="product-card__price">₹{Math.round(discountedPrice).toLocaleString()}</span>
+          <span className="product-card__price">{formatPrice(Math.round(discountedPrice))}</span>
           {product.discount > 0 && (
-            <span className="product-card__original-price">₹{product.price.toLocaleString()}</span>
+            <span className="product-card__original-price">{formatPrice(product.price)}</span>
           )}
         </div>
       </div>
@@ -403,6 +406,7 @@ const ProductCard = ({ product, navigate }) => {
 
 // New Arrival Card Component (horizontal layout)
 const NewArrivalCard = ({ product, navigate }) => {
+  const { formatPrice } = useCurrency();
   const discountedPrice = product.discount
     ? product.price - (product.price * product.discount) / 100
     : product.price;
@@ -425,9 +429,9 @@ const NewArrivalCard = ({ product, navigate }) => {
           <span>{product.rating?.toFixed(1) || '0.0'}</span>
         </div>
         <div className="new-arrival-card__pricing">
-          <span className="new-arrival-card__price">₹{Math.round(discountedPrice).toLocaleString()}</span>
+          <span className="new-arrival-card__price">{formatPrice(Math.round(discountedPrice))}</span>
           {product.discount > 0 && (
-            <span className="new-arrival-card__original-price">₹{product.price.toLocaleString()}</span>
+            <span className="new-arrival-card__original-price">{formatPrice(product.price)}</span>
           )}
         </div>
         <button className="new-arrival-card__cta">
