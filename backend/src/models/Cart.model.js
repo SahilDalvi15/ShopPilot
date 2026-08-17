@@ -52,6 +52,10 @@ const cartSchema = new mongoose.Schema({
   totalAmount: {
     type: Number,
     default: 0
+  },
+  abandonedEmailSent: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true
@@ -66,6 +70,12 @@ cartSchema.pre('save', function(next) {
     return sum + itemDiscount;
   }, 0) + (this.appliedCoupon?.discountAmount || 0);
   this.totalAmount = this.subtotal - this.totalDiscount;
+
+  // If cart is updated with items, reset abandoned email flag so the timer resets
+  if (this.isModified('items')) {
+    this.abandonedEmailSent = false;
+  }
+  
   next();
 });
 

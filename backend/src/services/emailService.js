@@ -137,6 +137,20 @@ const templates = {
       </div>
     `,
   }),
+
+  abandonedCart: (name, cartUrl) => ({
+    subject: 'Did you forget something? 🛒',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h1 style="color: #7c3aed;">You left items in your cart!</h1>
+        <p>Hi ${name},</p>
+        <p>We noticed you added some great items to your cart but haven't checked out yet. They're still waiting for you!</p>
+        <p>Click the button below to complete your purchase before they sell out:</p>
+        <a href="${cartUrl}" style="background-color: #7c3aed; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; margin: 20px 0;">View My Cart</a>
+        <p>Best regards,<br>The ShopPilot Team</p>
+      </div>
+    `,
+  }),
 };
 
 // Send specific email types
@@ -168,6 +182,11 @@ const emailService = {
 
   sendVerificationEmail: async (email, name, verifyLink) => {
     const template = templates.emailVerification(name, verifyLink);
+    return sendEmail({ to: email, ...template });
+  },
+
+  sendAbandonedCartEmail: async (email, name, cartUrl) => {
+    const template = templates.abandonedCart(name, cartUrl);
     return sendEmail({ to: email, ...template });
   },
 };

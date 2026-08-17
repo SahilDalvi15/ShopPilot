@@ -14,6 +14,7 @@ const { connectRedis } = require('./utils/redis');
 const logger = require('./utils/logger');
 const errorHandler = require('./middlewares/errorHandler');
 const { initializeSocket } = require('./config/socket');
+const startAbandonedCartJob = require('./jobs/abandonedCart.job');
 
 // Import routes
 const authRoutes = require('./routes/auth.routes');
@@ -122,6 +123,9 @@ const server = app.listen(PORT, () => {
 
 // Initialize Socket.IO
 initializeSocket(server);
+
+// Start Background Jobs
+startAbandonedCartJob();
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
