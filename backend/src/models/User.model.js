@@ -12,9 +12,22 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Password is required'],
+    required: function() {
+      // Password is required only if they are not using Google auth
+      return this.authProvider === 'local';
+    },
     minlength: [8, 'Password must be at least 8 characters'],
     select: false
+  },
+  authProvider: {
+    type: String,
+    enum: ['local', 'google'],
+    default: 'local'
+  },
+  googleId: {
+    type: String,
+    sparse: true,
+    unique: true
   },
   firstName: {
     type: String,
@@ -58,7 +71,16 @@ const userSchema = new mongoose.Schema({
   lastLogin: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
-  refreshToken: String
+  refreshToken: String,
+  loyaltyPoints: {
+    type: Number,
+    default: 0
+  },
+  loyaltyTier: {
+    type: String,
+    enum: ['Bronze', 'Silver', 'Gold', 'Platinum'],
+    default: 'Bronze'
+  }
 }, {
   timestamps: true
 });
@@ -70,7 +92,7 @@ userSchema.index({ createdAt: -1 });
 
 // Hash password before saving
 userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) {
+  if (!this.isModified('password') || !this.password) {
     return next();
   }
   this.password = await bcrypt.hash(this.password, 12);
@@ -79,6 +101,7 @@ userSchema.pre('save', async function(next) {
 
 // Method to compare password
 userSchema.methods.comparePassword = async function(candidatePassword) {
+  if (!this.password) return false;
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
