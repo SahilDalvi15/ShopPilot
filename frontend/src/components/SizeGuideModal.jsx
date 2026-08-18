@@ -51,23 +51,25 @@ const SizeGuideModal = ({ isOpen, onClose, onSelectSize }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-slate-700">
-          <h3 className="text-xl font-bold text-gray-900 dark:text-slate-100">Size Guide</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:text-slate-400 transition p-2 hover:bg-gray-100 rounded-full">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
+      <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden border border-white/20 dark:border-slate-700/50 animate-in fade-in zoom-in-95 duration-300">
+        <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-slate-800 bg-gradient-to-r from-indigo-50/50 to-purple-50/50 dark:from-indigo-900/20 dark:to-purple-900/20">
+          <h3 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            Interactive Size Guide
+          </h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all p-2 hover:bg-white/50 dark:hover:bg-slate-800/50 rounded-full shadow-sm hover:shadow">
             <X className="w-5 h-5" />
           </button>
         </div>
-        <div className="p-6">
+        <div className="p-8">
           {/* Tabs */}
-          <div className="flex items-center gap-4 border-b border-gray-200 dark:border-slate-700 mb-6">
+          <div className="flex items-center gap-6 border-b border-gray-200 dark:border-slate-800 mb-8">
             <button
               onClick={() => setActiveTab('chart')}
-              className={`pb-3 font-semibold text-sm transition-colors relative ${
+              className={`pb-4 font-semibold text-sm md:text-base transition-all relative ${
                 activeTab === 'chart' 
                   ? 'text-indigo-600 dark:text-indigo-400' 
-                  : 'text-gray-500 hover:text-gray-700 dark:text-slate-400'
+                  : 'text-gray-500 hover:text-gray-800 dark:text-slate-400 dark:hover:text-slate-200'
               }`}
             >
               <div className="flex items-center gap-2">
@@ -79,10 +81,10 @@ const SizeGuideModal = ({ isOpen, onClose, onSelectSize }) => {
             </button>
             <button
               onClick={() => setActiveTab('calculator')}
-              className={`pb-3 font-semibold text-sm transition-colors relative ${
+              className={`pb-4 font-semibold text-sm md:text-base transition-all relative ${
                 activeTab === 'calculator' 
                   ? 'text-indigo-600 dark:text-indigo-400' 
-                  : 'text-gray-500 hover:text-gray-700 dark:text-slate-400'
+                  : 'text-gray-500 hover:text-gray-800 dark:text-slate-400 dark:hover:text-slate-200'
               }`}
             >
               <div className="flex items-center gap-2">
@@ -196,15 +198,15 @@ const SizeGuideModal = ({ isOpen, onClose, onSelectSize }) => {
               </div>
 
               {recommendedSize && (
-                <div className="mt-8 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-xl p-6 text-center animate-in fade-in slide-in-from-bottom-2 duration-300">
-                  <p className="text-sm text-indigo-600 dark:text-indigo-400 font-semibold mb-2 uppercase tracking-wider">Your Recommended Size</p>
-                  <div className="text-4xl font-bold text-indigo-700 dark:text-indigo-300 mb-4">{recommendedSize}</div>
+                <div className="mt-10 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border border-indigo-100/50 dark:border-indigo-800/50 rounded-2xl p-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-inner">
+                  <p className="text-sm text-indigo-600/80 dark:text-indigo-400/80 font-bold mb-3 uppercase tracking-widest">Recommended Size</p>
+                  <div className="text-6xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-6 drop-shadow-sm">{recommendedSize}</div>
                   <button 
                     onClick={() => {
                       if(onSelectSize) onSelectSize(recommendedSize);
                       onClose();
                     }}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-8 rounded-xl transition shadow-md"
+                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-10 rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0"
                   >
                     Apply Size {recommendedSize}
                   </button>
