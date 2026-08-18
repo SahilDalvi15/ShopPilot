@@ -22,6 +22,7 @@ import WishlistPage from './pages/WishlistPage';
 import SharedWishlistPage from './pages/SharedWishlistPage';
 import ProfilePage from './pages/ProfilePage';
 import AddressesPage from './pages/AddressesPage';
+import LoyaltyDashboard from './pages/LoyaltyDashboard';
 import VerifyEmailPage from './pages/VerifyEmailPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminStats from './pages/admin/AdminStats';
@@ -105,6 +106,10 @@ function App() {
         <Route 
           path="/profile" 
           element={isAuthenticated ? <ProfilePage /> : <Navigate to="/login" replace />} 
+        />
+        <Route 
+          path="/loyalty" 
+          element={isAuthenticated ? <LoyaltyDashboard /> : <Navigate to="/login" replace />} 
         />
         <Route 
           path="/addresses" 
