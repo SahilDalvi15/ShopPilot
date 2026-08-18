@@ -529,7 +529,11 @@ const ProductDetailPage = () => {
       </div>
 
       {/* Size Chart Modal */}
-      <SizeGuideModal isOpen={isSizeChartOpen} onClose={() => setIsSizeChartOpen(false)} />
+      <SizeGuideModal 
+        isOpen={isSizeChartOpen} 
+        onClose={() => setIsSizeChartOpen(false)} 
+        onSelectSize={(size) => setSelectedSize(size)}
+      />
       
       {/* AI Recommendations */}
       <ProductRecommendations currentProductId={product.id} />
