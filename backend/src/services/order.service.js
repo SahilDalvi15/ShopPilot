@@ -179,6 +179,30 @@ class OrderService {
     cart.appliedCoupon = null;
     await cart.save();
 
+    // Update user loyalty points
+    try {
+      const userToUpdate = await User.findById(userId);
+      if (userToUpdate) {
+        const pointsEarned = Math.floor(totalAmount);
+        userToUpdate.loyaltyPoints = (userToUpdate.loyaltyPoints || 0) + pointsEarned;
+        
+        if (userToUpdate.loyaltyPoints >= 5000) {
+          userToUpdate.loyaltyTier = 'Platinum';
+        } else if (userToUpdate.loyaltyPoints >= 2000) {
+          userToUpdate.loyaltyTier = 'Gold';
+        } else if (userToUpdate.loyaltyPoints >= 500) {
+          userToUpdate.loyaltyTier = 'Silver';
+        } else {
+          userToUpdate.loyaltyTier = 'Bronze';
+        }
+        
+        await userToUpdate.save();
+        logger.info(`Added ${pointsEarned} loyalty points to user ${userId}. New tier: ${userToUpdate.loyaltyTier}`);
+      }
+    } catch (loyaltyErr) {
+      logger.error(`Failed to update loyalty points: ${loyaltyErr.message}`);
+    }
+
     // TODO: Create Razorpay order if payment method is razorpay
     let razorpayOrder = null;
     if (paymentMethod === 'razorpay') {
