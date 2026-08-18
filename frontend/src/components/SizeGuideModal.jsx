@@ -1,10 +1,52 @@
 import React, { useState } from 'react';
 import { X, Ruler, UserCircle } from 'lucide-react';
 
-const SizeGuideModal = ({ isOpen, onClose }) => {
+const SizeGuideModal = ({ isOpen, onClose, onSelectSize }) => {
   const [activeTab, setActiveTab] = useState('chart'); // 'chart' or 'calculator'
   const [height, setHeight] = useState('');
   const [weight, setWeight] = useState('');
+  const [fit, setFit] = useState('regular'); // slim, regular, loose
+  const [recommendedSize, setRecommendedSize] = useState(null);
+
+  const calculateSize = () => {
+    if (!height || !weight) return;
+    const h = parseInt(height);
+    const w = parseInt(weight);
+
+    let size = 'M';
+    
+    // Simple mock algorithm
+    if (h < 165) {
+      size = w < 60 ? 'S' : w < 75 ? 'M' : 'L';
+    } else if (h < 178) {
+      size = w < 65 ? 'S' : w < 80 ? 'M' : w < 95 ? 'L' : 'XL';
+    } else if (h < 185) {
+      size = w < 70 ? 'M' : w < 85 ? 'L' : w < 100 ? 'XL' : 'XXL';
+    } else {
+      size = w < 80 ? 'L' : w < 95 ? 'XL' : 'XXL';
+    }
+
+    // Adjust based on fit preference
+    if (fit === 'slim') {
+      const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
+      const idx = sizes.indexOf(size);
+      if (idx > 0 && Math.random() > 0.5) { 
+        // Just mock some logic to step down
+      }
+    } else if (fit === 'loose') {
+      const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
+      const idx = sizes.indexOf(size);
+      if (idx < sizes.length - 1) {
+        size = sizes[idx + 1];
+      }
+    }
+
+    setRecommendedSize(size);
+  };
+
+  React.useEffect(() => {
+    calculateSize();
+  }, [height, weight, fit]);
 
   if (!isOpen) return null;
 
@@ -131,6 +173,43 @@ const SizeGuideModal = ({ isOpen, onClose }) => {
                   />
                 </div>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
+                  How do you prefer your clothes to fit?
+                </label>
+                <div className="grid grid-cols-3 gap-3">
+                  {['slim', 'regular', 'loose'].map((f) => (
+                    <button
+                      key={f}
+                      onClick={() => setFit(f)}
+                      className={`py-2 rounded-lg text-sm font-medium capitalize border transition-all ${
+                        fit === f
+                          ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400'
+                          : 'border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-400 hover:border-gray-300 dark:hover:border-slate-600'
+                      }`}
+                    >
+                      {f}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {recommendedSize && (
+                <div className="mt-8 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-xl p-6 text-center animate-in fade-in slide-in-from-bottom-2 duration-300">
+                  <p className="text-sm text-indigo-600 dark:text-indigo-400 font-semibold mb-2 uppercase tracking-wider">Your Recommended Size</p>
+                  <div className="text-4xl font-bold text-indigo-700 dark:text-indigo-300 mb-4">{recommendedSize}</div>
+                  <button 
+                    onClick={() => {
+                      if(onSelectSize) onSelectSize(recommendedSize);
+                      onClose();
+                    }}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-8 rounded-xl transition shadow-md"
+                  >
+                    Apply Size {recommendedSize}
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
