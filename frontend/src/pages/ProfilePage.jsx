@@ -507,7 +507,7 @@ const ProfilePage = () => {
           </div>
 
           {/* Quick Links */}
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Link
               to="/orders"
               className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 border border-gray-100 transition-all duration-300 group"
@@ -528,6 +528,16 @@ const ProfilePage = () => {
             >
               <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">Wishlist</h3>
               <p className="text-sm text-gray-500">View your saved items</p>
+            </Link>
+            <Link
+              to="/loyalty"
+              className="bg-gradient-to-br from-slate-900 to-slate-800 p-6 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 border border-slate-700 transition-all duration-300 group relative overflow-hidden"
+            >
+              <div className="absolute -right-10 -top-10 w-32 h-32 bg-purple-500 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
+              <h3 className="font-bold text-white mb-2 flex items-center gap-2">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">ShopPilot</span> Rewards
+              </h3>
+              <p className="text-sm text-slate-300">View your points, tier, and exclusive benefits</p>
             </Link>
           </div>
         </div>
