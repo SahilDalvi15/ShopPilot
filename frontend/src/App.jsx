@@ -15,8 +15,10 @@ import ProductsPage from './pages/ProductsPage';
 import CategoriesPage from './pages/CategoriesPage';
 import BrandsPage from './pages/BrandsPage';
 import ProductDetailPage from './pages/ProductDetailPage';
+import AuthCallback from './pages/AuthCallback';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
+import BundleBuilderPage from './pages/BundleBuilderPage';
 import OrdersPage from './pages/OrdersPage';
 import WishlistPage from './pages/WishlistPage';
 import SharedWishlistPage from './pages/SharedWishlistPage';
@@ -97,6 +99,7 @@ function App() {
           path="/cart" 
           element={isAuthenticated ? <CartPage /> : <Navigate to="/login" replace />} 
         />
+        <Route path="/bundle-builder" element={<BundleBuilderPage />} />
         <Route 
           path="/checkout" 
           element={isAuthenticated ? <CheckoutPage /> : <Navigate to="/login" replace />} 
