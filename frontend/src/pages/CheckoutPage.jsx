@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { MapPin, Truck, Shield, ArrowRight, Plus, Check, CreditCard } from 'lucide-react';
+import { MapPin, Truck, Shield, ArrowRight, Plus, Check, CreditCard, Gift, Video } from 'lucide-react';
 import { fetchAddresses } from '../store/slices/addressSlice';
 import { clearCart, applyCouponAsync, removeCouponAsync } from '../store/slices/cartSlice';
 import { orderService } from '../services/order.service';
@@ -28,6 +28,13 @@ const CheckoutPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('cod');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMockModalOpen, setIsMockModalOpen] = useState(false);
+  
+  const [giftOptions, setGiftOptions] = useState({
+    isGift: false,
+    includeGiftWrap: false,
+    giftMessage: '',
+    videoMessageUrl: ''
+  });
 
   const { data: settingsData } = useQuery({
     queryKey: ['settings'],
@@ -104,7 +111,8 @@ const CheckoutPage = () => {
           postalCode: shippingAddress.postalCode,
           country: shippingAddress.country || 'India',
         },
-        paymentMethod: method, 
+        paymentMethod: method,
+        giftOptions: giftOptions.isGift ? giftOptions : undefined,
       };
 
       // Create order via API
@@ -279,6 +287,70 @@ const CheckoutPage = () => {
                     </div>
                   ))}
                 </div>
+              </div>
+
+              {/* Gift Options */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 overflow-hidden relative">
+                <div className="flex items-center justify-between mb-4 relative z-10">
+                  <h2 className="text-xl font-semibold text-gray-900 flex items-center space-x-2">
+                    <Gift className="h-5 w-5 text-pink-500" />
+                    <span>Gift Options</span>
+                  </h2>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      className="sr-only peer" 
+                      checked={giftOptions.isGift}
+                      onChange={(e) => setGiftOptions({...giftOptions, isGift: e.target.checked})}
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-500"></div>
+                  </label>
+                </div>
+                
+                {giftOptions.isGift && (
+                  <div className="mt-6 space-y-5 animate-in slide-in-from-top-4 duration-300 relative z-10">
+                    <div className="absolute -right-20 -top-20 w-64 h-64 bg-pink-100 rounded-full blur-3xl opacity-40 -z-10"></div>
+                    
+                    <label className="flex items-center space-x-3 cursor-pointer group">
+                      <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${giftOptions.includeGiftWrap ? 'bg-pink-500 border-pink-500' : 'border-gray-300 group-hover:border-pink-400'}`}>
+                        {giftOptions.includeGiftWrap && <Check className="w-3.5 h-3.5 text-white" />}
+                      </div>
+                      <input 
+                        type="checkbox" 
+                        className="hidden"
+                        checked={giftOptions.includeGiftWrap}
+                        onChange={(e) => setGiftOptions({...giftOptions, includeGiftWrap: e.target.checked})}
+                      />
+                      <span className="text-gray-700 font-medium">Add Premium Gift Wrapping (Free!)</span>
+                    </label>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Gift Message (Printed on card)</label>
+                      <textarea
+                        rows="3"
+                        placeholder="Write a personalized message..."
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all resize-none bg-white/80 backdrop-blur-sm"
+                        value={giftOptions.giftMessage}
+                        onChange={(e) => setGiftOptions({...giftOptions, giftMessage: e.target.value})}
+                      ></textarea>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+                        <Video className="w-4 h-4 text-pink-500" />
+                        Video Message Link (Optional)
+                      </label>
+                      <input
+                        type="url"
+                        placeholder="Paste a YouTube or Vimeo link here..."
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all bg-white/80 backdrop-blur-sm"
+                        value={giftOptions.videoMessageUrl}
+                        onChange={(e) => setGiftOptions({...giftOptions, videoMessageUrl: e.target.value})}
+                      />
+                      <p className="text-xs text-gray-500 mt-1">We'll send them a beautiful digital card with your video embedded.</p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Payment Method */}
