@@ -14,6 +14,7 @@ import {
   Sun,
   Moon,
   PackagePlus,
+  Camera,
 } from 'lucide-react';
 import { logout } from '../store/slices/authSlice';
 import { selectCartCount } from '../store/slices/cartSlice';
@@ -273,6 +274,14 @@ const Header = () => {
                 Bundle & Save
               </Link>
               <Link
+                to="/shop-the-look"
+                className="px-4 py-2 hover:bg-pink-50 text-pink-700 font-medium rounded-lg transition flex items-center gap-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Camera className="w-4 h-4" />
+                Shop The Look
+              </Link>
+              <Link
                 to="/wishlist"
                 className="px-4 py-2 hover:bg-gray-100 rounded-lg transition flex items-center justify-between"
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -406,6 +415,13 @@ const Header = () => {
             >
               <PackagePlus className="w-4 h-4" />
               Bundle & Save
+            </Link>
+            <Link
+              to="/shop-the-look"
+              className="text-pink-600 hover:text-pink-700 transition font-bold flex items-center gap-1 bg-pink-50 px-3 py-1.5 rounded-full"
+            >
+              <Camera className="w-4 h-4" />
+              Shop The Look
             </Link>
           </div>
         </div>

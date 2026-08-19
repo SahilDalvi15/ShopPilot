@@ -19,6 +19,7 @@ import AuthCallback from './pages/AuthCallback';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import BundleBuilderPage from './pages/BundleBuilderPage';
+import ShopTheLookPage from './pages/ShopTheLookPage';
 import OrdersPage from './pages/OrdersPage';
 import WishlistPage from './pages/WishlistPage';
 import SharedWishlistPage from './pages/SharedWishlistPage';
@@ -100,6 +101,7 @@ function App() {
           element={isAuthenticated ? <CartPage /> : <Navigate to="/login" replace />} 
         />
         <Route path="/bundle-builder" element={<BundleBuilderPage />} />
+        <Route path="/shop-the-look" element={<ShopTheLookPage />} />
         <Route 
           path="/checkout" 
           element={isAuthenticated ? <CheckoutPage /> : <Navigate to="/login" replace />} 
