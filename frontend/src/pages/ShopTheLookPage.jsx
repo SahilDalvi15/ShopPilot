@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { Camera, Heart, MessageCircle, Share2, Tag } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Camera, Heart, MessageCircle, Share2, Tag, Loader2 } from 'lucide-react';
+import { productService } from '../services/product.service';
 
 const MOCK_POSTS = [
   {
@@ -79,6 +81,38 @@ const MOCK_POSTS = [
 const ShopTheLookPage = () => {
   const [activePost, setActivePost] = useState(null);
 
+  const { data, isLoading } = useQuery({
+    queryKey: ['shopTheLookProducts'],
+    queryFn: () => productService.getProducts({ limit: 10 }),
+  });
+
+  const products = data?.data?.products || [];
+
+  const postsWithProducts = useMemo(() => {
+    if (!products.length) return MOCK_POSTS;
+    
+    let productIndex = 0;
+    return MOCK_POSTS.map(post => ({
+      ...post,
+      tags: post.tags.map(tag => {
+        const product = products[productIndex % products.length];
+        productIndex++;
+        return {
+          ...tag,
+          product
+        };
+      })
+    }));
+  }, [products]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Loader2 className="w-8 h-8 text-pink-500 animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50/50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -99,9 +133,9 @@ const ShopTheLookPage = () => {
 
         {/* Masonry Grid */}
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
-          {MOCK_POSTS.map((post) => (
+          {postsWithProducts.map((post) => (
             <div 
-              key={post.id} 
+              key={post.id}  
               className="break-inside-avoid bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-xl transition-all duration-500 relative"
               onMouseEnter={() => setActivePost(post.id)}
               onMouseLeave={() => setActivePost(null)}
@@ -130,10 +164,22 @@ const ShopTheLookPage = () => {
                         </span>
                       </button>
                       
-                      {/* Tooltip (Mock for now) */}
-                      <div className="absolute top-1/2 left-full ml-3 -translate-y-1/2 bg-white/90 backdrop-blur-md px-3 py-2 rounded-xl shadow-lg border border-gray-100 opacity-0 group-hover/tag:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10 flex items-center gap-2">
-                        <Tag className="w-3.5 h-3.5 text-gray-900" />
-                        <span className="text-sm font-semibold text-gray-900">View Product</span>
+                      {/* Tooltip */}
+                      <div className="absolute top-1/2 left-full ml-3 -translate-y-1/2 bg-white/95 backdrop-blur-md p-2 rounded-xl shadow-xl border border-gray-100 opacity-0 group-hover/tag:opacity-100 transition-opacity duration-200 z-10 flex items-center gap-3 pointer-events-auto cursor-pointer hover:bg-gray-50">
+                        {tag.product ? (
+                          <>
+                            <img src={tag.product.images?.[0] || '/placeholder.jpg'} alt={tag.product.title} className="w-10 h-10 rounded-lg object-cover" />
+                            <div className="pr-2">
+                              <p className="text-xs font-semibold text-gray-900 truncate w-32">{tag.product.title}</p>
+                              <p className="text-xs font-bold text-pink-600">₹{tag.product.discountedPrice || tag.product.price}</p>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="px-2 flex items-center gap-2">
+                            <Tag className="w-3.5 h-3.5 text-gray-900" />
+                            <span className="text-sm font-semibold text-gray-900">View Product</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
