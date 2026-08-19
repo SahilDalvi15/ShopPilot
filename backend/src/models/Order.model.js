@@ -98,7 +98,13 @@ const orderSchema = new mongoose.Schema({
   actualDelivery: Date,
   cancellationReason: String,
   returnReason: String,
-  notes: String
+  notes: String,
+  giftOptions: {
+    isGift: { type: Boolean, default: false },
+    includeGiftWrap: { type: Boolean, default: false },
+    giftMessage: { type: String, default: '' },
+    videoMessageUrl: { type: String, default: '' }
+  }
 }, {
   timestamps: true
 });
