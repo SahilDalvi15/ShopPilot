@@ -313,6 +313,7 @@ class OrderService {
       paymentStatus: order.paymentStatus,
       orderStatus: order.orderStatus,
       statusHistory: order.statusHistory,
+      giftOptions: order.giftOptions,
       estimatedDelivery: order.estimatedDelivery,
       createdAt: order.createdAt
     }));
@@ -379,6 +380,7 @@ class OrderService {
       orderStatus: order.orderStatus,
       statusHistory: order.statusHistory,
       coupon: order.coupon,
+      giftOptions: order.giftOptions,
       estimatedDelivery: order.estimatedDelivery,
       actualDelivery: order.actualDelivery,
       cancellationReason: order.cancellationReason,

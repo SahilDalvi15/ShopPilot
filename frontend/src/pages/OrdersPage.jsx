@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Package, Truck, CheckCircle, XCircle, Clock, ChevronDown, ChevronUp, MapPin, Calendar, CreditCard, Box, PackageCheck, Download } from 'lucide-react';
+import { Package, Truck, CheckCircle, XCircle, Clock, ChevronDown, ChevronUp, MapPin, Calendar, CreditCard, Box, PackageCheck, Download, Gift } from 'lucide-react';
 import { orderService } from '../services/order.service';
 import { useToast } from '../contexts/ToastContext';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -163,6 +163,11 @@ const OrdersPage = () => {
                           <span className={`text-xs font-semibold px-3 py-1 rounded-full shadow-sm ${getStatusColor(order.orderStatus)}`}>
                             {order.orderStatus.replace(/_/g, ' ').toUpperCase()}
                           </span>
+                          {order.giftOptions?.isGift && (
+                            <span className="flex items-center gap-1 text-xs font-semibold px-3 py-1 rounded-full shadow-sm bg-pink-100 text-pink-700">
+                              <Gift className="w-3.5 h-3.5" /> Gift Order
+                            </span>
+                          )}
                         </div>
                         <div className="flex items-center gap-4 text-sm text-gray-500">
                           <span className="flex items-center gap-1">
@@ -315,6 +320,22 @@ const OrdersPage = () => {
                             {order.shippingAddress.addressLine2 ? `, ${order.shippingAddress.addressLine2}` : ''}<br />
                             {order.shippingAddress.city}, {order.shippingAddress.state} - {order.shippingAddress.postalCode}
                           </p>
+                        </div>
+                      )}
+
+                      {/* Gift Options Details */}
+                      {order.giftOptions?.isGift && (
+                        <div className="p-5 border-b border-gray-100 bg-pink-50/30">
+                          <h4 className="font-semibold text-pink-900 mb-2 flex items-center gap-2">
+                            <Gift className="w-4 h-4 text-pink-500" /> Gift Details
+                          </h4>
+                          <div className="space-y-2 text-sm text-gray-700">
+                            <p><span className="font-medium">Gift Wrap:</span> {order.giftOptions.includeGiftWrap ? 'Yes (Premium)' : 'No'}</p>
+                            {order.giftOptions.giftMessage && <p><span className="font-medium">Message:</span> "{order.giftOptions.giftMessage}"</p>}
+                            {order.giftOptions.videoMessageUrl && (
+                              <p><span className="font-medium">Video Message:</span> <a href={order.giftOptions.videoMessageUrl} target="_blank" rel="noopener noreferrer" className="text-pink-600 hover:underline inline-flex items-center gap-1">{order.giftOptions.videoMessageUrl}</a></p>
+                            )}
+                          </div>
                         </div>
                       )}
 
