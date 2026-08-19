@@ -12,7 +12,7 @@ const { emitToUser, emitToAdmins } = require('../config/socket');
 
 class OrderService {
   async createOrder(userId, orderData) {
-    const { shippingAddressId, billingAddressId, paymentMethod, couponCode } = orderData;
+    const { shippingAddressId, billingAddressId, paymentMethod, couponCode, giftOptions } = orderData;
 
     // Get user's cart
     const cart = await Cart.findOne({ userId }).populate('items.productId');
@@ -102,6 +102,7 @@ class OrderService {
       paymentStatus: paymentMethod === 'mock' ? 'success' : 'pending',
       orderStatus: paymentMethod === 'mock' ? 'confirmed' : 'pending',
       ...(cart.appliedCoupon && cart.appliedCoupon.couponId && { coupon: cart.appliedCoupon }),
+      ...(giftOptions && { giftOptions }),
       estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days from now
     });
 
