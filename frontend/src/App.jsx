@@ -35,6 +35,7 @@ import AdminReviews from './pages/admin/AdminReviews';
 import ComparePage from './pages/ComparePage';
 import CompareWidget from './components/CompareWidget';
 import GlobalLoader from './components/GlobalLoader';
+import AIChatbot from './components/AIChatbot';
 import './App.css';
 
 // Admin route guard component
@@ -56,6 +57,7 @@ const MainLayout = () => (
     </main>
     <Footer />
     <CompareWidget />
+    <AIChatbot />
   </div>
 );
 
