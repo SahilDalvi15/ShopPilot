@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Bot, Sparkles, X, Send, ChevronRight } from 'lucide-react';
+import { Bot, Sparkles, X, Send, ChevronRight, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import api from '../services/api';
 
 const AIChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
@@ -20,26 +22,35 @@ const AIChatbot = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isOpen]);
+  }, [messages, isOpen, isLoading]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!message.trim()) return;
+    if (!message.trim() || isLoading) return;
 
-    // Add user message to state
-    setMessages(prev => [...prev, { role: 'user', text: message }]);
-    const currentMessage = message;
+    const userMessage = message;
+    setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
     setMessage('');
+    setIsLoading(true);
     
-    // TODO: Step 4 - Implement API call here
-    // For now, just simulate a reply
-    setTimeout(() => {
+    try {
+      const response = await api.post('/ai/chat', { message: userMessage });
+      const { replyText, recommendedProducts } = response.data;
+      
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        text: "I'm still learning! (API Integration coming in next step)",
+        text: replyText || "I'm not sure how to answer that.",
+        products: recommendedProducts || []
+      }]);
+    } catch (error) {
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        text: "Sorry, I'm having trouble connecting right now. Please try again later.",
         products: []
       }]);
-    }, 1000);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (!isOpen) {
@@ -123,6 +134,14 @@ const AIChatbot = () => {
             )}
           </div>
         ))}
+        {isLoading && (
+          <div className="flex flex-col items-start">
+            <div className="max-w-[85%] p-3 bg-white border border-slate-100 shadow-sm text-slate-700 rounded-2xl rounded-bl-sm flex items-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin text-purple-500" />
+              <span className="text-sm">Thinking...</span>
+            </div>
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
 
