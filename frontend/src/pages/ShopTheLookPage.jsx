@@ -1,7 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Camera, Heart, MessageCircle, Share2, Tag, Loader2 } from 'lucide-react';
+import { useDispatch } from 'react-redux';
+import { Camera, Heart, MessageCircle, Share2, Tag, Loader2, X, ShoppingCart } from 'lucide-react';
 import { productService } from '../services/product.service';
+import { addToCart } from '../store/slices/cartSlice';
+import { useToast } from '../contexts/ToastContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 const MOCK_POSTS = [
   {
@@ -80,6 +84,12 @@ const MOCK_POSTS = [
 
 const ShopTheLookPage = () => {
   const [activePost, setActivePost] = useState(null);
+  const [quickViewProduct, setQuickViewProduct] = useState(null);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  
+  const dispatch = useDispatch();
+  const { success, error: toastError } = useToast();
+  const { formatPrice } = useCurrency();
 
   const { data, isLoading } = useQuery({
     queryKey: ['shopTheLookProducts'],
@@ -104,6 +114,24 @@ const ShopTheLookPage = () => {
       })
     }));
   }, [products]);
+
+  const handleAddToCart = async () => {
+    if (!quickViewProduct) return;
+    setIsAddingToCart(true);
+    try {
+      await dispatch(addToCart({ 
+        productId: quickViewProduct._id, 
+        quantity: 1,
+        selectedSize: quickViewProduct.sizes?.length > 0 ? quickViewProduct.sizes[0] : undefined
+      })).unwrap();
+      success('Added to Cart', `${quickViewProduct.title} has been added to your cart.`);
+      setQuickViewProduct(null);
+    } catch (err) {
+      toastError('Error', 'Failed to add item to cart. Please try again.');
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -165,13 +193,16 @@ const ShopTheLookPage = () => {
                       </button>
                       
                       {/* Tooltip */}
-                      <div className="absolute top-1/2 left-full ml-3 -translate-y-1/2 bg-white/95 backdrop-blur-md p-2 rounded-xl shadow-xl border border-gray-100 opacity-0 group-hover/tag:opacity-100 transition-opacity duration-200 z-10 flex items-center gap-3 pointer-events-auto cursor-pointer hover:bg-gray-50">
+                      <div 
+                        onClick={() => tag.product && setQuickViewProduct(tag.product)}
+                        className="absolute top-1/2 left-full ml-3 -translate-y-1/2 bg-white/95 backdrop-blur-md p-2 rounded-xl shadow-xl border border-gray-100 opacity-0 group-hover/tag:opacity-100 transition-opacity duration-200 z-10 flex items-center gap-3 pointer-events-auto cursor-pointer hover:bg-gray-50"
+                      >
                         {tag.product ? (
                           <>
                             <img src={tag.product.images?.[0] || '/placeholder.jpg'} alt={tag.product.title} className="w-10 h-10 rounded-lg object-cover" />
                             <div className="pr-2">
                               <p className="text-xs font-semibold text-gray-900 truncate w-32">{tag.product.title}</p>
-                              <p className="text-xs font-bold text-pink-600">₹{tag.product.discountedPrice || tag.product.price}</p>
+                              <p className="text-xs font-bold text-pink-600">{formatPrice(tag.product.discountedPrice || tag.product.price)}</p>
                             </div>
                           </>
                         ) : (
@@ -220,6 +251,62 @@ const ShopTheLookPage = () => {
         </div>
 
       </div>
+
+      {/* Quick View Modal */}
+      {quickViewProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity">
+          <div className="bg-white rounded-3xl overflow-hidden shadow-2xl max-w-3xl w-full flex flex-col md:flex-row relative animate-in zoom-in-95 duration-200">
+            <button 
+              onClick={() => setQuickViewProduct(null)}
+              className="absolute top-4 right-4 bg-white/50 backdrop-blur-md text-gray-900 hover:bg-gray-100 p-2 rounded-full transition-colors z-10"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            
+            {/* Product Image */}
+            <div className="md:w-1/2 bg-gray-50">
+              <img 
+                src={quickViewProduct.images?.[0] || '/placeholder.jpg'} 
+                alt={quickViewProduct.title}
+                className="w-full h-64 md:h-full object-cover"
+              />
+            </div>
+            
+            {/* Product Details */}
+            <div className="md:w-1/2 p-8 flex flex-col justify-center">
+              <span className="text-pink-600 font-semibold text-sm mb-2">{quickViewProduct.brand?.name || 'ShopPilot Premium'}</span>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">{quickViewProduct.title}</h2>
+              
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-2xl font-bold text-gray-900">
+                  {formatPrice(quickViewProduct.discountedPrice || quickViewProduct.price)}
+                </span>
+                {quickViewProduct.discountedPrice && (
+                  <span className="text-sm text-gray-400 line-through">
+                    {formatPrice(quickViewProduct.price)}
+                  </span>
+                )}
+              </div>
+              
+              <p className="text-gray-600 mb-8 line-clamp-3">
+                {quickViewProduct.description}
+              </p>
+              
+              <button
+                onClick={handleAddToCart}
+                disabled={isAddingToCart}
+                className="w-full bg-gradient-to-r from-gray-900 to-gray-800 text-white font-bold py-4 rounded-xl hover:shadow-lg transition-all disabled:opacity-75 flex items-center justify-center gap-2"
+              >
+                {isAddingToCart ? (
+                  <><Loader2 className="w-5 h-5 animate-spin" /> Adding...</>
+                ) : (
+                  <><ShoppingCart className="w-5 h-5" /> Add to Cart</>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
