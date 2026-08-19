@@ -1,8 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ShoppingBag, Plus, Minus, Info, CheckCircle2, PackagePlus, ArrowRight } from 'lucide-react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { ShoppingBag, Plus, Minus, Info, CheckCircle2, PackagePlus, ArrowRight, Loader2 } from 'lucide-react';
 import { productService } from '../services/product.service';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { addToCart, applyCouponAsync } from '../store/slices/cartSlice';
+import { useToast } from '../contexts/ToastContext';
 
 const BUNDLE_TIERS = [
   { minItems: 2, discountPercent: 10, code: 'BUNDLE10' },
@@ -13,6 +17,11 @@ const BUNDLE_TIERS = [
 const BundleBuilderPage = () => {
   const { formatPrice } = useCurrency();
   const [bundleItems, setBundleItems] = useState([]);
+  const [isAdding, setIsAdding] = useState(false);
+  
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { success, error: toastError } = useToast();
 
   // Fetch some products to build bundles with (for example, we fetch top products)
   const { data, isLoading, error } = useQuery({
@@ -72,6 +81,40 @@ const BundleBuilderPage = () => {
   } else {
     progressPercentage = 100;
   }
+
+  const handleAddBundleToCart = async () => {
+    setIsAdding(true);
+    try {
+      // 1. Add all items to cart
+      for (const item of bundleItems) {
+        await dispatch(addToCart({ 
+          productId: item.product._id, 
+          quantity: item.quantity,
+          selectedSize: item.product.sizes?.length > 0 ? item.product.sizes[0] : undefined
+        })).unwrap();
+      }
+
+      // 2. Apply bundle coupon if applicable
+      if (currentTier.code) {
+        try {
+          await dispatch(applyCouponAsync(currentTier.code)).unwrap();
+          success('Bundle added!', `You unlocked ${currentTier.discountPercent}% off!`);
+        } catch (couponErr) {
+          console.error("Coupon error", couponErr);
+          toastError('Notice', 'Failed to apply bundle discount automatically. You can enter it manually at checkout.');
+        }
+      } else {
+        success('Items added!', 'Items have been added to your cart.');
+      }
+
+      // 3. Navigate to cart
+      navigate('/cart');
+    } catch (err) {
+      toastError('Error', 'Failed to add bundle to cart. Please try again.');
+    } finally {
+      setIsAdding(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -271,11 +314,15 @@ const BundleBuilderPage = () => {
 
                 {/* Add to Cart Action */}
                 <button 
-                  disabled={totalItems === 0}
+                  onClick={handleAddBundleToCart}
+                  disabled={totalItems === 0 || isAdding}
                   className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-4 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-indigo-200"
                 >
-                  Add Bundle to Cart
-                  <ArrowRight className="w-5 h-5" />
+                  {isAdding ? (
+                    <><Loader2 className="w-5 h-5 animate-spin" /> Adding to Cart...</>
+                  ) : (
+                    <>Add Bundle to Cart <ArrowRight className="w-5 h-5" /></>
+                  )}
                 </button>
               </div>
             </div>
