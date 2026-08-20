@@ -1,5 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Sparkles, ArrowRight, ArrowLeft, Wallet, CreditCard, Gem, CheckCircle2, Loader2 } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useDispatch } from 'react-redux';
+import { Sparkles, ArrowRight, ArrowLeft, Wallet, CreditCard, Gem, CheckCircle2, Loader2, ShoppingBag, Plus } from 'lucide-react';
+import { productService } from '../services/product.service';
+import { addToCart } from '../store/slices/cartSlice';
+import { useToast } from '../contexts/ToastContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 const QUIZ_QUESTIONS = [
   {
@@ -37,10 +43,60 @@ const QUIZ_QUESTIONS = [
 ];
 
 const StyleQuizPage = () => {
-  const [currentStep, setCurrentStep] = useState(-1); // -1 is the intro screen
+  const [currentStep, setCurrentStep] = useState(-1);
   const [answers, setAnswers] = useState({});
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
+  const [isAddingAll, setIsAddingAll] = useState(false);
+
+  const dispatch = useDispatch();
+  const { success, error: toastError } = useToast();
+  const { formatPrice } = useCurrency();
+
+  // Fetch products for recommendations
+  const { data } = useQuery({
+    queryKey: ['stylistProducts'],
+    queryFn: () => productService.getProducts({ limit: 50 }),
+  });
+
+  const products = data?.data?.products || [];
+
+  const recommendedProducts = useMemo(() => {
+    if (!products.length) return [];
+    
+    let filtered = [...products];
+
+    // Simulate AI filtering based on answers
+    if (answers.budget === 'budget') {
+      filtered = filtered.filter(p => (p.discountedPrice || p.price) < 1000);
+    } else if (answers.budget === 'mid') {
+      filtered = filtered.filter(p => (p.discountedPrice || p.price) >= 1000 && (p.discountedPrice || p.price) <= 3000);
+    } else if (answers.budget === 'premium') {
+      filtered = filtered.filter(p => (p.discountedPrice || p.price) > 3000);
+    }
+
+    // Shuffle and pick top 4
+    return filtered.sort(() => 0.5 - Math.random()).slice(0, 4);
+  }, [answers, products]);
+
+  const handleAddAllToCart = async () => {
+    if (!recommendedProducts.length) return;
+    setIsAddingAll(true);
+    try {
+      for (const product of recommendedProducts) {
+        await dispatch(addToCart({ 
+          productId: product._id, 
+          quantity: 1,
+          selectedSize: product.sizes?.length > 0 ? product.sizes[0] : undefined
+        })).unwrap();
+      }
+      success('Added to Cart', 'Your curated wardrobe has been added to the cart!');
+    } catch (err) {
+      toastError('Error', 'Failed to add items to cart.');
+    } finally {
+      setIsAddingAll(false);
+    }
+  };
 
   const handleStart = () => {
     setCurrentStep(0);
@@ -142,25 +198,78 @@ const StyleQuizPage = () => {
     );
   }
 
-  // Render Results Screen (Placeholder for Step 3)
+  // Render Results Screen
   if (currentStep === 99) {
     return (
       <div className="min-h-screen bg-gray-50 py-12">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 text-green-600 rounded-full mb-6">
-            <CheckCircle2 className="w-8 h-8" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 animate-in slide-in-from-bottom-4 duration-700">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 text-green-600 rounded-full mb-6 shadow-sm">
+              <CheckCircle2 className="w-8 h-8" />
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Your Custom Wardrobe is Ready!</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Based on your {answers.style} style and {answers.color} color preferences, we've curated these perfect matches for you.
+            </p>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Your Custom Wardrobe is Ready!</h2>
-          <p className="text-gray-600 mb-8">Results UI will be implemented in Step 3.</p>
-          <button 
-            onClick={() => {
-              setCurrentStep(-1);
-              setAnswers({});
-            }}
-            className="text-indigo-600 font-medium hover:underline"
-          >
-            Retake Quiz
-          </button>
+
+          {recommendedProducts.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500 mb-4">We couldn't find exact matches. Try adjusting your preferences.</p>
+              <button 
+                onClick={() => { setCurrentStep(-1); setAnswers({}); }}
+                className="text-indigo-600 font-medium hover:underline"
+              >
+                Retake Quiz
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-12">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-in slide-in-from-bottom-8 duration-700 delay-150 fill-mode-both">
+                {recommendedProducts.map(product => (
+                  <div key={product._id} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 group hover:shadow-xl transition-all duration-300">
+                    <div className="aspect-square rounded-xl overflow-hidden mb-4 bg-gray-50">
+                      <img 
+                        src={product.images[0] || '/placeholder.jpg'} 
+                        alt={product.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-sm text-indigo-600 font-medium mb-1 truncate">{product.brand?.name || 'ShopPilot'}</p>
+                      <h3 className="font-semibold text-gray-900 leading-tight mb-1 truncate">{product.title}</h3>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-gray-900">{formatPrice(product.discountedPrice || product.price)}</span>
+                        {product.discountedPrice && (
+                          <span className="text-sm text-gray-400 line-through">{formatPrice(product.price)}</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="max-w-md mx-auto text-center space-y-4 animate-in slide-in-from-bottom-4 duration-700 delay-300 fill-mode-both">
+                <button
+                  onClick={handleAddAllToCart}
+                  disabled={isAddingAll}
+                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-4 rounded-xl hover:opacity-90 transition-all shadow-xl shadow-indigo-200 disabled:opacity-75 flex items-center justify-center gap-2"
+                >
+                  {isAddingAll ? (
+                    <><Loader2 className="w-5 h-5 animate-spin" /> Adding to Cart...</>
+                  ) : (
+                    <><ShoppingBag className="w-5 h-5" /> Add Entire Wardrobe to Cart</>
+                  )}
+                </button>
+                <button 
+                  onClick={() => { setCurrentStep(-1); setAnswers({}); }}
+                  className="text-gray-500 font-medium hover:text-gray-900 transition-colors text-sm"
+                >
+                  Retake Quiz
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
