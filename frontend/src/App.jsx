@@ -20,6 +20,7 @@ import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import BundleBuilderPage from './pages/BundleBuilderPage';
 import ShopTheLookPage from './pages/ShopTheLookPage';
+import StyleQuizPage from './pages/StyleQuizPage';
 import OrdersPage from './pages/OrdersPage';
 import WishlistPage from './pages/WishlistPage';
 import SharedWishlistPage from './pages/SharedWishlistPage';
@@ -102,6 +103,7 @@ function App() {
         />
         <Route path="/bundle-builder" element={<BundleBuilderPage />} />
         <Route path="/shop-the-look" element={<ShopTheLookPage />} />
+        <Route path="/ai-stylist" element={<StyleQuizPage />} />
         <Route 
           path="/checkout" 
           element={isAuthenticated ? <CheckoutPage /> : <Navigate to="/login" replace />} 

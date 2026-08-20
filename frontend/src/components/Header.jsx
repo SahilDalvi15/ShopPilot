@@ -15,6 +15,7 @@ import {
   Moon,
   PackagePlus,
   Camera,
+  Sparkles,
 } from 'lucide-react';
 import { logout } from '../store/slices/authSlice';
 import { selectCartCount } from '../store/slices/cartSlice';
@@ -282,6 +283,14 @@ const Header = () => {
                 Shop The Look
               </Link>
               <Link
+                to="/ai-stylist"
+                className="px-4 py-2 hover:bg-indigo-50 text-indigo-700 font-medium rounded-lg transition flex items-center gap-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Sparkles className="w-4 h-4" />
+                AI Stylist
+              </Link>
+              <Link
                 to="/wishlist"
                 className="px-4 py-2 hover:bg-gray-100 rounded-lg transition flex items-center justify-between"
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -422,6 +431,13 @@ const Header = () => {
             >
               <Camera className="w-4 h-4" />
               Shop The Look
+            </Link>
+            <Link
+              to="/ai-stylist"
+              className="text-indigo-600 hover:text-indigo-700 transition font-bold flex items-center gap-1 bg-indigo-50 px-3 py-1.5 rounded-full shadow-sm"
+            >
+              <Sparkles className="w-4 h-4" />
+              AI Stylist
             </Link>
           </div>
         </div>
