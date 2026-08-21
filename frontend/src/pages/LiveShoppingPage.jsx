@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Eye, Heart, Send, MessageCircle, X, ShoppingBag } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { useDispatch } from 'react-redux';
+import { Eye, Heart, Send, MessageCircle, X, ShoppingBag, Loader2 } from 'lucide-react';
+import { productService } from '../services/product.service';
+import { addToCart } from '../store/slices/cartSlice';
+import { useToast } from '../contexts/ToastContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 const MOCK_CHAT = [
   { id: 1, user: 'Sarah123', message: 'Omg love that color!' },
@@ -14,7 +20,22 @@ const LiveShoppingPage = () => {
   const [chatMessages, setChatMessages] = useState(MOCK_CHAT.slice(0, 2));
   const [newMessage, setNewMessage] = useState('');
   const [viewers, setViewers] = useState(1243);
+  const [featuredProductIndex, setFeaturedProductIndex] = useState(0);
+  const [isAdding, setIsAdding] = useState(false);
+  
   const chatEndRef = useRef(null);
+  const dispatch = useDispatch();
+  const { success, error: toastError } = useToast();
+  const { formatPrice } = useCurrency();
+
+  // Fetch products for the stream
+  const { data } = useQuery({
+    queryKey: ['liveProducts'],
+    queryFn: () => productService.getProducts({ limit: 10 }),
+  });
+
+  const products = data?.data?.products || [];
+  const featuredProduct = products[featuredProductIndex];
 
   // Simulate chat and viewers
   useEffect(() => {
@@ -35,11 +56,18 @@ const LiveShoppingPage = () => {
       setViewers(prev => prev + Math.floor(Math.random() * 11) - 3); // Fluctuate viewers
     }, 5000);
 
+    const productInterval = setInterval(() => {
+      if (products.length > 0) {
+        setFeaturedProductIndex(prev => (prev + 1) % products.length);
+      }
+    }, 12000); // Change product every 12 seconds
+
     return () => {
       clearInterval(chatInterval);
       clearInterval(viewersInterval);
+      clearInterval(productInterval);
     };
-  }, []);
+  }, [products.length]);
 
   // Auto scroll chat
   useEffect(() => {
@@ -51,6 +79,23 @@ const LiveShoppingPage = () => {
     if (!newMessage.trim()) return;
     setChatMessages(prev => [...prev, { id: Date.now(), user: 'You', message: newMessage }]);
     setNewMessage('');
+  };
+
+  const handleAddToCart = async () => {
+    if (!featuredProduct) return;
+    setIsAdding(true);
+    try {
+      await dispatch(addToCart({ 
+        productId: featuredProduct._id, 
+        quantity: 1,
+        selectedSize: featuredProduct.sizes?.length > 0 ? featuredProduct.sizes[0] : undefined
+      })).unwrap();
+      success('Got it!', `${featuredProduct.title} added to your cart.`);
+    } catch (err) {
+      toastError('Error', 'Failed to add item to cart.');
+    } finally {
+      setIsAdding(false);
+    }
   };
 
   return (
@@ -85,15 +130,46 @@ const LiveShoppingPage = () => {
           </button>
         </div>
 
-        {/* Featured Product Placeholder (To be implemented in Step 2/3) */}
-        <div className="absolute bottom-24 left-6 md:bottom-12 md:left-12 z-10">
-           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 text-white max-w-sm">
-             <p className="text-sm font-medium text-white/70 mb-2 flex items-center gap-2">
-               <ShoppingBag className="w-4 h-4" /> Featured Product
-             </p>
-             <h3 className="text-lg font-bold">Product will appear here in Step 2</h3>
-           </div>
-        </div>
+        {/* Featured Product */}
+        {featuredProduct && (
+          <div className="absolute bottom-24 left-6 md:bottom-12 md:left-12 z-10 animate-in slide-in-from-bottom-8 fade-in duration-500" key={featuredProduct._id}>
+             <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 text-white max-w-sm shadow-2xl">
+               <div className="flex items-center gap-2 mb-3">
+                 <ShoppingBag className="w-4 h-4 text-pink-400" /> 
+                 <p className="text-xs font-bold text-pink-400 uppercase tracking-wider">Featured Now</p>
+               </div>
+               
+               <div className="flex gap-4 mb-4">
+                 <img 
+                   src={featuredProduct.images?.[0] || '/placeholder.jpg'} 
+                   alt={featuredProduct.title}
+                   className="w-20 h-20 rounded-xl object-cover border border-white/20"
+                 />
+                 <div>
+                   <h3 className="text-sm font-bold leading-tight mb-1 line-clamp-2">{featuredProduct.title}</h3>
+                   <div className="flex items-center gap-2">
+                     <span className="font-bold text-lg">{formatPrice(featuredProduct.discountedPrice || featuredProduct.price)}</span>
+                     {featuredProduct.discountedPrice && (
+                       <span className="text-sm text-white/60 line-through">{formatPrice(featuredProduct.price)}</span>
+                     )}
+                   </div>
+                 </div>
+               </div>
+
+               <button 
+                 onClick={handleAddToCart}
+                 disabled={isAdding}
+                 className="w-full bg-white text-gray-900 font-bold py-2.5 rounded-xl hover:bg-gray-100 transition-colors disabled:opacity-75 flex items-center justify-center gap-2"
+               >
+                 {isAdding ? (
+                   <><Loader2 className="w-4 h-4 animate-spin" /> Adding...</>
+                 ) : (
+                   'Buy Now'
+                 )}
+               </button>
+             </div>
+          </div>
+        )}
       </div>
 
       {/* Chat & Interactions Area */}
