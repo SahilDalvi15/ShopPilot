@@ -16,6 +16,7 @@ import {
   PackagePlus,
   Camera,
   Sparkles,
+  PlayCircle,
 } from 'lucide-react';
 import { logout } from '../store/slices/authSlice';
 import { selectCartCount } from '../store/slices/cartSlice';
@@ -291,6 +292,14 @@ const Header = () => {
                 AI Stylist
               </Link>
               <Link
+                to="/live"
+                className="px-4 py-2 hover:bg-red-50 text-red-600 font-medium rounded-lg transition flex items-center gap-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <PlayCircle className="w-4 h-4" />
+                LIVE
+              </Link>
+              <Link
                 to="/wishlist"
                 className="px-4 py-2 hover:bg-gray-100 rounded-lg transition flex items-center justify-between"
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -438,6 +447,13 @@ const Header = () => {
             >
               <Sparkles className="w-4 h-4" />
               AI Stylist
+            </Link>
+            <Link
+              to="/live"
+              className="text-red-600 hover:text-red-700 transition font-bold flex items-center gap-1 bg-red-50 px-3 py-1.5 rounded-full shadow-sm animate-pulse"
+            >
+              <PlayCircle className="w-4 h-4" />
+              LIVE
             </Link>
           </div>
         </div>
