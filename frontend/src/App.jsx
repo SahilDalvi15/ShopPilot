@@ -8,6 +8,9 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import LoadingScreen from './components/LoadingScreen';
+import AIChatbot from './components/AIChatbot';
+import SpinToWin from './components/SpinToWin';
 import HomePage from './pages/HomePage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
@@ -23,6 +26,7 @@ import ShopTheLookPage from './pages/ShopTheLookPage';
 import StyleQuizPage from './pages/StyleQuizPage';
 import LiveShoppingPage from './pages/LiveShoppingPage';
 import OrdersPage from './pages/OrdersPage';
+import { Gift } from 'lucide-react';
 import WishlistPage from './pages/WishlistPage';
 import SharedWishlistPage from './pages/SharedWishlistPage';
 import ProfilePage from './pages/ProfilePage';
@@ -40,7 +44,6 @@ import AdminReviews from './pages/admin/AdminReviews';
 import ComparePage from './pages/ComparePage';
 import CompareWidget from './components/CompareWidget';
 import GlobalLoader from './components/GlobalLoader';
-import AIChatbot from './components/AIChatbot';
 import './App.css';
 
 // Admin route guard component
@@ -66,9 +69,10 @@ const MainLayout = () => (
   </div>
 );
 
-function App() {
+const App = () => {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
+  const [isSpinToWinOpen, setIsSpinToWinOpen] = useState(false);
 
   useEffect(() => {
     if (localStorage.getItem('accessToken')) {
@@ -149,6 +153,22 @@ function App() {
         <Route path="settings" element={<AdminSettings />} />
       </Route>
     </Routes>
+    
+    {/* Global Spin to Win Widget */}
+    <SpinToWin isOpen={isSpinToWinOpen} onClose={() => setIsSpinToWinOpen(false)} />
+    
+    {/* Floating Gift Button */}
+    {!isSpinToWinOpen && (
+      <button
+        onClick={() => setIsSpinToWinOpen(true)}
+        className="fixed bottom-24 right-6 bg-gradient-to-r from-pink-500 to-violet-600 text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform z-40 group animate-bounce"
+      >
+        <Gift className="w-6 h-6 group-hover:rotate-12 transition-transform" />
+        <span className="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-sm font-bold px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          Spin & Win!
+        </span>
+      </button>
+    )}
     </>
   );
 }
