@@ -26,6 +26,7 @@ import ShopTheLookPage from './pages/ShopTheLookPage';
 import StyleQuizPage from './pages/StyleQuizPage';
 import LiveShoppingPage from './pages/LiveShoppingPage';
 import SubscribeAndSavePage from './pages/SubscribeAndSavePage';
+import SocialFeedPage from './pages/SocialFeedPage';
 import OrdersPage from './pages/OrdersPage';
 import { Gift } from 'lucide-react';
 import WishlistPage from './pages/WishlistPage';
@@ -111,6 +112,7 @@ const App = () => {
         <Route path="/shop-the-look" element={<ShopTheLookPage />} />
         <Route path="/ai-stylist" element={<StyleQuizPage />} />
         <Route path="/live" element={<LiveShoppingPage />} />
+        <Route path="/discover" element={<SocialFeedPage />} />
         <Route path="/subscribe" element={<SubscribeAndSavePage />} />
         <Route 
           path="/checkout" 

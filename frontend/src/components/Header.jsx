@@ -18,6 +18,7 @@ import {
   Sparkles,
   PlayCircle,
   Calendar,
+  Compass,
 } from 'lucide-react';
 import { logout } from '../store/slices/authSlice';
 import { selectCartCount } from '../store/slices/cartSlice';
@@ -309,6 +310,14 @@ const Header = () => {
                 Subscribe & Save
               </Link>
               <Link
+                to="/discover"
+                className="px-4 py-2 hover:bg-blue-50 text-blue-600 font-medium rounded-lg transition flex items-center gap-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Compass className="w-4 h-4" />
+                Discover
+              </Link>
+              <Link
                 to="/wishlist"
                 className="px-4 py-2 hover:bg-gray-100 rounded-lg transition flex items-center justify-between"
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -470,6 +479,13 @@ const Header = () => {
             >
               <Calendar className="w-4 h-4" />
               Subscribe & Save
+            </Link>
+            <Link
+              to="/discover"
+              className="text-blue-600 hover:text-blue-700 transition font-bold flex items-center gap-1 bg-blue-50 px-3 py-1.5 rounded-full shadow-sm"
+            >
+              <Compass className="w-4 h-4" />
+              Discover
             </Link>
           </div>
         </div>
