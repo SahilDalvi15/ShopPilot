@@ -17,6 +17,7 @@ import {
   Camera,
   Sparkles,
   PlayCircle,
+  Calendar,
 } from 'lucide-react';
 import { logout } from '../store/slices/authSlice';
 import { selectCartCount } from '../store/slices/cartSlice';
@@ -300,6 +301,14 @@ const Header = () => {
                 LIVE
               </Link>
               <Link
+                to="/subscribe"
+                className="px-4 py-2 hover:bg-green-50 text-green-700 font-medium rounded-lg transition flex items-center gap-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Calendar className="w-4 h-4" />
+                Subscribe & Save
+              </Link>
+              <Link
                 to="/wishlist"
                 className="px-4 py-2 hover:bg-gray-100 rounded-lg transition flex items-center justify-between"
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -454,6 +463,13 @@ const Header = () => {
             >
               <PlayCircle className="w-4 h-4" />
               LIVE
+            </Link>
+            <Link
+              to="/subscribe"
+              className="text-green-600 hover:text-green-700 transition font-bold flex items-center gap-1 bg-green-50 px-3 py-1.5 rounded-full shadow-sm"
+            >
+              <Calendar className="w-4 h-4" />
+              Subscribe & Save
             </Link>
           </div>
         </div>
