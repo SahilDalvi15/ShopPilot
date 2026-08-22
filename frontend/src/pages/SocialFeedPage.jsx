@@ -152,6 +152,9 @@ const SocialFeedPage = () => {
   });
 
   const products = data?.data?.products || [];
+  
+  // Ensure we always have items in the feed to show the videos even if database is empty
+  const feedItems = products.length > 0 ? products : Array(5).fill(null);
 
   // Setup intersection observer to track which video is in view
   useEffect(() => {
@@ -176,7 +179,7 @@ const SocialFeedPage = () => {
     return () => {
       if (observerRef.current) observerRef.current.disconnect();
     };
-  }, [products]);
+  }, [feedItems]);
 
   if (isLoading) {
     return (
@@ -188,9 +191,9 @@ const SocialFeedPage = () => {
 
   return (
     <div className="h-[100vh] sm:h-[calc(100vh-64px)] w-full bg-black overflow-y-scroll snap-y snap-mandatory scroll-smooth hide-scrollbar">
-      {products.map((product, index) => (
+      {feedItems.map((product, index) => (
         <div 
-          key={product._id} 
+          key={product?._id || `dummy-${index}`} 
           className="feed-item" 
           data-index={index}
         >
