@@ -34,6 +34,7 @@ import SharedWishlistPage from './pages/SharedWishlistPage';
 import ProfilePage from './pages/ProfilePage';
 import AddressesPage from './pages/AddressesPage';
 import LoyaltyDashboard from './pages/LoyaltyDashboard';
+import SubscriptionsPage from './pages/SubscriptionsPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminStats from './pages/admin/AdminStats';
@@ -129,6 +130,10 @@ const App = () => {
         <Route 
           path="/loyalty" 
           element={isAuthenticated ? <LoyaltyDashboard /> : <Navigate to="/login" replace />} 
+        />
+        <Route 
+          path="/subscriptions" 
+          element={isAuthenticated ? <SubscriptionsPage /> : <Navigate to="/login" replace />} 
         />
         <Route 
           path="/addresses" 

@@ -507,13 +507,20 @@ const ProfilePage = () => {
           </div>
 
           {/* Quick Links */}
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             <Link
               to="/orders"
               className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 border border-gray-100 transition-all duration-300 group"
             >
               <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">My Orders</h3>
               <p className="text-sm text-gray-500">View your order history and track shipments</p>
+            </Link>
+            <Link
+              to="/subscriptions"
+              className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 border border-gray-100 transition-all duration-300 group"
+            >
+              <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">Subscriptions</h3>
+              <p className="text-sm text-gray-500">Manage recurring deliveries</p>
             </Link>
             <Link
               to="/addresses"

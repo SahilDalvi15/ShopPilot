@@ -75,6 +75,9 @@ const SubscribeAndSavePage = () => {
       // Apply the SUBSCRIBE15 coupon
       await dispatch(applyCoupon('SUBSCRIBE15')).unwrap();
 
+      // Store the frequency for checkout
+      localStorage.setItem('checkoutSubscriptionFreq', frequency);
+
       success('Subscription Created!', 'Your items have been added to the cart with a 15% discount.');
       navigate('/cart');
     } catch (err) {
