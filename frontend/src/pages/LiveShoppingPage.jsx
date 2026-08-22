@@ -183,10 +183,10 @@ const LiveShoppingPage = () => {
 
         {/* Chat Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
-          {chatMessages.map((chat) => (
-            <div key={chat.id} className="animate-in slide-in-from-left-4 fade-in duration-300">
-              <span className="font-bold text-indigo-400 text-sm mr-2">{chat.user}</span>
-              <span className="text-gray-200 text-sm">{chat.message}</span>
+          {chatMessages.filter(Boolean).map((chat) => (
+            <div key={chat.id || Math.random()} className="animate-in slide-in-from-left-4 fade-in duration-300">
+              <span className="font-bold text-indigo-400 text-sm mr-2">{chat.user || 'User'}</span>
+              <span className="text-gray-200 text-sm">{chat.message || ''}</span>
             </div>
           ))}
           <div ref={chatEndRef} />
