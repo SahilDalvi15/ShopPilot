@@ -3,7 +3,6 @@ const User = require('../models/User.model');
 const Order = require('../models/Order.model');
 const OrderItem = require('../models/OrderItem.model');
 const Product = require('../models/Product.model');
-const ErrorResponse = require('../utils/errorResponse');
 
 // @desc    Register a new vendor store
 // @route   POST /api/vendors/register
@@ -14,16 +13,16 @@ exports.registerVendor = async (req, res, next) => {
 
     // Check if user is already a vendor
     if (req.user.role === 'vendor' || req.user.role === 'admin' || req.user.role === 'super_admin') {
-      return next(new ErrorResponse('You cannot register as a vendor with your current role', 400));
+      return res.status(400).json({ success: false, message: 'You cannot register as a vendor with your current role' });
     }
 
-    const existingVendor = await Vendor.findOne({ userId: req.user._id });
+    const existingVendor = await Vendor.findOne({ userId: req.user.id || req.user._id });
     if (existingVendor) {
-      return next(new ErrorResponse('You already have a registered store', 400));
+      return res.status(400).json({ success: false, message: 'You already have a registered store' });
     }
 
     const vendor = await Vendor.create({
-      userId: req.user._id,
+      userId: req.user.id || req.user._id,
       storeName,
       description,
       logo,
@@ -31,14 +30,14 @@ exports.registerVendor = async (req, res, next) => {
     });
 
     // Update user role to vendor
-    await User.findByIdAndUpdate(req.user._id, { role: 'vendor' });
+    await User.findByIdAndUpdate(req.user.id || req.user._id, { role: 'vendor' });
 
     res.status(201).json({
       success: true,
       data: vendor
     });
   } catch (error) {
-    next(error);
+    res.status(500).json({ success: false, message: error.message || 'Server Error' });
   }
 };
 
@@ -47,10 +46,10 @@ exports.registerVendor = async (req, res, next) => {
 // @access  Private/Vendor
 exports.getVendorDashboard = async (req, res, next) => {
   try {
-    const vendor = await Vendor.findOne({ userId: req.user._id });
+    const vendor = await Vendor.findOne({ userId: req.user.id || req.user._id });
     
     if (!vendor) {
-      return next(new ErrorResponse('Vendor profile not found', 404));
+      return res.status(404).json({ success: false, message: 'Vendor profile not found' });
     }
 
     // Get product count
@@ -76,7 +75,7 @@ exports.getVendorDashboard = async (req, res, next) => {
       }
     });
   } catch (error) {
-    next(error);
+    res.status(500).json({ success: false, message: error.message || 'Server Error' });
   }
 };
 
@@ -88,7 +87,7 @@ exports.getVendorStore = async (req, res, next) => {
     const vendor = await Vendor.findOne({ slug: req.params.slug, status: 'active' });
 
     if (!vendor) {
-      return next(new ErrorResponse('Store not found or inactive', 404));
+      return res.status(404).json({ success: false, message: 'Store not found or inactive' });
     }
 
     // Get products for this store
@@ -106,7 +105,7 @@ exports.getVendorStore = async (req, res, next) => {
       }
     });
   } catch (error) {
-    next(error);
+    res.status(500).json({ success: false, message: error.message || 'Server Error' });
   }
 };
 
@@ -123,6 +122,6 @@ exports.getVendors = async (req, res, next) => {
       data: vendors
     });
   } catch (error) {
-    next(error);
+    res.status(500).json({ success: false, message: error.message || 'Server Error' });
   }
 };
