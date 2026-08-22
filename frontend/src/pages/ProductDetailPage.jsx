@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useParams, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { productService } from '../services/productService';
-import { Heart, ShoppingCart, Star, Minus, Plus, Truck, Shield, RotateCcw, ChevronDown, ChevronUp, Share2, AlertCircle, X, ArrowRightLeft } from 'lucide-react';
+import { Heart, ShoppingCart, Star, Minus, Plus, Truck, Shield, RotateCcw, ChevronDown, ChevronUp, Share2, AlertCircle, X, ArrowRightLeft, Box } from 'lucide-react';
 import { addToCart } from '../store/slices/cartSlice';
 import { addToWishlist, removeFromWishlist } from '../store/slices/wishlistSlice';
 import { addToCompare, selectCompareItems } from '../store/slices/compareSlice';
@@ -13,6 +13,7 @@ import ReviewList from '../components/ReviewList';
 import RelatedProducts from '../components/RelatedProducts';
 import RecentlyViewed from '../components/RecentlyViewed';
 import ProductRecommendations from '../components/ProductRecommendations';
+import Product3DViewer from '../components/Product3DViewer';
 import SizeGuideModal from '../components/SizeGuideModal';
 import { fetchProductReviews, createReview, markReviewHelpful } from '../store/slices/reviewSlice';
 import { addRecentlyViewed } from '../store/slices/recentSlice';
@@ -25,6 +26,7 @@ const ProductDetailPage = () => {
   const { success, error: toastError } = useToast();
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [show3D, setShow3D] = useState(false);
   const [activeTab, setActiveTab] = useState('specs');
   const [expandedSpecs, setExpandedSpecs] = useState(false);
   const [selectedSize, setSelectedSize] = useState(null);
@@ -206,31 +208,58 @@ const ProductDetailPage = () => {
               </div>
             )}
             
-            {/* Main Image */}
+            {/* Main Image or 3D Viewer */}
             <div className="flex-1 bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 overflow-hidden relative group h-[400px] md:h-[500px] flex items-center justify-center">
-              <img
-                src={product.images[selectedImage] || '/placeholder.jpg'}
-                alt={product.title}
-                className="max-w-full max-h-full object-contain cursor-crosshair group-hover:scale-125 transition-transform duration-500 ease-in-out origin-center"
-              />
-              <button 
-                onClick={handleToggleWishlist}
-                className="absolute top-4 right-4 p-3 bg-white dark:bg-slate-800/80 backdrop-blur-md rounded-full shadow-md hover:bg-white dark:bg-slate-800 transition-all z-10"
-              >
-                <Heart 
-                  className={`w-6 h-6 ${wishlistItems?.some(item => item._id === product.id) ? 'text-red-500 fill-current' : 'text-gray-500 hover:text-red-500'}`} 
-                />
-              </button>
-              <button 
-                onClick={handleToggleCompare}
-                className={`absolute top-20 right-4 p-3 bg-white dark:bg-slate-800/80 backdrop-blur-md rounded-full shadow-md hover:bg-white dark:bg-slate-800 transition-all z-10 ${compareItems.some(item => item.id === product.id) ? 'text-indigo-600' : 'text-gray-500'}`}
-                title="Add to Compare"
-              >
-                <ArrowRightLeft className="w-5 h-5" />
-              </button>
-              <button className="absolute top-4 right-20 p-3 bg-white dark:bg-slate-800/80 backdrop-blur-md rounded-full shadow-md hover:bg-white dark:bg-slate-800 transition-all z-10">
-                <Share2 className="w-5 h-5 text-gray-500" />
-              </button>
+              {show3D ? (
+                <div className="w-full h-full relative">
+                  <Product3DViewer />
+                  <button
+                    onClick={() => setShow3D(false)}
+                    className="absolute top-4 left-4 bg-white/90 text-gray-900 px-4 py-2 rounded-full shadow-md font-bold text-sm hover:bg-gray-100 transition-colors z-10 backdrop-blur flex items-center gap-2"
+                  >
+                    <X className="w-4 h-4" /> Close 3D View
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <img
+                    src={product.images[selectedImage] || '/placeholder.jpg'}
+                    alt={product.title}
+                    className="max-w-full max-h-full object-contain cursor-crosshair group-hover:scale-125 transition-transform duration-500 ease-in-out origin-center"
+                  />
+                  
+                  {/* View in 3D Button */}
+                  <button 
+                    onClick={() => setShow3D(true)}
+                    className="absolute bottom-6 bg-indigo-600/90 hover:bg-indigo-700 backdrop-blur text-white px-5 py-2.5 rounded-full shadow-lg font-bold text-sm flex items-center gap-2 transition-all hover:scale-105 z-10"
+                  >
+                    <Box className="w-5 h-5" /> View in 3D
+                  </button>
+                </>
+              )}
+              
+              {!show3D && (
+                <>
+                  <button 
+                    onClick={handleToggleWishlist}
+                    className="absolute top-4 right-4 p-3 bg-white dark:bg-slate-800/80 backdrop-blur-md rounded-full shadow-md hover:bg-white dark:bg-slate-800 transition-all z-10"
+                  >
+                    <Heart 
+                      className={`w-6 h-6 ${wishlistItems?.some(item => item._id === product.id) ? 'text-red-500 fill-current' : 'text-gray-500 hover:text-red-500'}`} 
+                    />
+                  </button>
+                  <button 
+                    onClick={handleToggleCompare}
+                    className={`absolute top-20 right-4 p-3 bg-white dark:bg-slate-800/80 backdrop-blur-md rounded-full shadow-md hover:bg-white dark:bg-slate-800 transition-all z-10 ${compareItems.some(item => item.id === product.id) ? 'text-indigo-600' : 'text-gray-500'}`}
+                    title="Add to Compare"
+                  >
+                    <ArrowRightLeft className="w-5 h-5" />
+                  </button>
+                  <button className="absolute top-4 right-20 p-3 bg-white dark:bg-slate-800/80 backdrop-blur-md rounded-full shadow-md hover:bg-white dark:bg-slate-800 transition-all z-10">
+                    <Share2 className="w-5 h-5 text-gray-500" />
+                  </button>
+                </>
+              )}
             </div>
           </div>
 

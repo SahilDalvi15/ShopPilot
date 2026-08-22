@@ -69,6 +69,10 @@ const ProductsPage = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [priceRange, setPriceRange] = useState([
+    filters.minPrice ? parseInt(filters.minPrice) : 0,
+    filters.maxPrice ? parseInt(filters.maxPrice) : 100000
+  ]);
 
   useEffect(() => {
     if (filters.search.length >= 2) {
@@ -106,6 +110,13 @@ const ProductsPage = () => {
       sortBy: location.pathname === '/new-arrivals' ? 'createdAt' : prev.sortBy
     }));
   }, [location.pathname, searchParams]);
+
+  useEffect(() => {
+    setPriceRange([
+      filters.minPrice ? parseInt(filters.minPrice) : 0,
+      filters.maxPrice ? parseInt(filters.maxPrice) : 100000
+    ]);
+  }, [filters.minPrice, filters.maxPrice]);
 
   const { data, isLoading, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ['products', filters, location.pathname],
@@ -337,8 +348,9 @@ const ProductsPage = () => {
             min={0}
             max={100000}
             step={100}
-            value={[filters.minPrice ? parseInt(filters.minPrice) : 0, filters.maxPrice ? parseInt(filters.maxPrice) : 100000]}
-            onChange={(value) => {
+            value={priceRange}
+            onChange={setPriceRange}
+            onChangeComplete={(value) => {
               handleFilterChange('minPrice', value[0].toString());
               handleFilterChange('maxPrice', value[1].toString());
             }}
@@ -350,8 +362,8 @@ const ProductsPage = () => {
             ]}
           />
           <div className="flex items-center justify-between mt-6 text-sm font-medium text-gray-600 dark:text-slate-400">
-            <div className="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 px-3 py-1.5 rounded-lg">{formatPrice(filters.minPrice || 0)}</div>
-            <div className="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 px-3 py-1.5 rounded-lg">{formatPrice(filters.maxPrice || 100000)}</div>
+            <div className="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 px-3 py-1.5 rounded-lg">{formatPrice(priceRange[0])}</div>
+            <div className="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 px-3 py-1.5 rounded-lg">{formatPrice(priceRange[1])}</div>
           </div>
         </div>
       </div>

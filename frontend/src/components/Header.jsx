@@ -25,9 +25,11 @@ import { selectCartCount } from '../store/slices/cartSlice';
 import { selectWishlistCount } from '../store/slices/wishlistSlice';
 import { useTheme } from '../contexts/ThemeContext';
 import { useCurrency } from '../contexts/CurrencyContext';
+import VisualSearchModal from './VisualSearchModal';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isVisualSearchOpen, setIsVisualSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -93,9 +95,17 @@ const Header = () => {
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
+                className="w-full px-4 py-2 pl-10 pr-28 border border-gray-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
               />
               <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400 dark:text-gray-500" />
+              <button
+                type="button"
+                onClick={() => setIsVisualSearchOpen(true)}
+                title="Search with Image"
+                className="absolute right-24 top-2 text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+              >
+                <Camera className="h-5 w-5" />
+              </button>
               <button
                 type="submit"
                 className="absolute right-2 top-1.5 bg-purple-600 text-white px-4 py-1 rounded-md hover:bg-purple-700 transition"
@@ -248,9 +258,19 @@ const Header = () => {
                   placeholder="Search products..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600"
+                  className="w-full px-4 py-2 pl-10 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600"
                 />
                 <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsVisualSearchOpen(true);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="absolute right-3 top-2.5 text-gray-400 hover:text-purple-600"
+                >
+                  <Camera className="h-5 w-5" />
+                </button>
               </div>
             </form>
 
@@ -490,6 +510,12 @@ const Header = () => {
           </div>
         </div>
       </nav>
+
+      {/* Visual Search Modal */}
+      <VisualSearchModal 
+        isOpen={isVisualSearchOpen} 
+        onClose={() => setIsVisualSearchOpen(false)} 
+      />
     </header>
   );
 };
