@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { MapPin, Truck, Shield, ArrowRight, Plus, Check, CreditCard, Gift, Video } from 'lucide-react';
+import { MapPin, Truck, Shield, ArrowRight, Plus, Check, CreditCard, Gift, Video, Bitcoin } from 'lucide-react';
 import { fetchAddresses } from '../store/slices/addressSlice';
 import { clearCart, applyCouponAsync, removeCouponAsync } from '../store/slices/cartSlice';
 import { orderService } from '../services/order.service';
@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { settingService } from '../services/settingService';
 import AddressCardSkeleton from '../components/skeletons/AddressCardSkeleton';
 import MockPaymentModal from '../components/MockPaymentModal';
+import CryptoPaymentModal from '../components/CryptoPaymentModal';
 import { useCurrency } from '../contexts/CurrencyContext';
 
 const CheckoutPage = () => {
@@ -28,6 +29,7 @@ const CheckoutPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('cod');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMockModalOpen, setIsMockModalOpen] = useState(false);
+  const [isCryptoModalOpen, setIsCryptoModalOpen] = useState(false);
   
   const [giftOptions, setGiftOptions] = useState({
     isGift: false,
@@ -83,6 +85,11 @@ const CheckoutPage = () => {
       return;
     }
 
+    if (paymentMethod === 'crypto') {
+      setIsCryptoModalOpen(true);
+      return;
+    }
+
     // Process COD directly
     await processOrder('cod');
   };
@@ -92,12 +99,19 @@ const CheckoutPage = () => {
     await processOrder('mock');
   };
 
-  const processOrder = async (method) => {
+  const handleCryptoPaymentSuccess = async (cryptoDetails) => {
+    setIsCryptoModalOpen(false);
+    await processOrder('crypto', cryptoDetails);
+  };
+
+  const processOrder = async (method, cryptoPaymentDetails = null) => {
     setIsProcessing(true);
 
     try {
       const shippingAddress = addresses.find((addr) => (addr._id || addr.id) === selectedAddress);
       
+      const subscriptionFrequency = localStorage.getItem('checkoutSubscriptionFreq');
+
       const orderData = {
         shippingAddressId: selectedAddress,
         billingAddressId: selectedAddress,
@@ -113,10 +127,16 @@ const CheckoutPage = () => {
         },
         paymentMethod: method,
         giftOptions: giftOptions.isGift ? giftOptions : undefined,
+        ...(subscriptionFrequency && { subscriptionFrequency }),
+        ...(cryptoPaymentDetails && { cryptoPaymentDetails })
       };
 
       // Create order via API
       await orderService.createOrder(orderData);
+      
+      if (subscriptionFrequency) {
+        localStorage.removeItem('checkoutSubscriptionFreq');
+      }
 
       success('Order Placed!', `Your order has been placed successfully via ${method === 'cod' ? 'Cash on Delivery' : 'Online Payment'}.`);
       await dispatch(clearCart());
@@ -362,6 +382,30 @@ const CheckoutPage = () => {
 
                 <div className="space-y-4">
                   <div
+                    onClick={() => setPaymentMethod('crypto')}
+                    className={`relative flex items-center p-5 rounded-2xl cursor-pointer transition-all duration-300 ${
+                      paymentMethod === 'crypto'
+                        ? 'bg-purple-50/50 border-2 border-purple-600 shadow-md ring-4 ring-purple-600/10'
+                        : 'bg-white border-2 border-gray-100 shadow-sm hover:border-purple-300 hover:shadow-md'
+                    }`}
+                  >
+                    <div className={`flex items-center justify-center w-6 h-6 rounded-full border-2 mr-4 flex-shrink-0 ${paymentMethod === 'crypto' ? 'border-purple-600 bg-purple-600' : 'border-gray-300 bg-white'}`}>
+                      {paymentMethod === 'crypto' && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                    </div>
+                    <div className="flex-1 flex items-center justify-between">
+                      <div>
+                        <div className="font-semibold text-gray-900 text-lg">Crypto (BTC/ETH)</div>
+                        <div className="text-sm text-gray-500 mt-0.5">
+                          Pay securely with Bitcoin or Ethereum
+                        </div>
+                      </div>
+                      <div className={`p-3 rounded-xl ${paymentMethod === 'crypto' ? 'bg-orange-100 text-orange-600' : 'bg-gray-50 text-gray-400'}`}>
+                        <Bitcoin className="h-6 w-6" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
                     onClick={() => setPaymentMethod('mock')}
                     className={`relative flex items-center p-5 rounded-2xl cursor-pointer transition-all duration-300 ${
                       paymentMethod === 'mock'
@@ -544,6 +588,13 @@ const CheckoutPage = () => {
         onClose={() => setIsMockModalOpen(false)}
         amount={calculateTotal()}
         onSuccess={handleMockPaymentSuccess}
+      />
+
+      <CryptoPaymentModal
+        isOpen={isCryptoModalOpen}
+        onClose={() => setIsCryptoModalOpen(false)}
+        amountINR={calculateTotal()}
+        onSuccess={handleCryptoPaymentSuccess}
       />
     </div>
   );

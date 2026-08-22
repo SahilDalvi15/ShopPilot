@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const compression = require('compression');
 const morgan = require('morgan');
@@ -34,6 +35,8 @@ const searchRoutes = require('./routes/search.routes');
 const statsRoutes = require('./routes/stats.routes');
 const settingRoutes = require('./routes/setting.routes');
 const aiRoutes = require('./routes/ai.routes');
+const subscriptionRoutes = require('./routes/subscription.routes');
+const cryptoRoutes = require('./routes/crypto.routes');
 
 const app = express();
 
@@ -61,9 +64,10 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// Body parser
+// Body parser and Cookie parser
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(cookieParser());
 
 // Serve static files from uploads directory
 app.use('/uploads', express.static('uploads'));
@@ -96,6 +100,8 @@ app.use('/api/v1/search', searchRoutes);
 app.use('/api/v1/stats', statsRoutes);
 app.use('/api/v1/settings', settingRoutes);
 app.use('/api/v1/ai', aiRoutes);
+app.use('/api/v1/subscriptions', subscriptionRoutes);
+app.use('/api/v1/crypto', cryptoRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

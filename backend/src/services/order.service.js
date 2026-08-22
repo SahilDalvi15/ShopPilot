@@ -12,7 +12,7 @@ const { emitToUser, emitToAdmins } = require('../config/socket');
 
 class OrderService {
   async createOrder(userId, orderData) {
-    const { shippingAddressId, billingAddressId, paymentMethod, couponCode, giftOptions } = orderData;
+    const { shippingAddressId, billingAddressId, paymentMethod, couponCode, giftOptions, subscriptionFrequency, cryptoPaymentDetails } = orderData;
 
     // Get user's cart
     const cart = await Cart.findOne({ userId }).populate('items.productId');
@@ -99,8 +99,13 @@ class OrderService {
       tax,
       totalAmount,
       paymentMethod,
-      paymentStatus: paymentMethod === 'mock' ? 'success' : 'pending',
-      orderStatus: paymentMethod === 'mock' ? 'confirmed' : 'pending',
+      paymentStatus: paymentMethod === 'mock' || paymentMethod === 'crypto' ? 'success' : 'pending',
+      cryptoPaymentDetails: paymentMethod === 'crypto' ? cryptoPaymentDetails : undefined,
+      statusHistory: [{
+        status: 'pending',
+        note: 'Order created'
+      }],
+      orderStatus: paymentMethod === 'mock' || paymentMethod === 'crypto' ? 'confirmed' : 'pending',
       ...(cart.appliedCoupon && cart.appliedCoupon.couponId && { coupon: cart.appliedCoupon }),
       ...(giftOptions && { giftOptions }),
       estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days from now
@@ -162,6 +167,63 @@ class OrderService {
 
     order.items = orderItems;
     await order.save();
+
+    // Create Subscription if requested
+    if (subscriptionFrequency) {
+      try {
+        const Subscription = require('../models/Subscription.model');
+        const subscriptionItems = [];
+        
+        for (const item of cart.items) {
+          const product = await Product.findById(item.productId);
+          subscriptionItems.push({
+            productId: product._id,
+            productTitle: product.title,
+            productImage: product.images[0],
+            brand: product.brandId,
+            selectedSize: item.selectedSize,
+            quantity: item.quantity,
+            price: item.discountedPrice || item.price
+          });
+        }
+        
+        const nextDeliveryDate = new Date();
+        nextDeliveryDate.setDate(nextDeliveryDate.getDate() + Number(subscriptionFrequency));
+
+        const subscription = await Subscription.create({
+          userId,
+          items: subscriptionItems,
+          frequency: Number(subscriptionFrequency),
+          nextDeliveryDate,
+          shippingAddress: {
+            fullName: shippingAddress.fullName,
+            phoneNumber: shippingAddress.phoneNumber,
+            addressLine1: shippingAddress.addressLine1,
+            addressLine2: shippingAddress.addressLine2,
+            city: shippingAddress.city,
+            state: shippingAddress.state,
+            country: shippingAddress.country,
+            postalCode: shippingAddress.postalCode
+          },
+          billingAddress: {
+            fullName: billingAddress.fullName,
+            phoneNumber: billingAddress.phoneNumber,
+            addressLine1: billingAddress.addressLine1,
+            addressLine2: billingAddress.addressLine2,
+            city: billingAddress.city,
+            state: billingAddress.state,
+            country: billingAddress.country,
+            postalCode: billingAddress.postalCode
+          },
+          totalAmount: totalAmount,
+          discountApplied: discount,
+          paymentMethod: paymentMethod
+        });
+        logger.info(`Subscription ${subscription._id} created for user ${userId}`);
+      } catch (subErr) {
+        logger.error(`Failed to create subscription: ${subErr.message}`);
+      }
+    }
 
     // Update coupon usage if applied (must read before clearing)
     if (cart.appliedCoupon && cart.appliedCoupon.couponId) {
