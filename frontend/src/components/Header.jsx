@@ -58,11 +58,11 @@ const Header = () => {
     <header className="bg-white dark:bg-slate-900 shadow-md sticky top-0 z-50 transition-colors duration-300">
       {/* Top Bar */}
       <div className="bg-gray-900 text-white text-sm py-2">
-        <div className="container mx-auto px-4 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
+        <div className="container mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+          <div className="flex items-center space-x-4 text-xs sm:text-sm">
             <span>Free shipping on orders over ₹999</span>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="hidden sm:flex items-center space-x-4">
             <Link to="/products" className="hover:text-gray-300 transition">
               Shop
             </Link>
@@ -116,12 +116,12 @@ const Header = () => {
           </form>
 
           {/* Navigation Icons */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             {/* Currency Selector */}
             <select
               value={currency}
               onChange={(e) => setCurrency(e.target.value)}
-              className="bg-transparent text-sm font-medium text-gray-700 dark:text-gray-200 border-none focus:ring-0 cursor-pointer outline-none"
+              className="hidden md:block bg-transparent text-sm font-medium text-gray-700 dark:text-gray-200 border-none focus:ring-0 cursor-pointer outline-none"
             >
               {availableCurrencies.map((c) => (
                 <option key={c} value={c} className="text-gray-900 dark:text-gray-900">
@@ -133,7 +133,7 @@ const Header = () => {
             {/* Theme Toggle */}
             <button
               onClick={toggleDarkMode}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition text-gray-700 dark:text-gray-200"
+              className="hidden sm:block p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition text-gray-700 dark:text-gray-200"
               aria-label="Toggle Dark Mode"
             >
               {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
@@ -142,7 +142,7 @@ const Header = () => {
             {/* Wishlist */}
             <Link
               to="/wishlist"
-              className="relative p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition text-gray-700 dark:text-gray-200"
+              className="hidden sm:flex relative p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition text-gray-700 dark:text-gray-200"
             >
               <Heart className="h-6 w-6" />
               {wishlistCount > 0 && (
@@ -155,7 +155,7 @@ const Header = () => {
             {/* Cart */}
             <Link
               to="/cart"
-              className="relative p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition text-gray-700 dark:text-gray-200"
+              className="relative p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition text-gray-700 dark:text-gray-200 flex items-center justify-center"
             >
               <ShoppingCart className="h-6 w-6" />
               {cartCount > 0 && (
@@ -166,7 +166,7 @@ const Header = () => {
             </Link>
 
             {/* User Menu */}
-            <div className="relative group">
+            <div className="relative group hidden sm:block">
               <button className="flex items-center space-x-2 p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition text-gray-700 dark:text-gray-200">
                 {isAuthenticated ? (
                   <>

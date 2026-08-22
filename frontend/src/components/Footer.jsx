@@ -155,7 +155,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="mb-4 md:mb-0">
               <h4 className="text-white font-semibold mb-2">Payment Methods</h4>
-              <div className="flex space-x-4">
+              <div className="flex flex-wrap gap-4">
                 <div className="bg-white dark:bg-slate-800 rounded px-3 py-1 text-gray-800 dark:text-slate-200 text-sm font-bold">
                   VISA
                 </div>
