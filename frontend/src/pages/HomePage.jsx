@@ -21,6 +21,7 @@ import {
 import { productService } from '../services/product.service';
 import { categoryService } from '../services/category.service';
 import RecentlyViewed from '../components/RecentlyViewed';
+import StoriesFeed from '../components/StoriesFeed';
 import { useCurrency } from '../contexts/CurrencyContext';
 
 // Category icon/image mapping
@@ -101,8 +102,14 @@ const HomePage = () => {
   const nextBanner = () => setCurrentBanner((prev) => (prev + 1) % heroBanners.length);
   const prevBanner = () => setCurrentBanner((prev) => (prev - 1 + heroBanners.length) % heroBanners.length);
 
+  // Combine featured and new arrivals for the stories feed, ensuring unique items and max 10
+  const combinedStories = [...new Map([...featuredProducts, ...newArrivals].map(item => [item.id, item])).values()].slice(0, 10);
+
   return (
     <div className="homepage">
+      {/* Instagram-style Stories Feed */}
+      <StoriesFeed stories={combinedStories} title="Trending Now" />
+
       {/* Hero Banner Carousel */}
       <section className="hero-carousel">
         <div className="hero-carousel__track">

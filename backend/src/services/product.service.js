@@ -21,7 +21,9 @@ class ProductService {
       sortOrder = 'desc',
       isDeal,
       minRating,
-      inStock
+      inStock,
+      color,
+      size
     } = query;
 
     const skip = (page - 1) * limit;
@@ -66,6 +68,14 @@ class ProductService {
 
     if (inStock === 'true') {
       queryObj.stock = { $gt: 0 };
+    }
+
+    if (color) {
+      queryObj['specifications.color'] = { $in: color.split(',') };
+    }
+
+    if (size) {
+      queryObj['specifications.size'] = { $in: size.split(',') };
     }
 
     // Get products

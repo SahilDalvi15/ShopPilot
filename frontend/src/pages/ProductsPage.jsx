@@ -45,8 +45,24 @@ const ProductsPage = () => {
     inStock: searchParams.get('inStock') === 'true',
     sortBy: location.pathname === '/new-arrivals' ? 'createdAt' : 'createdAt',
     sortOrder: 'desc',
-    isDeal: location.pathname === '/deals' ? 'true' : undefined
+    isDeal: location.pathname === '/deals' ? 'true' : undefined,
+    color: searchParams.get('color') || '',
+    size: searchParams.get('size') || ''
   });
+
+  const AVAILABLE_COLORS = [
+    { name: 'Black', value: 'Black', hex: '#000000' },
+    { name: 'White', value: 'White', hex: '#FFFFFF' },
+    { name: 'Red', value: 'Red', hex: '#EF4444' },
+    { name: 'Blue', value: 'Blue', hex: '#3B82F6' },
+    { name: 'Green', value: 'Green', hex: '#10B981' },
+    { name: 'Yellow', value: 'Yellow', hex: '#F59E0B' },
+    { name: 'Pink', value: 'Pink', hex: '#EC4899' },
+    { name: 'Purple', value: 'Purple', hex: '#8B5CF6' },
+    { name: 'Gray', value: 'Gray', hex: '#6B7280' }
+  ];
+
+  const AVAILABLE_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
   
   const [viewMode, setViewMode] = useState('grid');
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
@@ -84,6 +100,8 @@ const ProductsPage = () => {
       search: searchParams.get('search') || '',
       minRating: searchParams.get('minRating') || '',
       inStock: searchParams.get('inStock') === 'true',
+      color: searchParams.get('color') || '',
+      size: searchParams.get('size') || '',
       isDeal: location.pathname === '/deals' ? 'true' : undefined,
       sortBy: location.pathname === '/new-arrivals' ? 'createdAt' : prev.sortBy
     }));
@@ -152,7 +170,7 @@ const ProductsPage = () => {
   };
 
   const clearFilters = () => {
-    setFilters({ ...filters, search: '', minPrice: '', maxPrice: '', category: '', brand: '', minRating: '', inStock: false });
+    setFilters({ ...filters, search: '', minPrice: '', maxPrice: '', category: '', brand: '', minRating: '', inStock: false, color: '', size: '' });
     setSearchParams({}); // Clear URL params
   };
 
@@ -256,6 +274,54 @@ const ProductsPage = () => {
                 }`}
               >
                 {brand.name}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Colors */}
+      <div>
+        <h3 className="text-sm font-bold text-gray-900 dark:text-slate-100 uppercase tracking-wider mb-4">Colors</h3>
+        <div className="flex flex-wrap gap-3">
+          {AVAILABLE_COLORS.map((color) => {
+            const isChecked = filters.color.split(',').includes(color.value);
+            return (
+              <button
+                key={color.value}
+                onClick={() => handleCheckboxChange('color', color.value)}
+                className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${
+                  isChecked ? 'border-indigo-600 scale-110 shadow-md shadow-indigo-200' : 'border-transparent hover:scale-110 shadow-sm'
+                }`}
+                style={{ backgroundColor: color.hex, borderColor: isChecked ? '#4f46e5' : color.hex === '#FFFFFF' ? '#e5e7eb' : 'transparent' }}
+                title={color.name}
+              >
+                {isChecked && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke={color.name === 'White' || color.name === 'Yellow' ? '#000' : '#fff'} strokeWidth="3" className="w-4 h-4"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Sizes */}
+      <div>
+        <h3 className="text-sm font-bold text-gray-900 dark:text-slate-100 uppercase tracking-wider mb-4">Sizes</h3>
+        <div className="grid grid-cols-3 gap-2">
+          {AVAILABLE_SIZES.map((size) => {
+            const isChecked = filters.size.split(',').includes(size);
+            return (
+              <button
+                key={size}
+                onClick={() => handleCheckboxChange('size', size)}
+                className={`py-2 rounded-xl text-xs font-bold transition-all duration-200 border ${
+                  isChecked
+                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-200'
+                    : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 border-gray-200 dark:border-slate-700 hover:border-indigo-400 hover:text-indigo-600'
+                }`}
+              >
+                {size}
               </button>
             );
           })}
@@ -492,7 +558,7 @@ const ProductsPage = () => {
           {/* Products Grid */}
           <div className="flex-1 min-w-0">
             {/* Active Filters Row */}
-            {(filters.category || filters.brand || filters.minPrice || filters.maxPrice || filters.minRating || filters.inStock) && (
+            {(filters.category || filters.brand || filters.color || filters.size || filters.minPrice || filters.maxPrice || filters.minRating || filters.inStock) && (
               <div className="flex items-center gap-2 flex-wrap mb-6 bg-white dark:bg-slate-800 p-4 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm">
                 <span className="text-sm font-bold text-gray-700 dark:text-slate-300 mr-2">Active Filters:</span>
                 
@@ -515,6 +581,21 @@ const ProductsPage = () => {
                     </span>
                   ) : null;
                 })}
+
+                {filters.color && filters.color.split(',').map(colorValue => (
+                  <span key={`color-${colorValue}`} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-pink-50 text-pink-700 border border-pink-100">
+                    <span className="w-3 h-3 rounded-full border border-gray-200" style={{ backgroundColor: AVAILABLE_COLORS.find(c => c.value === colorValue)?.hex || colorValue }}></span>
+                    {colorValue}
+                    <button onClick={() => handleCheckboxChange('color', colorValue)} className="hover:bg-pink-200 rounded-full p-0.5 transition-colors"><X className="w-3 h-3" /></button>
+                  </span>
+                ))}
+
+                {filters.size && filters.size.split(',').map(sizeValue => (
+                  <span key={`size-${sizeValue}`} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-orange-50 text-orange-700 border border-orange-100">
+                    Size: {sizeValue}
+                    <button onClick={() => handleCheckboxChange('size', sizeValue)} className="hover:bg-orange-200 rounded-full p-0.5 transition-colors"><X className="w-3 h-3" /></button>
+                  </span>
+                ))}
 
                 {(filters.minPrice || filters.maxPrice) && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-100">
