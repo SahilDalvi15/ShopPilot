@@ -8,7 +8,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import LoadingScreen from './components/LoadingScreen';
+
 import AIChatbot from './components/AIChatbot';
 import SpinToWin from './components/SpinToWin';
 import HomePage from './pages/HomePage';
