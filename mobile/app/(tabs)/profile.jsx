@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Alert, RefreshControl } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { User, LogOut, Package as PackageIcon, Shield } from 'lucide-react-native';
 import api from '../../services/api';
@@ -9,6 +9,7 @@ export default function ProfileScreen() {
   const { user, logout } = useContext(AuthContext);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
 
   useFocusEffect(
@@ -28,6 +29,12 @@ export default function ProfileScreen() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchOrders();
+    setRefreshing(false);
   };
 
   const handleLogout = async () => {
@@ -99,6 +106,9 @@ export default function ProfileScreen() {
             renderItem={renderOrder}
             contentContainerStyle={styles.orderList}
             showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#6366f1']} />
+            }
           />
         )}
       </View>

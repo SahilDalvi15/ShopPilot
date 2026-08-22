@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image, TouchableOpacity, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
@@ -7,6 +7,7 @@ import { AuthContext } from '../../context/AuthContext';
 export default function HomeScreen() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const { user } = useContext(AuthContext);
   const router = useRouter();
 
@@ -16,7 +17,6 @@ export default function HomeScreen() {
 
   const fetchProducts = async () => {
     try {
-      // Fetch some featured products or latest products
       const res = await api.get('/products?limit=5');
       if (res.data.success) {
         setProducts(res.data.data);
@@ -26,6 +26,12 @@ export default function HomeScreen() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchProducts();
+    setRefreshing(false);
   };
 
   const renderProduct = ({ item }) => (
@@ -70,6 +76,9 @@ export default function HomeScreen() {
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.productList}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#6366f1']} />
+            }
           />
         )}
       </View>

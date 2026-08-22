@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator, Alert, RefreshControl } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Trash2, ShoppingCart, Heart } from 'lucide-react-native';
 import api from '../../services/api';
@@ -7,6 +7,7 @@ import api from '../../services/api';
 export default function WishlistScreen() {
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
 
   useFocusEffect(
@@ -26,6 +27,12 @@ export default function WishlistScreen() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchWishlist();
+    setRefreshing(false);
   };
 
   const removeFromWishlist = async (productId) => {
@@ -79,6 +86,9 @@ export default function WishlistScreen() {
         keyExtractor={(item) => item._id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#6366f1']} />
+        }
       />
     </View>
   );

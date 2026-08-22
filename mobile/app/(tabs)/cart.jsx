@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator, Alert, RefreshControl } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { Minus, Plus, Trash2 } from 'lucide-react-native';
+import { Minus, Plus, Trash2, ShoppingCart } from 'lucide-react-native';
 import api from '../../services/api';
 
 export default function CartScreen() {
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
 
   useFocusEffect(
@@ -30,6 +31,12 @@ export default function CartScreen() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchCart();
+    setRefreshing(false);
   };
 
   const updateQuantity = async (productId, currentQuantity, change) => {
@@ -109,6 +116,9 @@ export default function CartScreen() {
         keyExtractor={(item) => item.product._id}
         renderItem={renderItem}
         contentContainerStyle={styles.listContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#6366f1']} />
+        }
       />
       
       <View style={styles.summaryContainer}>
