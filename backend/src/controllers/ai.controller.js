@@ -1,18 +1,18 @@
 const Product = require('../models/Product.model');
-const asyncHandler = require('../middlewares/asyncHandler');
 
 // @desc    Process chat message and return AI response with product recommendations
 // @route   POST /api/v1/ai/chat
 // @access  Public (or Private depending on requirements, let's keep it public so anyone can ask)
-exports.chat = asyncHandler(async (req, res) => {
-  const { message } = req.body;
-  
-  if (!message) {
-    return res.status(400).json({
-      success: false,
-      message: 'Please provide a message'
-    });
-  }
+exports.chat = async (req, res) => {
+  try {
+    const { message } = req.body;
+    
+    if (!message) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a message'
+      });
+    }
 
   const lowercaseMsg = message.toLowerCase();
   let query = {};
@@ -87,4 +87,11 @@ exports.chat = asyncHandler(async (req, res) => {
     replyText,
     recommendedProducts: finalProducts
   });
-});
+  } catch (error) {
+    console.error('AI Chat Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to process chat message'
+    });
+  }
+};
