@@ -9,11 +9,10 @@ import { useCurrency } from '../contexts/CurrencyContext';
 
 // Reliable public sample videos to act as "Social Feed" content
 const MOCK_VIDEOS = [
-  'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
-  'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-  'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-  'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
-  'https://storage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4'
+  'https://www.w3schools.com/html/mov_bbb.mp4',
+  'https://media.w3.org/2010/05/sintel/trailer_hd.mp4',
+  'https://media.w3.org/2010/05/bunny/trailer.mp4',
+  'https://media.w3.org/2010/05/video/movie_300.mp4'
 ];
 
 const FeedItem = ({ product, videoUrl, isActive, isMuted, toggleMute }) => {
