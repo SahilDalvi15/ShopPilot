@@ -7,13 +7,13 @@ import { addToCart } from '../store/slices/cartSlice';
 import { useToast } from '../contexts/ToastContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 
-// Reliable public sample vertical videos to act as "Social Feed" content (Fashion & Ecommerce)
+// Reliable public sample videos to act as "Social Feed" content
 const MOCK_VIDEOS = [
-  'https://assets.mixkit.co/videos/preview/mixkit-woman-trying-on-a-red-dress-41604-large.mp4',
-  'https://assets.mixkit.co/videos/preview/mixkit-girl-in-a-black-dress-walking-and-posing-41724-large.mp4',
-  'https://assets.mixkit.co/videos/preview/mixkit-young-woman-with-shopping-bags-walking-in-a-street-34533-large.mp4',
-  'https://assets.mixkit.co/videos/preview/mixkit-shoes-of-a-woman-walking-in-the-street-34534-large.mp4',
-  'https://assets.mixkit.co/videos/preview/mixkit-woman-looking-at-clothes-in-a-store-34537-large.mp4'
+  'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
+  'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+  'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+  'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
+  'https://storage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4'
 ];
 
 const FeedItem = ({ product, videoUrl, isActive, isMuted, toggleMute }) => {
