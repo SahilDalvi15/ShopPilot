@@ -64,7 +64,7 @@ const getProductRecommendations = async (req, res) => {
 
 const createProduct = async (req, res) => {
   try {
-    const product = await productService.createProduct(req.body, req.user.id);
+    const product = await productService.createProduct(req.body, req.user);
     res.status(201).json({
       success: true,
       message: 'Product created successfully',
@@ -83,7 +83,7 @@ const createProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   try {
-    const product = await productService.updateProduct(req.params.productId, req.body, req.user.id);
+    const product = await productService.updateProduct(req.params.productId, req.body, req.user);
     res.status(200).json({
       success: true,
       message: 'Product updated successfully',
@@ -102,7 +102,7 @@ const updateProduct = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
   try {
-    await productService.deleteProduct(req.params.productId);
+    await productService.deleteProduct(req.params.productId, req.user);
     res.status(200).json({
       success: true,
       message: 'Product deleted successfully'

@@ -184,7 +184,7 @@ class ProductService {
     };
   }
 
-  async createProduct(productData, userId) {
+  async createProduct(productData, user) {
     const {
       title,
       description,
@@ -231,6 +231,18 @@ class ProductService {
       throw error;
     }
 
+    let vendorId = null;
+    if (user.role === 'vendor') {
+      const Vendor = require('../models/Vendor.model');
+      const vendor = await Vendor.findOne({ userId: user.id || user._id });
+      if (!vendor) {
+        const error = new Error('Vendor profile not found');
+        error.statusCode = 404;
+        throw error;
+      }
+      vendorId = vendor._id;
+    }
+
     // Create product
     const product = await Product.create({
       title,
@@ -246,7 +258,8 @@ class ProductService {
       specifications: specifications || {},
       tags: tags || [],
       isFeatured: isFeatured || false,
-      createdBy: userId
+      createdBy: user.id || user._id,
+      vendorId
     });
 
     // Create inventory record
@@ -287,7 +300,7 @@ class ProductService {
     };
   }
 
-  async updateProduct(productId, updateData, userId) {
+  async updateProduct(productId, updateData, user) {
     const product = await Product.findById(productId);
 
     if (!product) {
@@ -297,9 +310,19 @@ class ProductService {
       throw error;
     }
 
+    if (user.role === 'vendor') {
+      const Vendor = require('../models/Vendor.model');
+      const vendor = await Vendor.findOne({ userId: user.id || user._id });
+      if (!vendor || !product.vendorId || vendor._id.toString() !== product.vendorId.toString()) {
+        const error = new Error('Not authorized to update this product');
+        error.statusCode = 403;
+        throw error;
+      }
+    }
+
     // Update fields
     Object.keys(updateData).forEach(key => {
-      if (key !== 'brandId' && key !== 'categoryId') {
+      if (key !== 'brandId' && key !== 'categoryId' && key !== 'vendorId') {
         product[key] = updateData[key];
       }
     });
@@ -365,7 +388,7 @@ class ProductService {
     };
   }
 
-  async deleteProduct(productId) {
+  async deleteProduct(productId, user) {
     const product = await Product.findById(productId);
 
     if (!product) {
@@ -373,6 +396,16 @@ class ProductService {
       error.statusCode = 404;
       error.code = 'PRODUCT_NOT_FOUND';
       throw error;
+    }
+
+    if (user.role === 'vendor') {
+      const Vendor = require('../models/Vendor.model');
+      const vendor = await Vendor.findOne({ userId: user.id || user._id });
+      if (!vendor || !product.vendorId || vendor._id.toString() !== product.vendorId.toString()) {
+        const error = new Error('Not authorized to delete this product');
+        error.statusCode = 403;
+        throw error;
+      }
     }
 
     product.isDeleted = true;

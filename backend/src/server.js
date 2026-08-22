@@ -37,6 +37,7 @@ const settingRoutes = require('./routes/setting.routes');
 const aiRoutes = require('./routes/ai.routes');
 const subscriptionRoutes = require('./routes/subscription.routes');
 const cryptoRoutes = require('./routes/crypto.routes');
+const vendorRoutes = require('./routes/vendor.routes');
 
 const app = express();
 
@@ -102,6 +103,7 @@ app.use('/api/v1/settings', settingRoutes);
 app.use('/api/v1/ai', aiRoutes);
 app.use('/api/v1/subscriptions', subscriptionRoutes);
 app.use('/api/v1/crypto', cryptoRoutes);
+app.use('/api/v1/vendors', vendorRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

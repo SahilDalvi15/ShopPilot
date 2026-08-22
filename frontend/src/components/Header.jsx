@@ -19,6 +19,7 @@ import {
   PlayCircle,
   Calendar,
   Compass,
+  Store,
 } from 'lucide-react';
 import { logout } from '../store/slices/authSlice';
 import { selectCartCount } from '../store/slices/cartSlice';
@@ -208,6 +209,17 @@ const Header = () => {
                         <span>Admin Dashboard</span>
                       </Link>
                     )}
+                    {user?.role === 'vendor' ? (
+                      <Link to="/vendor/dashboard" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-slate-700 transition font-medium text-indigo-600 dark:text-indigo-400 flex items-center space-x-2">
+                        <Store className="h-4 w-4" />
+                        <span>Vendor Dashboard</span>
+                      </Link>
+                    ) : (
+                      <Link to="/vendor/register" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-slate-700 transition font-medium text-indigo-600 dark:text-indigo-400 flex items-center space-x-2">
+                        <Store className="h-4 w-4" />
+                        <span>Become a Seller</span>
+                      </Link>
+                    )}
                     <hr className="my-2 border-gray-200 dark:border-slate-700" />
                     <button
                       onClick={handleLogout}
@@ -394,6 +406,25 @@ const Header = () => {
                     >
                       <LayoutDashboard className="h-4 w-4" />
                       <span>Admin Dashboard</span>
+                    </Link>
+                  )}
+                  {user?.role === 'vendor' ? (
+                    <Link
+                      to="/vendor/dashboard"
+                      className="px-4 py-2 hover:bg-gray-100 rounded-lg transition text-indigo-600 font-medium flex items-center space-x-2"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Store className="h-4 w-4" />
+                      <span>Vendor Dashboard</span>
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/vendor/register"
+                      className="px-4 py-2 hover:bg-gray-100 rounded-lg transition text-indigo-600 font-medium flex items-center space-x-2"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Store className="h-4 w-4" />
+                      <span>Become a Seller</span>
                     </Link>
                   )}
                   <button

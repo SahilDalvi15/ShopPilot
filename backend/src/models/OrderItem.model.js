@@ -48,7 +48,12 @@ const orderItemSchema = new mongoose.Schema({
     default: false
   },
   returnReason: String,
-  returnedAt: Date
+  returnedAt: Date,
+  vendorId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Vendor',
+    index: true
+  }
 }, {
   timestamps: true
 });

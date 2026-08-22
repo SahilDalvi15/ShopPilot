@@ -44,6 +44,9 @@ import AdminOrders from './pages/admin/AdminOrders';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminReviews from './pages/admin/AdminReviews';
+import VendorOnboarding from './pages/VendorOnboarding';
+import VendorDashboard from './pages/VendorDashboard';
+import VendorStorePage from './pages/VendorStorePage';
 import ComparePage from './pages/ComparePage';
 import CompareWidget from './components/CompareWidget';
 import GlobalLoader from './components/GlobalLoader';
@@ -147,6 +150,9 @@ const App = () => {
         <Route path="/categories" element={<CategoriesPage />} />
         <Route path="/deals" element={<ProductsPage />} />
         <Route path="/new-arrivals" element={<ProductsPage />} />
+        <Route path="/vendor/register" element={isAuthenticated ? <VendorOnboarding /> : <Navigate to="/login" replace />} />
+        <Route path="/vendor/dashboard" element={isAuthenticated ? <VendorDashboard /> : <Navigate to="/login" replace />} />
+        <Route path="/store/:slug" element={<VendorStorePage />} />
         <Route path="/" element={<HomePage />} />
       </Route>
       
