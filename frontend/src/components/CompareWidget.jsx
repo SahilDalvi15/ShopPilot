@@ -1,4 +1,5 @@
-import { useSelector, useDispatch } from 'react';
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { X, ArrowRightLeft, Trash2 } from 'lucide-react';
 import { selectCompareItems, removeFromCompare, clearCompare } from '../store/slices/compareSlice';
