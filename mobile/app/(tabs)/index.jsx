@@ -71,6 +71,15 @@ export default function HomeScreen() {
         <TouchableOpacity style={styles.subscribeBadge} onPress={() => router.push('/subscribe')}>
           <Text style={styles.subscribeBadgeText}>Subscribe & Save</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.liveBadge} onPress={() => router.push('/live-shopping')}>
+          <Text style={styles.liveBadgeText}>Live Shopping 🔴</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.socialBadge} onPress={() => router.push('/shop-the-look')}>
+          <Text style={styles.socialBadgeText}>Shop The Look</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.quizBadge} onPress={() => router.push('/style-quiz')}>
+          <Text style={styles.quizBadgeText}>Style Quiz ✨</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.section}>
@@ -167,6 +176,36 @@ const styles = StyleSheet.create({
   },
   subscribeBadgeText: {
     color: '#d97706', // Amber 600
+    fontWeight: '600',
+  },
+  liveBadge: {
+    backgroundColor: '#fee2e2', // Red 100
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  liveBadgeText: {
+    color: '#ef4444', // Red 500
+    fontWeight: '600',
+  },
+  socialBadge: {
+    backgroundColor: '#f3e8ff', // Purple 100
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  socialBadgeText: {
+    color: '#a855f7', // Purple 500
+    fontWeight: '600',
+  },
+  quizBadge: {
+    backgroundColor: '#ffedd5', // Orange 100
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  quizBadgeText: {
+    color: '#f97316', // Orange 500
     fontWeight: '600',
   },
   section: {
