@@ -19,7 +19,7 @@ export default function ProductsScreen() {
     try {
       const res = await api.get('/products');
       if (res.data.success) {
-        setProducts(res.data.data);
+        setProducts(res.data.data || res.data.products || []);
       }
     } catch (error) {
       console.error('Error fetching products', error);
