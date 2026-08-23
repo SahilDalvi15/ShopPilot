@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Alert, RefreshControl } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { User, LogOut, Package as PackageIcon, Shield, MapPin, ChevronRight, Award } from 'lucide-react-native';
+import { User, LogOut, Package as PackageIcon, Shield, MapPin, ChevronRight, Award, Store } from 'lucide-react-native';
 import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
 
@@ -90,6 +90,14 @@ export default function ProfileScreen() {
 
       <View style={styles.content}>
         <View style={styles.menuContainer}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/vendor-hub')}>
+            <View style={styles.menuIconContainer}>
+              <Store size={20} color="#6366f1" />
+            </View>
+            <Text style={styles.menuText}>Seller Dashboard</Text>
+            <ChevronRight size={20} color="#cbd5e1" />
+          </TouchableOpacity>
+
           <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/loyalty')}>
             <View style={styles.menuIconContainer}>
               <Award size={20} color="#6366f1" />
