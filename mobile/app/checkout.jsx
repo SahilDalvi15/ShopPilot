@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, CreditCard, Banknote } from 'lucide-react-native';
-import api from '../../services/api';
+import api from '../services/api';
 
 export default function CheckoutScreen() {
   const [cart, setCart] = useState(null);
