@@ -92,7 +92,9 @@ class ProductService {
     // Transform products
     const transformedProducts = products.map(product => ({
       id: product._id,
+      _id: product._id,
       title: product.title,
+      name: product.title,
       slug: product.slug,
       description: product.description,
       shortDescription: product.shortDescription,
@@ -136,7 +138,14 @@ class ProductService {
   }
 
   async getProductBySlug(slug) {
-    const product = await Product.findOne({ slug, isActive: true, isDeleted: false })
+    let query = { isActive: true, isDeleted: false };
+    if (mongoose.Types.ObjectId.isValid(slug)) {
+      query._id = slug;
+    } else {
+      query.slug = slug;
+    }
+
+    const product = await Product.findOne(query)
       .populate('brandId', 'name slug logo website')
       .populate('categoryId', 'name slug image description');
 
@@ -149,7 +158,9 @@ class ProductService {
 
     return {
       id: product._id,
+      _id: product._id,
       title: product.title,
+      name: product.title,
       slug: product.slug,
       description: product.description,
       shortDescription: product.shortDescription,
