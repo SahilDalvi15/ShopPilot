@@ -1,36 +1,37 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { AuthContext } from '../../context/AuthContext';
+import api from '../../services/api';
 
-export default function LoginScreen() {
+export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { login } = useContext(AuthContext);
 
-  const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+  const handleReset = async () => {
+    if (!email) {
+      Alert.alert('Error', 'Please enter your email');
       return;
     }
 
     setIsLoading(true);
-    const result = await login(email, password);
-    setIsLoading(false);
-
-    if (result.success) {
-      router.replace('/(tabs)');
-    } else {
-      Alert.alert('Login Failed', result.message);
+    try {
+      const res = await api.post('/auth/forgot-password', { email });
+      if (res.data.success) {
+        Alert.alert('Success', 'Password reset instructions have been sent to your email.');
+        router.back();
+      }
+    } catch (error) {
+      Alert.alert('Error', error.response?.data?.message || 'Failed to request password reset');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome Back</Text>
-      <Text style={styles.subtitle}>Sign in to ShopPilot</Text>
+      <Text style={styles.title}>Reset Password</Text>
+      <Text style={styles.subtitle}>Enter your email to receive reset instructions</Text>
 
       <View style={styles.form}>
         <Text style={styles.label}>Email</Text>
@@ -43,39 +44,23 @@ export default function LoginScreen() {
           keyboardType="email-address"
         />
 
-        <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-
         <TouchableOpacity 
           style={styles.button} 
-          onPress={handleLogin}
+          onPress={handleReset}
           disabled={isLoading}
         >
           {isLoading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.buttonText}>Login</Text>
+            <Text style={styles.buttonText}>Send Instructions</Text>
           )}
         </TouchableOpacity>
 
         <TouchableOpacity 
-          style={styles.forgotPasswordButton}
-          onPress={() => router.push('/(auth)/forgot-password')}
-        >
-          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
           style={styles.linkButton}
-          onPress={() => router.push('/(auth)/register')}
+          onPress={() => router.back()}
         >
-          <Text style={styles.linkText}>Don't have an account? Sign up</Text>
+          <Text style={styles.linkText}>Back to Login</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -101,49 +86,40 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   form: {
-    width: '100%',
+    gap: 16,
   },
   label: {
     fontSize: 14,
     fontWeight: '500',
     color: '#334155',
-    marginBottom: 8,
+    marginBottom: -8,
   },
   input: {
-    backgroundColor: '#f1f5f9',
+    backgroundColor: '#f8fafc',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
     borderRadius: 8,
     padding: 16,
-    marginBottom: 16,
     fontSize: 16,
     color: '#0f172a',
   },
   button: {
     backgroundColor: '#6366f1',
-    borderRadius: 8,
     padding: 16,
+    borderRadius: 8,
     alignItems: 'center',
     marginTop: 8,
   },
   buttonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   linkButton: {
-    marginTop: 24,
     alignItems: 'center',
+    marginTop: 16,
   },
   linkText: {
-    color: '#6366f1',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  forgotPasswordButton: {
-    alignItems: 'flex-end',
-    marginTop: -4,
-    marginBottom: 8,
-  },
-  forgotPasswordText: {
     color: '#6366f1',
     fontSize: 14,
     fontWeight: '500',
