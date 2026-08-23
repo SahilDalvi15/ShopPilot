@@ -65,6 +65,12 @@ export default function HomeScreen() {
         <TouchableOpacity style={styles.brandBadge} onPress={() => router.push('/brands')}>
           <Text style={styles.brandBadgeText}>Explore Brands</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.bundleBadge} onPress={() => router.push('/bundle-builder')}>
+          <Text style={styles.bundleBadgeText}>Build a Bundle</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.subscribeBadge} onPress={() => router.push('/subscribe')}>
+          <Text style={styles.subscribeBadgeText}>Subscribe & Save</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.section}>
@@ -118,6 +124,7 @@ const styles = StyleSheet.create({
   },
   categoriesContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     paddingHorizontal: 24,
     marginTop: 16,
     gap: 12,
@@ -140,6 +147,26 @@ const styles = StyleSheet.create({
   },
   brandBadgeText: {
     color: '#db2777', // Pink 600
+    fontWeight: '600',
+  },
+  bundleBadge: {
+    backgroundColor: '#dcfce7', // Green 100
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  bundleBadgeText: {
+    color: '#16a34a', // Green 600
+    fontWeight: '600',
+  },
+  subscribeBadge: {
+    backgroundColor: '#fef3c7', // Amber 100
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  subscribeBadgeText: {
+    color: '#d97706', // Amber 600
     fontWeight: '600',
   },
   section: {
