@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft, ShoppingCart, Heart, ArrowRightLeft } from 'lucide-react-native';
-import api from '../../services/api';
+import api, { getImageUrl } from '../../services/api';
 import { CompareContext } from '../../context/CompareContext';
 
 export default function ProductDetailsScreen() {
@@ -81,13 +81,13 @@ export default function ProductDetailsScreen() {
 
       <ScrollView contentContainerStyle={styles.content}>
         <Image 
-          source={{ uri: product.images && product.images[0] ? product.images[0].url : 'https://via.placeholder.com/400' }} 
+          source={{ uri: product.images && product.images[0] ? product.images[0] : 'https://via.placeholder.com/400' }} 
           style={styles.image}
           resizeMode="cover"
         />
         
         <View style={styles.detailsContainer}>
-          <Text style={styles.productName}>{product.name}</Text>
+          <Text style={styles.productName}>{product.title}</Text>
           <Text style={styles.productPrice}>${product.price.toFixed(2)}</Text>
           
           <View style={styles.stockBadge}>

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useContext } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { PackagePlus, Plus, Minus, ArrowRight, CheckCircle2 } from 'lucide-react-native';
-import api from '../services/api';
+import api, { getImageUrl } from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 
 const BUNDLE_TIERS = [
@@ -117,12 +117,12 @@ export default function BundleBuilderScreen() {
     return (
       <View style={styles.productCard}>
         <Image 
-          source={{ uri: item.images && item.images[0] ? item.images[0].url : 'https://via.placeholder.com/150' }} 
+          source={{ uri: getImageUrl(item).images && item.images[0] ? item.images[0] : 'https://via.placeholder.com/150' }} 
           style={styles.productImage}
           resizeMode="cover"
         />
         <View style={styles.productInfo}>
-          <Text style={styles.productName} numberOfLines={2}>{item.name}</Text>
+          <Text style={styles.productName} numberOfLines={2}>{item.title}</Text>
           <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
           
           <View style={styles.quantityControls}>

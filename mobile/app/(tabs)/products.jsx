@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image, TouchableOpacity, TextInput, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Search } from 'lucide-react-native';
-import api from '../../services/api';
+import api, { getImageUrl } from '../../services/api';
 
 export default function ProductsScreen() {
   const [products, setProducts] = useState([]);
@@ -35,7 +35,7 @@ export default function ProductsScreen() {
   };
 
   const filteredProducts = products.filter(p => 
-    p.name.toLowerCase().includes(search.toLowerCase())
+    p.title.toLowerCase().includes(search.toLowerCase())
   );
 
   const renderProduct = ({ item }) => (
@@ -44,12 +44,12 @@ export default function ProductsScreen() {
       onPress={() => router.push(`/product/${item._id}`)}
     >
       <Image 
-        source={{ uri: item.images && item.images[0] ? item.images[0].url : 'https://via.placeholder.com/150' }} 
+        source={{ uri: getImageUrl(item).images && item.images[0] ? item.images[0] : 'https://via.placeholder.com/150' }} 
         style={styles.productImage}
         resizeMode="cover"
       />
       <View style={styles.productInfo}>
-        <Text style={styles.productName} numberOfLines={2}>{item.name}</Text>
+        <Text style={styles.productName} numberOfLines={2}>{item.title}</Text>
         <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
       </View>
     </TouchableOpacity>

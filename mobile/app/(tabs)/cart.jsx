@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator, Alert, RefreshControl } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Minus, Plus, Trash2, ShoppingCart } from 'lucide-react-native';
-import api from '../../services/api';
+import api, { getImageUrl } from '../../services/api';
 
 export default function CartScreen() {
   const [cart, setCart] = useState(null);
@@ -67,11 +67,11 @@ export default function CartScreen() {
     return (
       <View style={styles.cartItem}>
         <Image 
-          source={{ uri: product.images && product.images[0] ? product.images[0].url : 'https://via.placeholder.com/80' }} 
+          source={{ uri: product.images && product.images[0] ? product.images[0] : 'https://via.placeholder.com/80' }} 
           style={styles.itemImage}
         />
         <View style={styles.itemDetails}>
-          <Text style={styles.itemName} numberOfLines={2}>{product.name}</Text>
+          <Text style={styles.itemName} numberOfLines={2}>{product.title}</Text>
           <Text style={styles.itemPrice}>${item.price.toFixed(2)}</Text>
           
           <View style={styles.quantityContainer}>

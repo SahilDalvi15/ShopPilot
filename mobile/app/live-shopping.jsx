@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, FlatList, TextInput, KeyboardAvoidingView, Platform, Image, ActivityIndicator, Alert, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Eye, Heart, Send, ArrowLeft, ShoppingBag, X } from 'lucide-react-native';
-import api from '../services/api';
+import api, { getImageUrl } from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 
 const { width, height } = Dimensions.get('window');
@@ -107,7 +107,7 @@ export default function LiveShoppingScreen() {
         productId: featuredProduct._id,
         quantity: 1
       });
-      Alert.alert('Got it!', `${featuredProduct.name} added to your cart.`);
+      Alert.alert('Got it!', `${featuredProduct.title} added to your cart.`);
     } catch (err) {
       Alert.alert('Error', 'Failed to add item to cart.');
     } finally {
@@ -158,11 +158,11 @@ export default function LiveShoppingScreen() {
             {featuredProduct && (
               <View style={styles.productCard}>
                 <Image 
-                  source={{ uri: featuredProduct.images && featuredProduct.images[0] ? featuredProduct.images[0].url : 'https://via.placeholder.com/150' }}
+                  source={{ uri: featuredProduct.images && featuredProduct.images[0] ? featuredProduct.images[0] : 'https://via.placeholder.com/150' }}
                   style={styles.productImage}
                 />
                 <View style={styles.productInfo}>
-                  <Text style={styles.productName} numberOfLines={1}>{featuredProduct.name}</Text>
+                  <Text style={styles.productName} numberOfLines={1}>{featuredProduct.title}</Text>
                   <Text style={styles.productPrice}>${featuredProduct.price.toFixed(2)}</Text>
                 </View>
                 <TouchableOpacity 

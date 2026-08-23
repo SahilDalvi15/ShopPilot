@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { CheckCircle2, Calendar, Plus, Minus, Package } from 'lucide-react-native';
-import api from '../services/api';
+import api, { getImageUrl } from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 
 const FREQUENCIES = [
@@ -102,7 +102,7 @@ export default function SubscribeAndSaveScreen() {
       <View style={[styles.productCard, isSelected && styles.productCardSelected]}>
         <TouchableOpacity style={styles.cardSelectArea} onPress={() => handleToggleProduct(item)}>
           <Image 
-            source={{ uri: item.images && item.images[0] ? item.images[0].url : 'https://via.placeholder.com/150' }} 
+            source={{ uri: getImageUrl(item).images && item.images[0] ? item.images[0] : 'https://via.placeholder.com/150' }} 
             style={styles.productImage}
           />
           <View style={styles.checkboxContainer}>
@@ -115,7 +115,7 @@ export default function SubscribeAndSaveScreen() {
         </TouchableOpacity>
         
         <View style={styles.productInfo}>
-          <Text style={styles.productName} numberOfLines={2}>{item.name}</Text>
+          <Text style={styles.productName} numberOfLines={2}>{item.title}</Text>
           <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
           
           {isSelected && (

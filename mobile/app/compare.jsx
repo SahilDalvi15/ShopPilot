@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { ArrowLeft, Trash2, ShoppingCart, Info } from 'lucide-react-native';
 import { CompareContext } from '../context/CompareContext';
 import { AuthContext } from '../context/AuthContext';
-import api from '../services/api';
+import api, { getImageUrl } from '../services/api';
 
 export default function CompareScreen() {
   const { compareItems, removeFromCompare, clearCompare } = useContext(CompareContext);
@@ -87,11 +87,11 @@ export default function CompareScreen() {
                   <Trash2 size={16} color="#64748b" />
                 </TouchableOpacity>
                 <Image 
-                  source={{ uri: item.images && item.images[0] ? item.images[0].url : 'https://via.placeholder.com/150' }} 
+                  source={{ uri: getImageUrl(item).images && item.images[0] ? item.images[0] : 'https://via.placeholder.com/150' }} 
                   style={styles.productImage}
                   resizeMode="contain"
                 />
-                <Text style={styles.productName} numberOfLines={2}>{item.name}</Text>
+                <Text style={styles.productName} numberOfLines={2}>{item.title}</Text>
                 <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
                 <TouchableOpacity 
                   style={styles.addToCartButton}

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator, Alert, RefreshControl } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Trash2, ShoppingCart, Heart } from 'lucide-react-native';
-import api from '../../services/api';
+import api, { getImageUrl } from '../../services/api';
 
 export default function WishlistScreen() {
   const [wishlist, setWishlist] = useState([]);
@@ -51,11 +51,11 @@ export default function WishlistScreen() {
   const renderItem = ({ item }) => (
     <TouchableOpacity style={styles.card} onPress={() => router.push(`/product/${item._id}`)}>
       <Image 
-        source={{ uri: item.images && item.images[0] ? item.images[0].url : 'https://via.placeholder.com/100' }} 
+        source={{ uri: getImageUrl(item).images && item.images[0] ? item.images[0] : 'https://via.placeholder.com/100' }} 
         style={styles.image}
       />
       <View style={styles.details}>
-        <Text style={styles.name} numberOfLines={2}>{item.name}</Text>
+        <Text style={styles.name} numberOfLines={2}>{item.title}</Text>
         <Text style={styles.price}>${item.price.toFixed(2)}</Text>
       </View>
       <TouchableOpacity style={styles.removeBtn} onPress={() => removeFromWishlist(item._id)}>

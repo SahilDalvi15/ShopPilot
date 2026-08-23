@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity, Modal, Dimensions, ActivityIndicator, Alert, SafeAreaView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Camera, Heart, MessageCircle, Share2, Tag, X, ShoppingCart, ArrowLeft } from 'lucide-react-native';
-import api from '../services/api';
+import api, { getImageUrl } from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 
 const { width, height } = Dimensions.get('window');
@@ -101,7 +101,7 @@ export default function ShopTheLookScreen() {
     <View style={styles.postCard}>
       {/* Post Header */}
       <View style={styles.postHeader}>
-        <Image source={{ uri: item.influencer.avatar }} style={styles.avatar} />
+        <Image source={{ uri: getImageUrl(item).influencer.avatar }} style={styles.avatar} />
         <View>
           <Text style={styles.influencerName}>{item.influencer.name}</Text>
           <Text style={styles.influencerHandle}>{item.influencer.handle}</Text>
@@ -110,7 +110,7 @@ export default function ShopTheLookScreen() {
 
       {/* Post Image & Tags */}
       <View style={styles.imageContainer}>
-        <Image source={{ uri: item.imageUrl }} style={styles.postImage} />
+        <Image source={{ uri: getImageUrl(item).imageUrl }} style={styles.postImage} />
         {item.tags.map(tag => (
           <TouchableOpacity 
             key={tag.id}
@@ -199,12 +199,12 @@ export default function ShopTheLookScreen() {
 
               <View style={styles.quickViewProduct}>
                 <Image 
-                  source={{ uri: quickViewProduct.images && quickViewProduct.images[0] ? quickViewProduct.images[0].url : 'https://via.placeholder.com/150' }}
+                  source={{ uri: quickViewProduct.images && quickViewProduct.images[0] ? quickViewProduct.images[0] : 'https://via.placeholder.com/150' }}
                   style={styles.quickViewImage}
                   resizeMode="contain"
                 />
                 <View style={styles.quickViewInfo}>
-                  <Text style={styles.quickViewName} numberOfLines={2}>{quickViewProduct.name}</Text>
+                  <Text style={styles.quickViewName} numberOfLines={2}>{quickViewProduct.title}</Text>
                   <Text style={styles.quickViewBrand}>{quickViewProduct.brand}</Text>
                   <Text style={styles.quickViewPrice}>${quickViewProduct.price.toFixed(2)}</Text>
                   

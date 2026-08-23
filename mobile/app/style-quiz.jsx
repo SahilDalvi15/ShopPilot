@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator, Alert, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Sparkles, ArrowRight, ArrowLeft, Wallet, CreditCard, Gem, CheckCircle2, ShoppingBag } from 'lucide-react-native';
-import api from '../services/api';
+import api, { getImageUrl } from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 
 const QUIZ_QUESTIONS = [
@@ -203,9 +203,9 @@ export default function StyleQuizScreen() {
           <View style={styles.productsGrid}>
             {recommendedProducts.map(product => (
               <View key={product._id} style={styles.productCard}>
-                <Image source={{ uri: product.images[0]?.url }} style={styles.productImage} />
+                <Image source={{ uri: getImageUrl(product.images[0]) }} style={styles.productImage} />
                 <View style={styles.productInfo}>
-                  <Text style={styles.productName} numberOfLines={2}>{product.name}</Text>
+                  <Text style={styles.productName} numberOfLines={2}>{product.title}</Text>
                   <Text style={styles.productPrice}>${product.price.toFixed(2)}</Text>
                 </View>
               </View>

@@ -58,4 +58,10 @@ api.interceptors.response.use(
   }
 );
 
+export const getImageUrl = (url) => {
+  if (!url) return 'https://via.placeholder.com/150';
+  if (url.startsWith('http')) return url;
+  return `http://10.0.2.2:5000${url}`;
+};
+
 export default api;
