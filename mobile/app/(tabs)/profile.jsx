@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Alert, RefreshControl } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { User, LogOut, Package as PackageIcon, Shield } from 'lucide-react-native';
+import { User, LogOut, Package as PackageIcon, Shield, MapPin, ChevronRight } from 'lucide-react-native';
 import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
 
@@ -25,7 +25,9 @@ export default function ProfileScreen() {
         setOrders(res.data.data);
       }
     } catch (error) {
-      console.log('Error fetching orders', error);
+      if (error.response?.status !== 401) {
+        console.log('Error fetching orders', error);
+      }
     } finally {
       setLoading(false);
     }
@@ -87,6 +89,16 @@ export default function ProfileScreen() {
       </View>
 
       <View style={styles.content}>
+        <View style={styles.menuContainer}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/addresses')}>
+            <View style={styles.menuIconContainer}>
+              <MapPin size={20} color="#6366f1" />
+            </View>
+            <Text style={styles.menuText}>Manage Addresses</Text>
+            <ChevronRight size={20} color="#cbd5e1" />
+          </TouchableOpacity>
+        </View>
+
         <Text style={styles.sectionTitle}>
           <PackageIcon size={20} color="#0f172a" style={{marginRight: 8}} /> Order History
         </Text>
@@ -187,6 +199,37 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  menuContainer: {
+    marginBottom: 24,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  menuIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#eff6ff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  menuText: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#334155',
   },
   centered: {
     flex: 1,
