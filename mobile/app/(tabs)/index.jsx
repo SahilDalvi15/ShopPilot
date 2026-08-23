@@ -19,7 +19,7 @@ export default function HomeScreen() {
     try {
       const res = await api.get('/products?limit=5');
       if (res.data.success) {
-        setProducts(res.data.data);
+        setProducts(res.data.data || res.data.products || []);
       }
     } catch (error) {
       console.error('Error fetching home products', error);
@@ -56,6 +56,15 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <Text style={styles.greeting}>Hello, {user?.firstName || 'Guest'} 👋</Text>
         <Text style={styles.subtitle}>Find your favorite products today</Text>
+      </View>
+
+      <View style={styles.categoriesContainer}>
+        <TouchableOpacity style={styles.categoryBadge} onPress={() => router.push('/categories')}>
+          <Text style={styles.categoryBadgeText}>Shop by Category</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.brandBadge} onPress={() => router.push('/brands')}>
+          <Text style={styles.brandBadgeText}>Explore Brands</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.section}>
@@ -107,8 +116,34 @@ const styles = StyleSheet.create({
     color: '#64748b',
     marginTop: 4,
   },
+  categoriesContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 24,
+    marginTop: 16,
+    gap: 12,
+  },
+  categoryBadge: {
+    backgroundColor: '#e0e7ff', // Indigo 100
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  categoryBadgeText: {
+    color: '#4f46e5', // Indigo 600
+    fontWeight: '600',
+  },
+  brandBadge: {
+    backgroundColor: '#fce7f3', // Pink 100
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  brandBadgeText: {
+    color: '#db2777', // Pink 600
+    fontWeight: '600',
+  },
   section: {
-    paddingTop: 24,
+    paddingTop: 16,
   },
   sectionHeader: {
     flexDirection: 'row',
