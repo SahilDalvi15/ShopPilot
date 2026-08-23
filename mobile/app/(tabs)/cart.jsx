@@ -23,7 +23,9 @@ export default function CartScreen() {
         setCart(res.data.data);
       }
     } catch (error) {
-      console.log('Error fetching cart', error.response?.status);
+      if (error.response?.status !== 401) {
+        console.log('Error fetching cart', error.response?.status);
+      }
       if (error.response?.status === 401) {
         // User not logged in, ignore or redirect
         setCart(null);

@@ -23,7 +23,9 @@ export default function WishlistScreen() {
         setWishlist(res.data.data.products || []);
       }
     } catch (error) {
-      console.log('Error fetching wishlist', error.response?.status);
+      if (error.response?.status !== 401) {
+        console.log('Error fetching wishlist', error.response?.status);
+      }
     } finally {
       setLoading(false);
     }
