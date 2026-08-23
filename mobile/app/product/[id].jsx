@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ArrowLeft, ShoppingCart, Heart } from 'lucide-react-native';
-import api from '../../../services/api';
+import { ArrowLeft, ShoppingCart, Heart, ArrowRightLeft } from 'lucide-react-native';
+import api from '../../services/api';
+import { CompareContext } from '../../context/CompareContext';
 
 export default function ProductDetailsScreen() {
   const { id } = useLocalSearchParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const { addToCompare } = useContext(CompareContext);
 
   useEffect(() => {
     fetchProductDetails();
@@ -30,6 +32,18 @@ export default function ProductDetailsScreen() {
 
   const handleAddToCart = () => {
     Alert.alert('Success', 'Added to cart!');
+  };
+
+  const handleCompare = () => {
+    const res = addToCompare(product);
+    if (res.success) {
+      Alert.alert('Added to Compare', res.message, [
+        { text: 'Continue Shopping', style: 'cancel' },
+        { text: 'View Compare', onPress: () => router.push('/compare') }
+      ]);
+    } else {
+      Alert.alert('Notice', res.message);
+    }
   };
 
   if (loading) {
@@ -55,9 +69,14 @@ export default function ProductDetailsScreen() {
           <ArrowLeft size={24} color="#0f172a" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Details</Text>
-        <TouchableOpacity style={styles.iconButton}>
-          <Heart size={24} color="#0f172a" />
-        </TouchableOpacity>
+        <View style={{flexDirection: 'row'}}>
+          <TouchableOpacity style={styles.iconButton} onPress={handleCompare}>
+            <ArrowRightLeft size={24} color="#0f172a" style={{marginRight: 12}} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.iconButton}>
+            <Heart size={24} color="#0f172a" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
