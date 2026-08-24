@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 
 export const CompareContext = createContext();
 
@@ -12,7 +12,7 @@ export const CompareProvider = ({ children }) => {
 
   const loadCompareItems = async () => {
     try {
-      const stored = await AsyncStorage.getItem('compareItems');
+      const stored = await SecureStore.getItemAsync('compareItems');
       if (stored) {
         setCompareItems(JSON.parse(stored));
       }
@@ -23,7 +23,7 @@ export const CompareProvider = ({ children }) => {
 
   const saveCompareItems = async (items) => {
     try {
-      await AsyncStorage.setItem('compareItems', JSON.stringify(items));
+      await SecureStore.setItemAsync('compareItems', JSON.stringify(items));
     } catch (error) {
       console.error('Error saving compare items', error);
     }
@@ -50,9 +50,9 @@ export const CompareProvider = ({ children }) => {
     saveCompareItems(newItems);
   };
 
-  const clearCompare = () => {
+  const clearCompare = async () => {
     setCompareItems([]);
-    AsyncStorage.removeItem('compareItems');
+    await SecureStore.deleteItemAsync('compareItems');
   };
 
   return (

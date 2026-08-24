@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, Dimensions, FlatList, TouchableOpacity, ActivityIndicator, Alert, SafeAreaView, Platform } from 'react-native';
-import { Video, ResizeMode } from 'expo-av';
+import { useVideoPlayer, VideoView } from 'expo-video';
 import { Heart, MessageCircle, Share2, ShoppingBag, Volume2, VolumeX, ArrowLeft } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import api from '../services/api';
@@ -111,22 +111,27 @@ export default function SocialFeedScreen() {
 }
 
 const FeedItem = ({ item, isActive, isMuted, toggleMute }) => {
-  const videoRef = useRef(null);
-  const [status, setStatus] = useState({});
   const [isLiked, setIsLiked] = useState(false);
   const [likes, setLikes] = useState(item.likes);
   const [addingToCart, setAddingToCart] = useState(false);
 
+  const player = useVideoPlayer(item.videoUrl, player => {
+    player.loop = true;
+    player.muted = isMuted;
+  });
+
   useEffect(() => {
-    if (!videoRef.current) return;
-    
     if (isActive) {
-      videoRef.current.playAsync();
+      player.play();
     } else {
-      videoRef.current.pauseAsync();
-      videoRef.current.setPositionAsync(0);
+      player.pause();
+      player.currentTime = 0;
     }
-  }, [isActive]);
+  }, [isActive, player]);
+
+  useEffect(() => {
+    player.muted = isMuted;
+  }, [isMuted, player]);
 
   const handleLike = () => {
     setIsLiked(!isLiked);
@@ -153,15 +158,11 @@ const FeedItem = ({ item, isActive, isMuted, toggleMute }) => {
 
   return (
     <View style={styles.videoContainer}>
-      <Video
-        ref={videoRef}
+      <VideoView
+        player={player}
         style={styles.video}
-        source={{ uri: item.videoUrl }}
-        useNativeControls={false}
-        resizeMode={ResizeMode.COVER}
-        isLooping
-        isMuted={isMuted}
-        onPlaybackStatusUpdate={status => setStatus(() => status)}
+        contentFit="cover"
+        nativeControls={false}
       />
       
       {/* Gradient Overlay Simulation */}
