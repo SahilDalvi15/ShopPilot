@@ -1,4 +1,5 @@
 const orderService = require('../services/order.service');
+const { Parser } = require('json2csv');
 
 const createOrder = async (req, res) => {
   try {
@@ -144,6 +145,35 @@ const downloadInvoice = async (req, res) => {
   }
 };
 
+const exportOrdersCsv = async (req, res) => {
+  try {
+    const orders = await Order.find().populate('userId', 'name email').sort({ createdAt: -1 });
+    
+    const csvData = orders.map(order => ({
+      OrderNumber: order.orderNumber,
+      Date: order.createdAt.toISOString().split('T')[0],
+      CustomerName: order.userId?.name || 'Unknown',
+      CustomerEmail: order.userId?.email || 'Unknown',
+      Status: order.orderStatus,
+      PaymentStatus: order.paymentStatus,
+      PaymentMethod: order.paymentMethod,
+      TotalAmount: order.totalAmount,
+      City: order.shippingAddress?.city || '',
+      State: order.shippingAddress?.state || ''
+    }));
+
+    const json2csvParser = new Parser();
+    const csv = json2csvParser.parse(csvData);
+
+    res.header('Content-Type', 'text/csv');
+    res.attachment(`orders_export_${new Date().toISOString().split('T')[0]}.csv`);
+    return res.send(csv);
+  } catch (error) {
+    console.error('EXPORT ORDERS CSV ERROR:', error);
+    res.status(500).json({ success: false, message: 'Failed to export orders as CSV' });
+  }
+};
+
 module.exports = {
   createOrder,
   getOrders,
@@ -151,5 +181,6 @@ module.exports = {
   cancelOrder,
   adminGetOrders,
   adminUpdateOrderStatus,
-  downloadInvoice
+  downloadInvoice,
+  exportOrdersCsv
 };
