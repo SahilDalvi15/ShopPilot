@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Store, ArrowRight, ArrowLeft } from 'lucide-react-native';
@@ -127,7 +128,7 @@ export default function VendorOnboardingScreen() {
               </>
             )}
           </TouchableOpacity>
-        </View>
+        </SafeAreaView>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -140,8 +141,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 20,
-    paddingTop: 60,
-    paddingBottom: 40,
+        paddingBottom: 40,
   },
   backButton: {
     alignSelf: 'flex-start',
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     padding: 24,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.08,
     shadowRadius: 12,
     elevation: 4,
     borderWidth: 1,
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     shadowColor: '#6366f1',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
-    shadowRadius: 8,
+    shadowRadius: 12,
     elevation: 4,
   },
   submitBtnText: {

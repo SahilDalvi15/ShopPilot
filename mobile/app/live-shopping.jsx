@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, FlatList, TextInput, KeyboardAvoidingView, Platform, Image, ActivityIndicator, Alert, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Eye, Heart, Send, ArrowLeft, ShoppingBag, X } from 'lucide-react-native';
@@ -220,7 +221,7 @@ export default function LiveShoppingScreen() {
             </View>
 
           </View>
-        </View>
+        </SafeAreaView>
       </ImageBackground>
     </KeyboardAvoidingView>
   );
@@ -246,8 +247,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 24,
-    paddingTop: 60,
-  },
+      },
   leftHeader: {
     flexDirection: 'row',
     alignItems: 'center',

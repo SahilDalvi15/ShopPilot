@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useContext } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator, Alert, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Sparkles, ArrowRight, ArrowLeft, Wallet, CreditCard, Gem, CheckCircle2, ShoppingBag } from 'lucide-react-native';
@@ -184,6 +185,7 @@ export default function StyleQuizScreen() {
     const totalValue = recommendedProducts.reduce((sum, item) => sum + item.price, 0);
 
     return (
+    <SafeAreaView style={{flex: 1, backgroundColor: "#f8fafc"}}>
       <View style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => setCurrentStep(-1)} style={styles.backButton}>
@@ -308,10 +310,10 @@ const styles = StyleSheet.create({
   primaryBtnText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
   progressContainer: { width: '80%', height: 8, backgroundColor: '#e2e8f0', borderRadius: 4, overflow: 'hidden' },
   progressFill: { height: '100%', backgroundColor: '#6366f1' },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 24, paddingTop: 60, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#f1f5f9' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 24,  backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#f1f5f9' },
   backButton: { padding: 8, marginLeft: -8 },
   headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#0f172a' },
-  quizHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 24, paddingTop: 60, backgroundColor: '#fff' },
+  quizHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 24,  backgroundColor: '#fff' },
   quizProgressHeader: { flex: 1, alignItems: 'center', paddingHorizontal: 16 },
   quizStepText: { fontSize: 12, fontWeight: 'bold', color: '#64748b', marginBottom: 8, textTransform: 'uppercase' },
   quizProgressBar: { width: '100%', height: 4, backgroundColor: '#e2e8f0', borderRadius: 2, overflow: 'hidden' },
@@ -320,7 +322,7 @@ const styles = StyleSheet.create({
   questionTitle: { fontSize: 24, fontWeight: 'bold', color: '#0f172a', marginBottom: 8 },
   questionSubtitle: { fontSize: 16, color: '#64748b', marginBottom: 32 },
   optionsList: { gap: 16 },
-  optionCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 16, padding: 16, borderWidth: 2, borderColor: 'transparent', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
+  optionCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 16, padding: 16, borderWidth: 2, borderColor: 'transparent', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 3 },
   optionCardSelected: { borderColor: '#6366f1', backgroundColor: '#f5f7ff' },
   optionImage: { width: 64, height: 64, borderRadius: 8, marginRight: 16 },
   colorBlock: { width: 64, height: 64, borderRadius: 8, marginRight: 16, borderWidth: 1, borderColor: '#e2e8f0' },
@@ -336,12 +338,12 @@ const styles = StyleSheet.create({
   resultsTitle: { fontSize: 24, fontWeight: 'bold', color: '#0f172a', marginBottom: 8 },
   resultsSubtitle: { fontSize: 16, color: '#64748b', textAlign: 'center' },
   productsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 16, justifyContent: 'space-between' },
-  productCard: { width: '47%', backgroundColor: '#fff', borderRadius: 12, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2, marginBottom: 16 },
+  productCard: { width: '47%', backgroundColor: '#fff', borderRadius: 12, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 3, marginBottom: 16 },
   productImage: { width: '100%', height: 160 },
   productInfo: { padding: 12 },
   productName: { fontSize: 14, fontWeight: '600', color: '#0f172a', marginBottom: 4, height: 40 },
   productPrice: { fontSize: 16, fontWeight: 'bold', color: '#6366f1' },
-  bottomBar: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#e2e8f0', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, paddingBottom: 40, shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.05, shadowRadius: 8, elevation: 10 },
+  bottomBar: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#e2e8f0', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, paddingBottom: 40, shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 10 },
   totalLabel: { fontSize: 14, color: '#64748b', marginBottom: 4 },
   totalPrice: { fontSize: 24, fontWeight: 'bold', color: '#0f172a' },
   addAllBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#0f172a', paddingVertical: 14, paddingHorizontal: 24, borderRadius: 12 },

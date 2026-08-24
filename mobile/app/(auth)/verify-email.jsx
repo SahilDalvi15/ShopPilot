@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { CheckCircle, XCircle, ArrowLeft } from 'lucide-react-native';
@@ -41,7 +42,7 @@ export default function VerifyEmailScreen() {
   }, [token]);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={() => router.push('/')}>
         <ArrowLeft size={24} color="#64748b" />
       </TouchableOpacity>
@@ -88,7 +89,7 @@ export default function VerifyEmailScreen() {
         )}
 
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -97,8 +98,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8fafc',
     padding: 24,
-    paddingTop: 60,
-  },
+      },
   backButton: {
     marginBottom: 32,
     alignSelf: 'flex-start',
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     shadowColor: '#6366f1',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
-    shadowRadius: 8,
+    shadowRadius: 12,
     elevation: 4,
   },
   primaryBtnText: {

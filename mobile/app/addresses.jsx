@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Alert, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MapPin, Plus, Edit2, Trash2, Check, ArrowLeft } from 'lucide-react-native';
@@ -105,7 +106,7 @@ export default function AddressesScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <ArrowLeft size={24} color="#0f172a" />
@@ -135,7 +136,7 @@ export default function AddressesScreen() {
           contentContainerStyle={styles.list}
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -149,8 +150,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 24,
-    paddingTop: 60,
-    backgroundColor: '#fff',
+        backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#f1f5f9',
   },
@@ -179,9 +179,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.08,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 3,
   },
   addressHeader: {
     flexDirection: 'row',

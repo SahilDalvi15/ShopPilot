@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Lock, Eye, EyeOff, ArrowLeft, CheckCircle } from 'lucide-react-native';
@@ -118,7 +119,7 @@ export default function ResetPasswordScreen() {
             <Text style={styles.primaryBtnText}>Reset Password</Text>
           )}
         </TouchableOpacity>
-      </View>
+      </SafeAreaView>
     </KeyboardAvoidingView>
   );
 }
@@ -128,8 +129,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8fafc',
     padding: 24,
-    paddingTop: 60,
-  },
+      },
   centerContainer: {
     flex: 1,
     backgroundColor: '#f8fafc',
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     shadowColor: '#6366f1',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
-    shadowRadius: 8,
+    shadowRadius: 12,
     elevation: 4,
   },
   primaryBtnText: {

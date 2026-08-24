@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Trash2, ShoppingCart, Info } from 'lucide-react-native';
@@ -60,7 +61,7 @@ export default function CompareScreen() {
   ));
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <ArrowLeft size={24} color="#0f172a" />
@@ -133,7 +134,7 @@ export default function CompareScreen() {
           ))}
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -151,8 +152,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 24,
-    paddingTop: 60,
-    backgroundColor: '#fff',
+        backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#f1f5f9',
   },

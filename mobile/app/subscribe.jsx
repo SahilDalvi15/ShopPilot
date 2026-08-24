@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { CheckCircle2, Calendar, Plus, Minus, Package } from 'lucide-react-native';
@@ -135,7 +136,7 @@ export default function SubscribeAndSaveScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.header}>
           <View style={styles.badge}>
@@ -208,7 +209,7 @@ export default function SubscribeAndSaveScreen() {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -219,8 +220,7 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 24,
-    paddingTop: 60,
-    alignItems: 'center',
+        alignItems: 'center',
   },
   badge: {
     flexDirection: 'row',
@@ -310,9 +310,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.08,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 3,
   },
   productCardSelected: {
     borderColor: '#16a34a',
@@ -390,8 +390,8 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
     elevation: 10,
   },
   summaryRow: {

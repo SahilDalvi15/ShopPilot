@@ -1,4 +1,5 @@
 import React, { useContext, useMemo } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Award, Sparkles, Star, Zap, Check } from 'lucide-react-native';
@@ -38,7 +39,7 @@ export default function LoyaltyDashboardScreen() {
 
   if (!user) {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
             <ArrowLeft size={24} color="#0f172a" />
@@ -140,7 +141,7 @@ export default function LoyaltyDashboardScreen() {
         })}
 
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -184,8 +185,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 24,
-    paddingTop: 60,
-    backgroundColor: '#fff',
+        backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#f1f5f9',
   },
@@ -293,9 +293,9 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.08,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 3,
   },
   tierCardCurrent: {
     borderColor: '#6366f1',
