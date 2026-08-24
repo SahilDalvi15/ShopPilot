@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Alert, Image, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Calendar, Package, Clock, Play, Pause, XCircle } from 'lucide-react-native';
-import api, { getImageUrl } from '../../services/api';
+import api, { getImageUrl } from '../services/api';
 
 export default function SubscriptionsScreen() {
   const [subscriptions, setSubscriptions] = useState([]);

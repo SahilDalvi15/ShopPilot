@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Dimensions, FlatList, TouchableOpacity, Activit
 import { Video, ResizeMode } from 'expo-av';
 import { Heart, MessageCircle, Share2, ShoppingBag, Volume2, VolumeX, ArrowLeft } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
-import api from '../../services/api';
+import api from '../services/api';
 
 const { width, height } = Dimensions.get('window');
 

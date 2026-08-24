@@ -3,8 +3,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Store, ArrowRight, ArrowLeft } from 'lucide-react-native';
-import api from '../../services/api';
-import { AuthContext } from '../../context/AuthContext';
+import api from '../services/api';
+import { AuthContext } from '../context/AuthContext';
 
 export default function VendorOnboardingScreen() {
   const router = useRouter();

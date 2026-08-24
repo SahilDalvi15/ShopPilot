@@ -3,7 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image, TouchableOpacity, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Heart, ShoppingCart, Share2, ArrowLeft } from 'lucide-react-native';
-import api, { getImageUrl } from '../../services/api';
+import api, { getImageUrl } from '../services/api';
 
 export default function SharedWishlistScreen() {
   const { token } = useLocalSearchParams();
