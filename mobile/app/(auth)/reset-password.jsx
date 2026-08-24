@@ -119,7 +119,7 @@ export default function ResetPasswordScreen() {
             <Text style={styles.primaryBtnText}>Reset Password</Text>
           )}
         </TouchableOpacity>
-      </SafeAreaView>
+      </View>
     </KeyboardAvoidingView>
   );
 }
