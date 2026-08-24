@@ -185,8 +185,7 @@ export default function StyleQuizScreen() {
     const totalValue = recommendedProducts.reduce((sum, item) => sum + item.price, 0);
 
     return (
-    <View style={{flex: 1, backgroundColor: "#f8fafc"}}>
-      <View style={styles.container}>
+    <View style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => setCurrentStep(-1)} style={styles.backButton}>
             <ArrowLeft size={24} color="#0f172a" />
