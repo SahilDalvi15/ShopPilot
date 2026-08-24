@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Plus, Search, Edit, Trash2, Eye, Filter, MoreVertical, Loader2 } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Plus, Search, Edit, Trash2, Eye, Filter, Loader2, Upload } from 'lucide-react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import adminProductService from '../../services/adminProductService';
@@ -13,6 +13,7 @@ const AdminProducts = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const { formatPrice } = useCurrency();
+  const fileInputRef = useRef(null);
 
   // Fetch products
   const { data: response, isLoading, error } = useQuery({
@@ -31,6 +32,20 @@ const AdminProducts = () => {
     },
     onError: (err) => {
       toastError(err.response?.data?.message || 'Failed to delete product');
+    },
+  });
+
+  // Import CSV mutation
+  const importMutation = useMutation({
+    mutationFn: adminProductService.importCsv,
+    onSuccess: (data) => {
+      success(data.message || 'Products imported successfully');
+      queryClient.invalidateQueries(['admin-products']);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    },
+    onError: (err) => {
+      toastError(err.response?.data?.message || 'Failed to import products');
+      if (fileInputRef.current) fileInputRef.current.value = '';
     },
   });
 
@@ -62,6 +77,13 @@ const AdminProducts = () => {
     }
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      importMutation.mutate(file);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -70,13 +92,30 @@ const AdminProducts = () => {
           <h1 className="text-3xl font-bold text-gray-900">Products</h1>
           <p className="text-gray-600 mt-2">Manage your product inventory</p>
         </div>
-        <button 
-          onClick={() => navigate('/admin/products/new')}
-          className="flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition"
-        >
-          <Plus className="w-5 h-5" />
-          Add Product
-        </button>
+        <div className="flex items-center gap-3">
+          <input 
+            type="file" 
+            accept=".csv" 
+            ref={fileInputRef} 
+            onChange={handleFileChange} 
+            className="hidden" 
+          />
+          <button 
+            onClick={() => fileInputRef.current?.click()}
+            disabled={importMutation.isLoading}
+            className="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-6 py-3 rounded-lg hover:bg-indigo-100 transition disabled:opacity-50"
+          >
+            {importMutation.isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Upload className="w-5 h-5" />}
+            Import CSV
+          </button>
+          <button 
+            onClick={() => navigate('/admin/products/new')}
+            className="flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition"
+          >
+            <Plus className="w-5 h-5" />
+            Add Product
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
