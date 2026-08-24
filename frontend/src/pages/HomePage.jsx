@@ -22,6 +22,7 @@ import { productService } from '../services/product.service';
 import { categoryService } from '../services/category.service';
 import RecentlyViewed from '../components/RecentlyViewed';
 import StoriesFeed from '../components/StoriesFeed';
+import SEO from '../components/SEO';
 import { useCurrency } from '../contexts/CurrencyContext';
 
 // Category icon/image mapping
@@ -107,6 +108,10 @@ const HomePage = () => {
 
   return (
     <div className="homepage">
+      <SEO 
+        title="Home"
+        description="ShopPilot - Discover incredible deals on electronics, fashion, and more."
+      />
       {/* Instagram-style Stories Feed */}
       <StoriesFeed stories={combinedStories} title="Trending Now" />
 

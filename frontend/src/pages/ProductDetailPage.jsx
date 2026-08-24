@@ -19,6 +19,7 @@ import { fetchProductReviews, createReview, markReviewHelpful } from '../store/s
 import { addRecentlyViewed } from '../store/slices/recentSlice';
 import { useToast } from '../contexts/ToastContext';
 import { useCurrency } from '../contexts/CurrencyContext';
+import SEO from '../components/SEO';
 
 const ProductDetailPage = () => {
   const { slug } = useParams();
@@ -169,6 +170,12 @@ const ProductDetailPage = () => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-800 pb-20">
+      <SEO 
+        title={product.title} 
+        description={product.description?.substring(0, 160) || `Buy ${product.title} on ShopPilot`} 
+        image={product.images?.[0]} 
+        url={window.location.href} 
+      />
       {/* Breadcrumbs */}
       <div className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 py-3">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
