@@ -24,6 +24,12 @@ const adminOrderService = {
     const response = await api.put(`/orders/${orderId}/cancel`);
     return response.data;
   },
+
+  // Export CSV
+  exportCsv: async () => {
+    const response = await api.get('/orders/admin/export/csv', { responseType: 'blob' });
+    return response.data;
+  },
 };
 
 export default adminOrderService;
