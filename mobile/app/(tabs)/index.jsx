@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image, TouchableOpacity, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image, TouchableOpacity, RefreshControl, Dimensions, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import api, { getImageUrl } from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
+import { LayoutGrid, Tag, Package, Clock, PlayCircle, Smartphone, Sparkles, Wand2 } from 'lucide-react-native';
+
+const { width } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const [products, setProducts] = useState([]);
@@ -58,31 +61,57 @@ export default function HomeScreen() {
         <Text style={styles.subtitle}>Find your favorite products today</Text>
       </View>
 
-      <View style={styles.categoriesContainer}>
-        <TouchableOpacity style={styles.categoryBadge} onPress={() => router.push('/categories')}>
-          <Text style={styles.categoryBadgeText}>Shop by Category</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.brandBadge} onPress={() => router.push('/brands')}>
-          <Text style={styles.brandBadgeText}>Explore Brands</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bundleBadge} onPress={() => router.push('/bundle-builder')}>
-          <Text style={styles.bundleBadgeText}>Build a Bundle</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.subscribeBadge} onPress={() => router.push('/subscribe')}>
-          <Text style={styles.subscribeBadgeText}>Subscribe & Save</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.liveBadge} onPress={() => router.push('/live-shopping')}>
-          <Text style={styles.liveBadgeText}>Live Shopping 🔴</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.socialBadge} onPress={() => router.push('/social-feed')}>
-          <Text style={styles.socialBadgeText}>Social Feed 📱</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.shopTheLookBadge} onPress={() => router.push('/shop-the-look')}>
-          <Text style={styles.shopTheLookBadgeText}>Shop The Look</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.quizBadge} onPress={() => router.push('/style-quiz')}>
-          <Text style={styles.quizBadgeText}>Style Quiz ✨</Text>
-        </TouchableOpacity>
+      <View style={styles.quickLinksContainer}>
+        <View style={styles.quickLinksGrid}>
+          <TouchableOpacity style={styles.quickLinkItem} onPress={() => router.push('/categories')}>
+            <View style={[styles.iconCircle, { backgroundColor: '#e0e7ff' }]}>
+              <LayoutGrid color="#4f46e5" size={24} />
+            </View>
+            <Text style={styles.quickLinkText}>Categories</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.quickLinkItem} onPress={() => router.push('/brands')}>
+            <View style={[styles.iconCircle, { backgroundColor: '#fce7f3' }]}>
+              <Tag color="#db2777" size={24} />
+            </View>
+            <Text style={styles.quickLinkText}>Brands</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.quickLinkItem} onPress={() => router.push('/bundle-builder')}>
+            <View style={[styles.iconCircle, { backgroundColor: '#dcfce7' }]}>
+              <Package color="#16a34a" size={24} />
+            </View>
+            <Text style={styles.quickLinkText}>Bundles</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.quickLinkItem} onPress={() => router.push('/subscribe')}>
+            <View style={[styles.iconCircle, { backgroundColor: '#fef3c7' }]}>
+              <Clock color="#d97706" size={24} />
+            </View>
+            <Text style={styles.quickLinkText}>Subscribe</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.quickLinkItem} onPress={() => router.push('/live-shopping')}>
+            <View style={[styles.iconCircle, { backgroundColor: '#fee2e2' }]}>
+              <PlayCircle color="#ef4444" size={24} />
+            </View>
+            <Text style={styles.quickLinkText}>Live</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.quickLinkItem} onPress={() => router.push('/social-feed')}>
+            <View style={[styles.iconCircle, { backgroundColor: '#0f172a' }]}>
+              <Smartphone color="#fff" size={24} />
+            </View>
+            <Text style={styles.quickLinkText}>Social Feed</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.quickLinkItem} onPress={() => router.push('/shop-the-look')}>
+            <View style={[styles.iconCircle, { backgroundColor: '#f3e8ff' }]}>
+              <Sparkles color="#a855f7" size={24} />
+            </View>
+            <Text style={styles.quickLinkText}>The Look</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.quickLinkItem} onPress={() => router.push('/style-quiz')}>
+            <View style={[styles.iconCircle, { backgroundColor: '#ffedd5' }]}>
+              <Wand2 color="#f97316" size={24} />
+            </View>
+            <Text style={styles.quickLinkText}>Quiz</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.section}>
@@ -134,92 +163,40 @@ const styles = StyleSheet.create({
     color: '#64748b',
     marginTop: 4,
   },
-  categoriesContainer: {
+  quickLinksContainer: {
+    paddingHorizontal: 20,
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  quickLinksGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: 24,
-    marginTop: 16,
-    gap: 12,
+    justifyContent: 'space-between',
+    gap: 16,
   },
-  categoryBadge: {
-    backgroundColor: '#e0e7ff', // Indigo 100
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+  quickLinkItem: {
+    width: (width - 40 - 48) / 4, // 4 items per row, 3 gaps of 16
+    alignItems: 'center',
+    marginBottom: 8,
   },
-  categoryBadgeText: {
-    color: '#4f46e5', // Indigo 600
+  iconCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  quickLinkText: {
+    fontSize: 12,
     fontWeight: '600',
-  },
-  brandBadge: {
-    backgroundColor: '#fce7f3', // Pink 100
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  brandBadgeText: {
-    color: '#db2777', // Pink 600
-    fontWeight: '600',
-  },
-  bundleBadge: {
-    backgroundColor: '#dcfce7', // Green 100
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  bundleBadgeText: {
-    color: '#16a34a', // Green 600
-    fontWeight: '600',
-  },
-  subscribeBadge: {
-    backgroundColor: '#fef3c7', // Amber 100
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  subscribeBadgeText: {
-    color: '#d97706', // Amber 600
-    fontWeight: '600',
-  },
-  liveBadge: {
-    backgroundColor: '#fee2e2', // Red 100
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  liveBadgeText: {
-    color: '#ef4444', // Red 500
-    fontWeight: '600',
-  },
-  socialBadge: {
-    backgroundColor: '#0f172a', // Black
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  socialBadgeText: {
-    color: '#fff', 
-    fontWeight: '600',
-  },
-  shopTheLookBadge: {
-    backgroundColor: '#f3e8ff', // Purple 100
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  shopTheLookBadgeText: {
-    color: '#a855f7', // Purple 500
-    fontWeight: '600',
-  },
-  quizBadge: {
-    backgroundColor: '#ffedd5', // Orange 100
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  quizBadgeText: {
-    color: '#f97316', // Orange 500
-    fontWeight: '600',
+    color: '#475569',
+    textAlign: 'center',
   },
   section: {
     paddingTop: 16,

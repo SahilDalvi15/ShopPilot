@@ -21,7 +21,7 @@ export default function VendorHubScreen() {
   const fetchDashboard = async () => {
     try {
       setLoading(true);
-      const res = await api.get('/vendor/dashboard');
+      const res = await api.get('/vendors/me');
       if (res.data.success) {
         setDashboardData(res.data.data);
       }
