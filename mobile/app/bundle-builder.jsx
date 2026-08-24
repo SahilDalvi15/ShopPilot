@@ -149,7 +149,7 @@ export default function BundleBuilderScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <ScrollView>
         <View style={styles.header}>
           <View style={styles.badge}>
@@ -212,7 +212,7 @@ export default function BundleBuilderScreen() {
           </TouchableOpacity>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

@@ -106,7 +106,7 @@ export default function AddressesScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <ArrowLeft size={24} color="#0f172a" />
@@ -136,7 +136,7 @@ export default function AddressesScreen() {
           contentContainerStyle={styles.list}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 

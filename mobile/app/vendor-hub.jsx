@@ -72,7 +72,7 @@ export default function VendorHubScreen() {
   const { vendor, stats } = dashboardData || {};
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <ArrowLeft size={24} color="#0f172a" />
@@ -165,7 +165,7 @@ export default function VendorHubScreen() {
         </View>
 
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

@@ -111,7 +111,7 @@ export default function SharedWishlistScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => router.push('/')}>
           <ArrowLeft size={24} color="#0f172a" />
@@ -137,7 +137,7 @@ export default function SharedWishlistScreen() {
           </View>
         }
       />
-    </SafeAreaView>
+    </View>
   );
 }
 

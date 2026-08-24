@@ -128,7 +128,7 @@ export default function VendorOnboardingScreen() {
               </>
             )}
           </TouchableOpacity>
-        </SafeAreaView>
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );

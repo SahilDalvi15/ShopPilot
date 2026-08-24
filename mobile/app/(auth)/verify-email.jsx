@@ -42,7 +42,7 @@ export default function VerifyEmailScreen() {
   }, [token]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={() => router.push('/')}>
         <ArrowLeft size={24} color="#64748b" />
       </TouchableOpacity>
@@ -89,7 +89,7 @@ export default function VerifyEmailScreen() {
         )}
 
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
