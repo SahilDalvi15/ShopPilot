@@ -62,29 +62,20 @@ const AdminOrders = () => {
     updateStatusMutation.mutate({ orderId, status: newStatus });
   };
 
-  const handleExport = () => {
-    if (!filteredOrders.length) return;
-    const headers = ['Order ID', 'Customer Name', 'Customer Email', 'Items', 'Total', 'Payment', 'Status', 'Date'];
-    const csvData = filteredOrders.map(order => [
-      order._id,
-      order.user?.name || 'Unknown',
-      order.user?.email || 'N/A',
-      order.items?.length || 0,
-      order.totalAmount,
-      order.paymentMethod || 'N/A',
-      order.status,
-      new Date(order.createdAt).toLocaleDateString()
-    ]);
-    const csvContent = [headers.join(','), ...csvData.map(row => row.map(cell => `"${cell}"`).join(','))].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `orders_export_${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleExport = async () => {
+    try {
+      const blob = await adminOrderService.exportCsv();
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `orders_export_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      success('Orders exported successfully');
+    } catch (err) {
+      toastError('Failed to export orders');
+    }
   };
 
   return (
