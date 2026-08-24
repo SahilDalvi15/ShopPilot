@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense, lazy } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,8 +13,8 @@ import ReviewList from '../components/ReviewList';
 import RelatedProducts from '../components/RelatedProducts';
 import RecentlyViewed from '../components/RecentlyViewed';
 import ProductRecommendations from '../components/ProductRecommendations';
-import Product3DViewer from '../components/Product3DViewer';
 import SizeGuideModal from '../components/SizeGuideModal';
+const Product3DViewer = lazy(() => import('../components/Product3DViewer'));
 import { fetchProductReviews, createReview, markReviewHelpful } from '../store/slices/reviewSlice';
 import { addRecentlyViewed } from '../store/slices/recentSlice';
 import { useToast } from '../contexts/ToastContext';
@@ -219,7 +219,14 @@ const ProductDetailPage = () => {
             <div className="flex-1 bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 overflow-hidden relative group h-[400px] md:h-[500px] flex items-center justify-center">
               {show3D ? (
                 <div className="w-full h-full relative">
-                  <Product3DViewer />
+                  <Suspense fallback={
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 dark:bg-slate-900">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mb-4" />
+                      <p className="text-gray-500 font-medium">Loading 3D Model...</p>
+                    </div>
+                  }>
+                    <Product3DViewer />
+                  </Suspense>
                   <button
                     onClick={() => setShow3D(false)}
                     className="absolute top-4 left-4 bg-white/90 text-gray-900 px-4 py-2 rounded-full shadow-md font-bold text-sm hover:bg-gray-100 transition-colors z-10 backdrop-blur flex items-center gap-2"

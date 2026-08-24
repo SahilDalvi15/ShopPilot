@@ -23,6 +23,7 @@ import { categoryService } from '../services/category.service';
 import RecentlyViewed from '../components/RecentlyViewed';
 import StoriesFeed from '../components/StoriesFeed';
 import SEO from '../components/SEO';
+import ProductCard from '../components/ProductCard';
 import { useCurrency } from '../contexts/CurrencyContext';
 
 // Category icon/image mapping
@@ -355,66 +356,6 @@ const HomePage = () => {
   );
 };
 
-// Product Card Component
-const ProductCard = ({ product, navigate }) => {
-  const { formatPrice } = useCurrency();
-  const discountedPrice = product.discount
-    ? product.price - (product.price * product.discount) / 100
-    : product.price;
-
-  return (
-    <div className="product-card" onClick={() => navigate(`/products/${product.slug}`)}>
-      <div className="product-card__image-wrapper">
-        <img
-          src={product.images?.[0] || '/placeholder.jpg'}
-          alt={product.title}
-          className="product-card__image"
-        />
-        {product.discount > 0 && (
-          <span className="product-card__badge">-{product.discount}%</span>
-        )}
-        <div className="product-card__actions">
-          <button 
-            className="product-card__action" 
-            title="Add to Wishlist"
-            onClick={(e) => {
-              e.stopPropagation();
-              // To be implemented via props if needed, or redirect to product page for now
-              navigate(`/products/${product.slug}`);
-            }}
-          >
-            <Heart className="w-4 h-4" />
-          </button>
-          <button 
-            className="product-card__action" 
-            title="Add to Cart"
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/products/${product.slug}`);
-            }}
-          >
-            <ShoppingCart className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-      <div className="product-card__info">
-        <p className="product-card__category">{product.category?.name || product.category}</p>
-        <h3 className="product-card__title">{product.title}</h3>
-        <div className="product-card__rating">
-          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-          <span>{product.rating?.toFixed(1) || '0.0'}</span>
-          <span className="product-card__reviews">({product.reviewCount || 0})</span>
-        </div>
-        <div className="product-card__pricing">
-          <span className="product-card__price">{formatPrice(Math.round(discountedPrice))}</span>
-          {product.discount > 0 && (
-            <span className="product-card__original-price">{formatPrice(product.price)}</span>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // New Arrival Card Component (horizontal layout)
 const NewArrivalCard = ({ product, navigate }) => {

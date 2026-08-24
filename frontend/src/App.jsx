@@ -1,4 +1,4 @@
-import { useEffect,useState } from 'react';
+import { useEffect, useState, Suspense, lazy } from 'react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectIsAuthenticated, selectCurrentUser, getCurrentUser } from './store/slices/authSlice';
@@ -6,48 +6,43 @@ import { fetchCart } from './store/slices/cartSlice';
 import { fetchWishlist } from './store/slices/wishlistSlice';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-
-import AIChatbot from './components/AIChatbot';
-import SpinToWin from './components/SpinToWin';
-import HomePage from './pages/HomePage';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
-import ResetPasswordPage from './pages/ResetPasswordPage';
-import ProductsPage from './pages/ProductsPage';
-import CategoriesPage from './pages/CategoriesPage';
-import BrandsPage from './pages/BrandsPage';
-import ProductDetailPage from './pages/ProductDetailPage';
-
-import CartPage from './pages/CartPage';
-import CheckoutPage from './pages/CheckoutPage';
-import BundleBuilderPage from './pages/BundleBuilderPage';
-import ShopTheLookPage from './pages/ShopTheLookPage';
-import StyleQuizPage from './pages/StyleQuizPage';
-import LiveShoppingPage from './pages/LiveShoppingPage';
-import SubscribeAndSavePage from './pages/SubscribeAndSavePage';
-import SocialFeedPage from './pages/SocialFeedPage';
-import OrdersPage from './pages/OrdersPage';
-import { Gift } from 'lucide-react';
-import WishlistPage from './pages/WishlistPage';
-import SharedWishlistPage from './pages/SharedWishlistPage';
-import ProfilePage from './pages/ProfilePage';
-import AddressesPage from './pages/AddressesPage';
-import LoyaltyDashboard from './pages/LoyaltyDashboard';
-import SubscriptionsPage from './pages/SubscriptionsPage';
-import VerifyEmailPage from './pages/VerifyEmailPage';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminStats from './pages/admin/AdminStats';
-import AdminProducts from './pages/admin/AdminProducts';
-import AdminProductForm from './pages/admin/AdminProductForm';
-import AdminOrders from './pages/admin/AdminOrders';
-import AdminUsers from './pages/admin/AdminUsers';
-import AdminSettings from './pages/admin/AdminSettings';
-import AdminReviews from './pages/admin/AdminReviews';
-import VendorOnboarding from './pages/VendorOnboarding';
-import VendorDashboard from './pages/VendorDashboard';
-import VendorStorePage from './pages/VendorStorePage';
-import ComparePage from './pages/ComparePage';
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+const HomePage = lazy(() => import('./pages/HomePage'));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
+const ProductsPage = lazy(() => import('./pages/ProductsPage'));
+const CategoriesPage = lazy(() => import('./pages/CategoriesPage'));
+const BrandsPage = lazy(() => import('./pages/BrandsPage'));
+const ProductDetailPage = lazy(() => import('./pages/ProductDetailPage'));
+const CartPage = lazy(() => import('./pages/CartPage'));
+const CheckoutPage = lazy(() => import('./pages/CheckoutPage'));
+const BundleBuilderPage = lazy(() => import('./pages/BundleBuilderPage'));
+const ShopTheLookPage = lazy(() => import('./pages/ShopTheLookPage'));
+const StyleQuizPage = lazy(() => import('./pages/StyleQuizPage'));
+const LiveShoppingPage = lazy(() => import('./pages/LiveShoppingPage'));
+const SubscribeAndSavePage = lazy(() => import('./pages/SubscribeAndSavePage'));
+const SocialFeedPage = lazy(() => import('./pages/SocialFeedPage'));
+const OrdersPage = lazy(() => import('./pages/OrdersPage'));
+const WishlistPage = lazy(() => import('./pages/WishlistPage'));
+const SharedWishlistPage = lazy(() => import('./pages/SharedWishlistPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const AddressesPage = lazy(() => import('./pages/AddressesPage'));
+const LoyaltyDashboard = lazy(() => import('./pages/LoyaltyDashboard'));
+const SubscriptionsPage = lazy(() => import('./pages/SubscriptionsPage'));
+const VerifyEmailPage = lazy(() => import('./pages/VerifyEmailPage'));
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const AdminStats = lazy(() => import('./pages/admin/AdminStats'));
+const AdminProducts = lazy(() => import('./pages/admin/AdminProducts'));
+const AdminProductForm = lazy(() => import('./pages/admin/AdminProductForm'));
+const AdminOrders = lazy(() => import('./pages/admin/AdminOrders'));
+const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'));
+const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
+const AdminReviews = lazy(() => import('./pages/admin/AdminReviews'));
+const VendorOnboarding = lazy(() => import('./pages/VendorOnboarding'));
+const VendorDashboard = lazy(() => import('./pages/VendorDashboard'));
+const VendorStorePage = lazy(() => import('./pages/VendorStorePage'));
+const ComparePage = lazy(() => import('./pages/ComparePage'));
 import CompareWidget from './components/CompareWidget';
 import GlobalLoader from './components/GlobalLoader';
 import './App.css';
@@ -97,77 +92,79 @@ const App = () => {
   return (
     <>
       <GlobalLoader />
-      <Routes>
-        <Route element={<MainLayout />}>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/verify-email" element={<VerifyEmailPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/products" element={<ProductsPage />} />
-        <Route path="/products/:slug" element={<ProductDetailPage />} />
-        <Route path="/compare" element={<ComparePage />} />
-        <Route path="/shared-wishlist/:token" element={<SharedWishlistPage />} />
-        <Route 
-          path="/cart" 
-          element={isAuthenticated ? <CartPage /> : <Navigate to="/login" replace />} 
-        />
-        <Route path="/bundle-builder" element={<BundleBuilderPage />} />
-        <Route path="/shop-the-look" element={<ShopTheLookPage />} />
-        <Route path="/ai-stylist" element={<StyleQuizPage />} />
-        <Route path="/live" element={<LiveShoppingPage />} />
-        <Route path="/discover" element={<SocialFeedPage />} />
-        <Route path="/subscribe" element={<SubscribeAndSavePage />} />
-        <Route 
-          path="/checkout" 
-          element={isAuthenticated ? <CheckoutPage /> : <Navigate to="/login" replace />} 
-        />
-        <Route 
-          path="/orders" 
-          element={isAuthenticated ? <OrdersPage /> : <Navigate to="/login" replace />} 
-        />
-        <Route 
-          path="/profile" 
-          element={isAuthenticated ? <ProfilePage /> : <Navigate to="/login" replace />} 
-        />
-        <Route 
-          path="/loyalty" 
-          element={isAuthenticated ? <LoyaltyDashboard /> : <Navigate to="/login" replace />} 
-        />
-        <Route 
-          path="/subscriptions" 
-          element={isAuthenticated ? <SubscriptionsPage /> : <Navigate to="/login" replace />} 
-        />
-        <Route 
-          path="/addresses" 
-          element={isAuthenticated ? <AddressesPage /> : <Navigate to="/login" replace />} 
-        />
-        <Route 
-          path="/wishlist" 
-          element={isAuthenticated ? <WishlistPage /> : <Navigate to="/login" replace />} 
-        />
-        <Route path="/brands" element={<BrandsPage />} />
-        <Route path="/categories" element={<CategoriesPage />} />
-        <Route path="/deals" element={<ProductsPage />} />
-        <Route path="/new-arrivals" element={<ProductsPage />} />
-        <Route path="/vendor/register" element={isAuthenticated ? <VendorOnboarding /> : <Navigate to="/login" replace />} />
-        <Route path="/vendor/dashboard" element={isAuthenticated ? <VendorDashboard /> : <Navigate to="/login" replace />} />
-        <Route path="/store/:slug" element={<VendorStorePage />} />
-        <Route path="/" element={<HomePage />} />
-      </Route>
-      
-      {/* Admin Routes - Protected */}
-      <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>}>
-        <Route index element={<AdminStats />} />
-        <Route path="products" element={<AdminProducts />} />
-        <Route path="products/new" element={<AdminProductForm />} />
-        <Route path="products/:id/edit" element={<AdminProductForm isEdit />} />
-        <Route path="orders" element={<AdminOrders />} />
-        <Route path="users" element={<AdminUsers />} />
-        <Route path="reviews" element={<AdminReviews />} />
-        <Route path="settings" element={<AdminSettings />} />
-      </Route>
-    </Routes>
+      <Suspense fallback={<GlobalLoader />}>
+        <Routes>
+          <Route element={<MainLayout />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/products" element={<ProductsPage />} />
+          <Route path="/products/:slug" element={<ProductDetailPage />} />
+          <Route path="/compare" element={<ComparePage />} />
+          <Route path="/shared-wishlist/:token" element={<SharedWishlistPage />} />
+          <Route 
+            path="/cart" 
+            element={isAuthenticated ? <CartPage /> : <Navigate to="/login" replace />} 
+          />
+          <Route path="/bundle-builder" element={<BundleBuilderPage />} />
+          <Route path="/shop-the-look" element={<ShopTheLookPage />} />
+          <Route path="/ai-stylist" element={<StyleQuizPage />} />
+          <Route path="/live" element={<LiveShoppingPage />} />
+          <Route path="/discover" element={<SocialFeedPage />} />
+          <Route path="/subscribe" element={<SubscribeAndSavePage />} />
+          <Route 
+            path="/checkout" 
+            element={isAuthenticated ? <CheckoutPage /> : <Navigate to="/login" replace />} 
+          />
+          <Route 
+            path="/orders" 
+            element={isAuthenticated ? <OrdersPage /> : <Navigate to="/login" replace />} 
+          />
+          <Route 
+            path="/profile" 
+            element={isAuthenticated ? <ProfilePage /> : <Navigate to="/login" replace />} 
+          />
+          <Route 
+            path="/loyalty" 
+            element={isAuthenticated ? <LoyaltyDashboard /> : <Navigate to="/login" replace />} 
+          />
+          <Route 
+            path="/subscriptions" 
+            element={isAuthenticated ? <SubscriptionsPage /> : <Navigate to="/login" replace />} 
+          />
+          <Route 
+            path="/addresses" 
+            element={isAuthenticated ? <AddressesPage /> : <Navigate to="/login" replace />} 
+          />
+          <Route 
+            path="/wishlist" 
+            element={isAuthenticated ? <WishlistPage /> : <Navigate to="/login" replace />} 
+          />
+          <Route path="/brands" element={<BrandsPage />} />
+          <Route path="/categories" element={<CategoriesPage />} />
+          <Route path="/deals" element={<ProductsPage />} />
+          <Route path="/new-arrivals" element={<ProductsPage />} />
+          <Route path="/vendor/register" element={isAuthenticated ? <VendorOnboarding /> : <Navigate to="/login" replace />} />
+          <Route path="/vendor/dashboard" element={isAuthenticated ? <VendorDashboard /> : <Navigate to="/login" replace />} />
+          <Route path="/store/:slug" element={<VendorStorePage />} />
+          <Route path="/" element={<HomePage />} />
+        </Route>
+        
+        {/* Admin Routes - Protected */}
+        <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>}>
+          <Route index element={<AdminStats />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="products/new" element={<AdminProductForm />} />
+          <Route path="products/:id/edit" element={<AdminProductForm isEdit />} />
+          <Route path="orders" element={<AdminOrders />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="reviews" element={<AdminReviews />} />
+          <Route path="settings" element={<AdminSettings />} />
+        </Route>
+      </Routes>
+    </Suspense>
     
     {/* Global Spin to Win Widget */}
     <SpinToWin isOpen={isSpinToWinOpen} onClose={() => setIsSpinToWinOpen(false)} />

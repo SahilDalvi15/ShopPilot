@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Store, ArrowRight, CheckCircle } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectCurrentUser, getCurrentUser } from '../store/slices/authSlice';
 import vendorService from '../services/vendor.service';
 import toast from 'react-hot-toast';
 
 const VendorOnboarding = () => {
-  const { user, loadUser } = useAuth();
+  const dispatch = useDispatch();
+  const user = useSelector(selectCurrentUser);
+  const loadUser = () => dispatch(getCurrentUser());
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({

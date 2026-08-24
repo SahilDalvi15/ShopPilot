@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Store, DollarSign, Package, TrendingUp, Plus } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../store/slices/authSlice';
 import vendorService from '../services/vendor.service';
 import toast from 'react-hot-toast';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const VendorDashboard = () => {
-  const { user } = useAuth();
+  const user = useSelector(selectCurrentUser);
   const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);

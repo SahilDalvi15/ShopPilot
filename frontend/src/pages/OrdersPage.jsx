@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, Suspense, lazy } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Package, Truck, CheckCircle, XCircle, Clock, ChevronDown, ChevronUp, MapPin, Calendar, CreditCard, Box, PackageCheck, Download, Gift } from 'lucide-react';
 import { orderService } from '../services/order.service';
 import { useToast } from '../contexts/ToastContext';
 import { useCurrency } from '../contexts/CurrencyContext';
-import OrderTrackingMap from '../components/OrderTrackingMap';
+const OrderTrackingMap = lazy(() => import('../components/OrderTrackingMap'));
 
 const ORDER_STEPS = [
   { key: 'pending', label: 'Order Placed', icon: Clock },
@@ -346,7 +346,14 @@ const OrdersPage = () => {
                           <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                             <MapPin className="w-4 h-4 text-indigo-500" /> Live Delivery Tracking
                           </h4>
-                          <OrderTrackingMap orderStatus={order.orderStatus} shippingAddress={order.shippingAddress} />
+                          <Suspense fallback={
+                            <div className="w-full h-64 flex flex-col items-center justify-center bg-gray-50 rounded-xl border border-gray-200">
+                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mb-4" />
+                              <p className="text-gray-500 font-medium">Loading Tracking Map...</p>
+                            </div>
+                          }>
+                            <OrderTrackingMap orderStatus={order.orderStatus} shippingAddress={order.shippingAddress} />
+                          </Suspense>
                         </div>
                       )}
 
