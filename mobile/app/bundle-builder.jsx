@@ -118,7 +118,7 @@ export default function BundleBuilderScreen() {
     return (
       <View style={styles.productCard}>
         <Image 
-          source={{ uri: getImageUrl(item).images && item.images[0] ? item.images[0] : 'https://via.placeholder.com/150' }} 
+          source={{ uri: getImageUrl(item.images && item.images[0] ? item.images[0] : null) }} 
           style={styles.productImage}
           resizeMode="cover"
         />

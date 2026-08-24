@@ -88,7 +88,7 @@ export default function CompareScreen() {
                   <Trash2 size={16} color="#64748b" />
                 </TouchableOpacity>
                 <Image 
-                  source={{ uri: getImageUrl(item).images && item.images[0] ? item.images[0] : 'https://via.placeholder.com/150' }} 
+                  source={{ uri: getImageUrl(item.images && item.images[0] ? item.images[0] : null) }} 
                   style={styles.productImage}
                   resizeMode="contain"
                 />

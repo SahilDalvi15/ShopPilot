@@ -51,7 +51,7 @@ export default function WishlistScreen() {
   const renderItem = ({ item }) => (
     <TouchableOpacity style={styles.card} onPress={() => router.push(`/product/${item._id}`)}>
       <Image 
-        source={{ uri: getImageUrl(item).images && item.images[0] ? item.images[0] : 'https://via.placeholder.com/100' }} 
+        source={{ uri: getImageUrl(item.images && item.images[0] ? item.images[0] : null) }} 
         style={styles.image}
       />
       <View style={styles.details}>

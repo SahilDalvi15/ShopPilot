@@ -103,7 +103,7 @@ export default function SubscribeAndSaveScreen() {
       <View style={[styles.productCard, isSelected && styles.productCardSelected]}>
         <TouchableOpacity style={styles.cardSelectArea} onPress={() => handleToggleProduct(item)}>
           <Image 
-            source={{ uri: getImageUrl(item).images && item.images[0] ? item.images[0] : 'https://via.placeholder.com/150' }} 
+            source={{ uri: getImageUrl(item.images && item.images[0] ? item.images[0] : null) }} 
             style={styles.productImage}
           />
           <View style={styles.checkboxContainer}>

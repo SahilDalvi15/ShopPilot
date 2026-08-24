@@ -101,7 +101,7 @@ export default function ShopTheLookScreen() {
     <View style={styles.postCard}>
       {/* Post Header */}
       <View style={styles.postHeader}>
-        <Image source={{ uri: getImageUrl(item).influencer.avatar }} style={styles.avatar} />
+        <Image source={{ uri: getImageUrl(item.influencer?.avatar) }} style={styles.avatar} />
         <View>
           <Text style={styles.influencerName}>{item.influencer.name}</Text>
           <Text style={styles.influencerHandle}>{item.influencer.handle}</Text>
@@ -110,7 +110,7 @@ export default function ShopTheLookScreen() {
 
       {/* Post Image & Tags */}
       <View style={styles.imageContainer}>
-        <Image source={{ uri: getImageUrl(item).imageUrl }} style={styles.postImage} />
+        <Image source={{ uri: getImageUrl(item.imageUrl) }} style={styles.postImage} />
         {item.tags.map(tag => (
           <TouchableOpacity 
             key={tag.id}
