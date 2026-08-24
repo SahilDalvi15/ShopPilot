@@ -1,5 +1,11 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { registerSW } from 'virtual:pwa-register'
+
+// Register service worker for PWA
+if ('serviceWorker' in navigator) {
+  registerSW({ immediate: true })
+}
 import { BrowserRouter as Router } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { QueryClientProvider } from '@tanstack/react-query'

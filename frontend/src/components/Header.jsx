@@ -27,6 +27,7 @@ import { selectWishlistCount } from '../store/slices/wishlistSlice';
 import { useTheme } from '../contexts/ThemeContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import VisualSearchModal from './VisualSearchModal';
+import InstallPWABanner from './InstallPWABanner';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -56,8 +57,10 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white dark:bg-slate-900 shadow-md sticky top-0 z-50 transition-colors duration-300">
-      {/* Top Bar */}
+    <>
+      <InstallPWABanner />
+      <header className="bg-white dark:bg-slate-900 shadow-md sticky top-0 z-50 transition-colors duration-300">
+        {/* Top Bar */}
       <div className="bg-gray-900 text-white text-sm py-2">
         <div className="container mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
           <div className="flex items-center space-x-4 text-xs sm:text-sm">
@@ -547,7 +550,8 @@ const Header = () => {
         isOpen={isVisualSearchOpen} 
         onClose={() => setIsVisualSearchOpen(false)} 
       />
-    </header>
+      </header>
+    </>
   );
 };
 
