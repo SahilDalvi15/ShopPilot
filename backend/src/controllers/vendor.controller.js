@@ -61,6 +61,62 @@ exports.getVendorDashboard = async (req, res, next) => {
       .sort('-createdAt')
       .limit(10);
 
+    // Get sales trends (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const salesTrendsRaw = await OrderItem.aggregate([
+      { 
+        $match: { 
+          vendorId: vendor._id,
+          createdAt: { $gte: thirtyDaysAgo }
+        }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          revenue: { $sum: "$subtotal" },
+          sales: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    // Fill missing dates
+    const salesTrends = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateString = d.toISOString().split('T')[0];
+      const match = salesTrendsRaw.find(item => item._id === dateString);
+      salesTrends.push({
+        date: dateString,
+        revenue: match ? match.revenue : 0,
+        sales: match ? match.sales : 0
+      });
+    }
+
+    // Get top products
+    const topProductsRaw = await OrderItem.aggregate([
+      { $match: { vendorId: vendor._id } },
+      { 
+        $group: {
+          _id: "$productId",
+          productTitle: { $first: "$productTitle" },
+          totalQuantity: { $sum: "$quantity" },
+          totalRevenue: { $sum: "$subtotal" }
+        }
+      },
+      { $sort: { totalQuantity: -1 } },
+      { $limit: 5 }
+    ]);
+    
+    const topProducts = topProductsRaw.map(p => ({
+      name: p.productTitle,
+      sales: p.totalQuantity,
+      revenue: p.totalRevenue
+    }));
+
     res.status(200).json({
       success: true,
       data: {
@@ -71,7 +127,9 @@ exports.getVendorDashboard = async (req, res, next) => {
           totalRevenue: vendor.totalRevenue,
           balance: vendor.balance
         },
-        recentOrderItems: orderItems
+        recentOrderItems: orderItems,
+        salesTrends,
+        topProducts
       }
     });
   } catch (error) {

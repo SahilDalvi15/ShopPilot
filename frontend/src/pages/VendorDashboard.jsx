@@ -4,6 +4,7 @@ import { Store, DollarSign, Package, TrendingUp, Plus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import vendorService from '../services/vendor.service';
 import toast from 'react-hot-toast';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const VendorDashboard = () => {
   const { user } = useAuth();
@@ -119,6 +120,47 @@ const VendorDashboard = () => {
               <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
                 <Package className="w-6 h-6 text-orange-600" />
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Sales Trends Line Chart */}
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Sales Trends (Last 30 Days)</h3>
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={dashboardData.salesTrends || []}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                  <XAxis dataKey="date" tick={{fontSize: 12}} stroke="#94a3b8" />
+                  <YAxis tick={{fontSize: 12}} stroke="#94a3b8" />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#1e293b', borderRadius: '8px', border: 'none', color: '#fff' }}
+                    itemStyle={{ color: '#fff' }}
+                  />
+                  <Line type="monotone" dataKey="revenue" stroke="#4f46e5" strokeWidth={3} dot={false} activeDot={{ r: 8 }} name="Revenue (₹)" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Top Products Bar Chart */}
+          <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-slate-700">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Top 5 Products</h3>
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={dashboardData.topProducts || []} layout="vertical" margin={{ left: 10, right: 10 }}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
+                  <XAxis type="number" tick={{fontSize: 12}} stroke="#94a3b8" />
+                  <YAxis type="category" dataKey="name" tick={{fontSize: 11}} stroke="#94a3b8" width={90} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#1e293b', borderRadius: '8px', border: 'none', color: '#fff' }}
+                    itemStyle={{ color: '#fff' }}
+                  />
+                  <Bar dataKey="sales" fill="#f59e0b" radius={[0, 4, 4, 0]} barSize={20} name="Units Sold" />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </div>
