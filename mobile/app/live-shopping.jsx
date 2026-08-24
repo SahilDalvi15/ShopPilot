@@ -221,7 +221,7 @@ export default function LiveShoppingScreen() {
             </View>
 
           </View>
-        </SafeAreaView>
+        </View>
       </ImageBackground>
     </KeyboardAvoidingView>
   );
