@@ -1,4 +1,7 @@
 const productService = require('../services/product.service');
+const { parse } = require('csv-parse/sync');
+const Product = require('../models/Product.model');
+const Category = require('../models/Category.model');
 
 const getProducts = async (req, res) => {
   try {
@@ -118,11 +121,59 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+const importProductsCsv = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No CSV file uploaded' });
+    }
+
+    const fileContent = req.file.buffer.toString('utf-8');
+    const records = parse(fileContent, { columns: true, skip_empty_lines: true });
+
+    const categories = await Category.find();
+
+    const productsToInsert = [];
+    for (const record of records) {
+      let categoryId = null;
+      if (record.category) {
+        const cat = categories.find(c => c.name.toLowerCase() === record.category.toLowerCase().trim());
+        if (cat) categoryId = cat._id;
+      }
+
+      if (!categoryId && categories.length > 0) {
+        categoryId = categories[0]._id;
+      }
+
+      productsToInsert.push({
+        title: record.title,
+        description: record.description || record.title,
+        price: parseFloat(record.price) || 0,
+        stockQuantity: parseInt(record.stock) || 0,
+        category: categoryId,
+        vendor: req.user.id,
+        status: 'published'
+      });
+    }
+
+    const inserted = await Product.insertMany(productsToInsert);
+
+    res.status(200).json({
+      success: true,
+      message: `${inserted.length} products imported successfully`,
+      data: inserted
+    });
+  } catch (error) {
+    console.error('IMPORT PRODUCTS CSV ERROR:', error);
+    res.status(500).json({ success: false, message: 'Failed to import products from CSV' });
+  }
+};
+
 module.exports = {
   getProducts,
   getProductBySlug,
   getProductRecommendations,
   createProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  importProductsCsv
 };
