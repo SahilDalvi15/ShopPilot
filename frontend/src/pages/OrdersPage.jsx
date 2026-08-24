@@ -4,6 +4,7 @@ import { Package, Truck, CheckCircle, XCircle, Clock, ChevronDown, ChevronUp, Ma
 import { orderService } from '../services/order.service';
 import { useToast } from '../contexts/ToastContext';
 import { useCurrency } from '../contexts/CurrencyContext';
+import OrderTrackingMap from '../components/OrderTrackingMap';
 
 const ORDER_STEPS = [
   { key: 'pending', label: 'Order Placed', icon: Clock },
@@ -336,6 +337,16 @@ const OrdersPage = () => {
                               <p><span className="font-medium">Video Message:</span> <a href={order.giftOptions.videoMessageUrl} target="_blank" rel="noopener noreferrer" className="text-pink-600 hover:underline inline-flex items-center gap-1">{order.giftOptions.videoMessageUrl}</a></p>
                             )}
                           </div>
+                        </div>
+                      )}
+
+                      {/* Map Tracking */}
+                      {['shipped', 'out_for_delivery', 'delivered'].includes(order.orderStatus) && (
+                        <div className="p-5 border-b border-gray-100 bg-white">
+                          <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <MapPin className="w-4 h-4 text-indigo-500" /> Live Delivery Tracking
+                          </h4>
+                          <OrderTrackingMap orderStatus={order.orderStatus} shippingAddress={order.shippingAddress} />
                         </div>
                       )}
 
