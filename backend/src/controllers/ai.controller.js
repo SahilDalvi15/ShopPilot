@@ -67,7 +67,7 @@ Answer the user directly and concisely. Recommend 1 or 2 products from the list 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'phi3', // Default to a lightweight model, you can change to 'llama3'
+          model: 'llama3', // Default to a lightweight model, you can change to 'llama3'
           prompt: prompt,
           stream: false
         })
