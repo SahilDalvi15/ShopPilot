@@ -45,6 +45,9 @@ const VendorStorePage = lazy(() => import('./pages/VendorStorePage'));
 const ComparePage = lazy(() => import('./pages/ComparePage'));
 import CompareWidget from './components/CompareWidget';
 import GlobalLoader from './components/GlobalLoader';
+import AIChatbot from './components/AIChatbot';
+import SpinToWin from './components/SpinToWin';
+import { Gift } from 'lucide-react';
 import './App.css';
 
 // Admin route guard component
