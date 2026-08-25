@@ -34,7 +34,7 @@ const AIChatbot = () => {
     setIsLoading(true);
     
     try {
-      const response = await api.post('/ai/chat', { message: userMessage });
+      const response = await api.post('/ai/chat', { message: userMessage }, { skipLoader: true });
       const { replyText, recommendedProducts } = response.data;
       
       setMessages(prev => [...prev, { 
@@ -115,7 +115,7 @@ const AIChatbot = () => {
                     className="flex gap-3 bg-white p-2 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow group"
                   >
                     <div className="w-16 h-16 rounded-lg overflow-hidden bg-slate-50 flex-shrink-0">
-                      <img src={product.images[0]?.url} alt={product.title} className="w-full h-full object-contain" />
+                      <img src={product.images?.[0] || '/placeholder.jpg'} alt={product.title} className="w-full h-full object-contain" />
                     </div>
                     <div className="flex-1 min-w-0 flex flex-col justify-center">
                       <h4 className="text-xs font-semibold text-slate-900 truncate group-hover:text-purple-600 transition-colors">

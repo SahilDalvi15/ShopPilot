@@ -14,7 +14,9 @@ const apiClient = axios.create({
 // Request interceptor
 apiClient.interceptors.request.use(
   (config) => {
-    topLoader.start();
+    if (!config.skipLoader) {
+      topLoader.start();
+    }
     const token = localStorage.getItem('accessToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -30,11 +32,15 @@ apiClient.interceptors.request.use(
 // Response interceptor
 apiClient.interceptors.response.use(
   (response) => {
-    topLoader.done();
+    if (!response.config.skipLoader) {
+      topLoader.done();
+    }
     return response;
   },
   async (error) => {
-    topLoader.done();
+    if (!error.config?.skipLoader) {
+      topLoader.done();
+    }
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
