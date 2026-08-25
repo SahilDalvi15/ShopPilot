@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Bot, Sparkles, X, Send, ChevronRight, Loader2 } from 'lucide-react';
+import { Bot, Sparkles, X, Send, ChevronRight, Loader2, Mic, MicOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 
@@ -14,7 +14,54 @@ const AIChatbot = () => {
       products: []
     }
   ]);
+  const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef(null);
+  const recognitionRef = useRef(null);
+
+  // Initialize Speech Recognition
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.lang = 'en-US';
+
+      recognitionRef.current.onresult = (event) => {
+        let currentTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          currentTranscript += transcript;
+        }
+        setMessage(currentTranscript);
+      };
+
+      recognitionRef.current.onerror = (event) => {
+        console.error('Speech recognition error', event.error);
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+    }
+  }, []);
+
+  const toggleListening = () => {
+    if (!recognitionRef.current) {
+      alert("Your browser does not support voice search. Try Chrome or Edge.");
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      setMessage('');
+      recognitionRef.current.start();
+      setIsListening(true);
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -147,7 +194,7 @@ const AIChatbot = () => {
 
       {/* Input Area */}
       <div className="p-4 bg-white border-t border-slate-100">
-        <form onSubmit={handleSubmit} className="flex gap-2 relative">
+        <form onSubmit={handleSubmit} className="flex gap-2 relative items-center">
           <input 
             type="text" 
             value={message}
@@ -156,9 +203,20 @@ const AIChatbot = () => {
             className="flex-1 bg-slate-50 border border-slate-200 text-sm rounded-full px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
           />
           <button 
+            type="button"
+            onClick={toggleListening}
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+              isListening 
+                ? 'bg-red-500 text-white animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.5)]' 
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+          </button>
+          <button 
             type="submit"
             disabled={!message.trim()}
-            className="w-12 h-12 bg-slate-900 text-white rounded-full flex items-center justify-center hover:bg-slate-800 disabled:opacity-50 disabled:hover:bg-slate-900 transition-colors"
+            className="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center hover:bg-slate-800 disabled:opacity-50 disabled:hover:bg-slate-900 transition-colors flex-shrink-0"
           >
             <Send className="w-4 h-4 ml-1" />
           </button>
