@@ -18,7 +18,8 @@ exports.chat = async (req, res) => {
     // In a real advanced setup, you'd use embeddings (RAG). Here we do simple keyword matching 
     // to feed a context list to Ollama.
     const lowercaseMsg = message.toLowerCase();
-    let query = {};
+    let query = null; // Use null to indicate no specific product query matched
+    let isProductQuery = true;
     
     if (lowercaseMsg.includes('phone') || lowercaseMsg.includes('smartphone') || lowercaseMsg.includes('mobile')) {
       query = { $or: [{ title: { $regex: 'phone|mobile', $options: 'i' } }, { tags: { $in: ['electronics', 'smartphone', 'mobile'] } }] };
@@ -32,29 +33,36 @@ exports.chat = async (req, res) => {
       query = { discount: { $gt: 0 } };
     } else if (lowercaseMsg.includes('recommend') || lowercaseMsg.includes('best') || lowercaseMsg.includes('popular')) {
       query = { rating: { $gte: 4 } };
+    } else {
+      isProductQuery = false;
     }
 
-    let recommendedProducts = await Product.find(query)
-      .select('title slug images price discountedPrice rating discount category tags')
-      .limit(5)
-      .sort({ rating: -1, reviewCount: -1 });
+    let recommendedProducts = [];
 
-    if (recommendedProducts.length === 0) {
-      recommendedProducts = await Product.find({ isFeatured: true })
+    if (isProductQuery && query !== null) {
+      recommendedProducts = await Product.find(query)
         .select('title slug images price discountedPrice rating discount category tags')
-        .limit(5);
+        .limit(5)
+        .sort({ rating: -1, reviewCount: -1 });
+
+      if (recommendedProducts.length === 0) {
+        // Fallback to featured if query yielded nothing
+        recommendedProducts = await Product.find({ isFeatured: true })
+          .select('title slug images price discountedPrice rating discount category tags')
+          .limit(5);
+      }
     }
 
     // Prepare context for the prompt
-    const productsContext = recommendedProducts.map(p => 
-      `- ${p.title} ($${p.discountedPrice || p.price}): ${p.category} with rating ${p.rating}`
-    ).join('\\n');
+    const productsContext = recommendedProducts.length > 0 
+      ? recommendedProducts.map(p => `- ${p.title} ($${p.discountedPrice || p.price}): ${p.category} with rating ${p.rating}`).join('\\n')
+      : "No specific products to show right now.";
 
-    const prompt = `You are an expert, friendly AI shopping assistant for ShopPilot.
+    const prompt = `You are Leo, an expert, friendly AI shopping assistant for ShopPilot.
     
 The user says: "${message}"
 
-Here is a list of available products that match their query or are featured:
+Here is a list of available products (if any):
 ${productsContext}
 
 Answer the user directly and concisely. Recommend 1 or 2 products from the list above if they match the user's intent. Do not mention that you were given a list, just act naturally. Keep your response under 3 sentences.`;

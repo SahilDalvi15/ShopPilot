@@ -10,7 +10,7 @@ const AIChatbot = () => {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      text: "Hi there! I'm your ShopPilot AI assistant. Looking for something specific?",
+      text: "Hi there! I'm Leo, your ShopPilot AI assistant. Looking for something specific?",
       products: []
     }
   ]);
@@ -76,7 +76,7 @@ const AIChatbot = () => {
             <Bot className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h3 className="font-bold text-white text-sm">Personal Shopper</h3>
+            <h3 className="font-bold text-white text-sm">Leo</h3>
             <p className="text-xs text-slate-300 flex items-center gap-1">
               <span className="w-1.5 h-1.5 bg-green-400 rounded-full inline-block animate-pulse"></span>
               Online
