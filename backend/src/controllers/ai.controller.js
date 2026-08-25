@@ -1,4 +1,9 @@
 const Product = require('../models/Product.model');
+const Groq = require('groq-sdk');
+
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY || 'dummy_key_to_prevent_crash_if_missing',
+});
 
 // @desc    Process chat message and return AI response with product recommendations
 // @route   POST /api/v1/ai/chat
@@ -69,26 +74,43 @@ Answer the user directly and concisely. Recommend 1 or 2 products from the list 
 
     let replyText = "I'm having trouble connecting to my brain right now, but here are some products you might like!";
 
-    // Call local Ollama API
     try {
-      const ollamaResponse = await fetch('http://localhost:11434/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'llama3', // Default to a lightweight model, you can change to 'llama3'
-          prompt: prompt,
-          stream: false
-        })
-      });
+      const isProduction = process.env.NODE_ENV === 'production';
 
-      if (ollamaResponse.ok) {
-        const data = await ollamaResponse.json();
-        replyText = data.response;
+      if (isProduction && process.env.GROQ_API_KEY) {
+        // --- PRODUCTION: Use Groq API (Lightning fast Cloud Llama 3) ---
+        const chatCompletion = await groq.chat.completions.create({
+          messages: [
+            {
+              role: 'user',
+              content: prompt,
+            },
+          ],
+          model: 'llama3-8b-8192',
+        });
+        
+        replyText = chatCompletion.choices[0]?.message?.content || "Sorry, I couldn't generate a response.";
       } else {
-        console.warn('Ollama API returned an error:', ollamaResponse.statusText);
+        // --- DEVELOPMENT: Use Local Ollama API (100% Free & Private) ---
+        const ollamaResponse = await fetch('http://localhost:11434/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'llama3', 
+            prompt: prompt,
+            stream: false
+          })
+        });
+
+        if (ollamaResponse.ok) {
+          const data = await ollamaResponse.json();
+          replyText = data.response;
+        } else {
+          console.warn('Ollama API returned an error:', ollamaResponse.statusText);
+        }
       }
-    } catch (ollamaErr) {
-      console.warn('Could not connect to local Ollama instance at localhost:11434. Falling back to default response.', ollamaErr.message);
+    } catch (apiErr) {
+      console.warn('AI API Error:', apiErr.message);
     }
 
     res.status(200).json({
