@@ -46,6 +46,7 @@ connectDB();
 connectRedis();
 
 // Security middleware
+app.set('trust proxy', 1); // Trust the reverse proxy to get the correct client IP
 app.use(helmet());
 app.use(cors({
   origin: process.env.FRONTEND_URL
