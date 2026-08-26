@@ -42,7 +42,11 @@ class UserService {
     const allowedFields = ['firstName', 'lastName', 'phoneNumber', 'dateOfBirth', 'gender', 'profilePicture'];
     allowedFields.forEach(field => {
       if (updateData[field] !== undefined) {
-        user[field] = updateData[field];
+        if (updateData[field] === '') {
+          user[field] = undefined;
+        } else {
+          user[field] = updateData[field];
+        }
       }
     });
 
