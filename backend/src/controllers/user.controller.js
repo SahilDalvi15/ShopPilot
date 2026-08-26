@@ -2,18 +2,20 @@ const userService = require('../services/user.service');
 
 const getProfile = async (req, res) => {
   try {
-    const profile = await userService.getProfile(req.user.id);
+    const profile = await userService.getProfile(req.user._id);
     res.status(200).json({
       success: true,
       message: 'Profile retrieved successfully',
       data: profile
     });
   } catch (error) {
+    console.error('getProfile Error:', error);
     res.status(error.statusCode || 500).json({
       success: false,
       message: error.message || 'Failed to retrieve profile',
       error: {
-        code: error.code || 'GET_PROFILE_ERROR'
+        code: error.code || 'GET_PROFILE_ERROR',
+        details: error.stack
       }
     });
   }
