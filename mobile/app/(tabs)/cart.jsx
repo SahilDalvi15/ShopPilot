@@ -1,10 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator, Alert, RefreshControl } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Minus, Plus, Trash2, ShoppingCart } from 'lucide-react-native';
 import api, { getImageUrl } from '../../services/api';
+import { AuthContext } from '../../context/AuthContext';
+import LoginRequiredView from '../../components/LoginRequiredView';
 
 export default function CartScreen() {
+  const { user } = useContext(AuthContext);
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -12,8 +15,12 @@ export default function CartScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      fetchCart();
-    }, [])
+      if (user) {
+        fetchCart();
+      } else {
+        setLoading(false);
+      }
+    }, [user])
   );
 
   const fetchCart = async () => {
@@ -90,6 +97,10 @@ export default function CartScreen() {
       </View>
     );
   };
+
+  if (!user) {
+    return <LoginRequiredView message="Please log in to view your shopping cart." />;
+  }
 
   if (loading) {
     return (

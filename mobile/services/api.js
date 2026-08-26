@@ -4,10 +4,11 @@ import * as SecureStore from 'expo-secure-store';
 // Use your local IP for development (e.g., 192.168.1.5). 
 // Don't use localhost or 127.0.0.1 for Android emulator/physical devices.
 // Usually 10.0.2.2 works for Android Emulator to access host localhost.
-const API_URL = 'http://10.0.2.2:5000/api/v1';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://10.0.2.2:5000/api/v1';
 
 const api = axios.create({
   baseURL: API_URL,
+  timeout: 60000, // 60 seconds to handle Render backend cold starts
   headers: {
     'Content-Type': 'application/json',
   },
@@ -61,7 +62,8 @@ api.interceptors.response.use(
 export const getImageUrl = (url) => {
   if (!url) return 'https://via.placeholder.com/150';
   if (url.startsWith('http')) return url;
-  return `http://10.0.2.2:5000${url}`;
+  const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL || 'http://10.0.2.2:5000';
+  return `${BASE_URL}${url}`;
 };
 
 export default api;

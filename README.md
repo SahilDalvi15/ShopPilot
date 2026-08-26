@@ -1,226 +1,143 @@
-# ShopPilot
+<div align="center">
+  <img src="https://img.icons8.com/color/150/000000/shopping-cart--v1.png" alt="ShopPilot Logo" width="100"/>
+  <h1>🛍️ ShopPilot - The Ultimate Full-Stack E-Commerce Platform</h1>
 
-A modern, full-stack e-commerce application built with React, Node.js, Express, and MongoDB.
+  <p>
+    <strong>A modern, high-performance, and scalable e-commerce solution with Web, Mobile, and Backend seamlessly integrated.</strong>
+  </p>
 
-## Features
+  <!-- Badges -->
+  <p>
+    <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+    <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="NodeJS" />
+    <img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" />
+    <img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" />
+    <img src="https://img.shields.io/badge/Expo-1B1F23?style=for-the-badge&logo=expo&logoColor=white" alt="Expo" />
+    <img src="https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React Native" />
+  </p>
+</div>
 
-### Frontend
-- **Modern UI/UX** - Built with React, TailwindCSS, and Lucide icons
-- **User Authentication** - Login, registration, password reset
-- **Product Management** - Browse, search, filter products
-- **Shopping Cart** - Add to cart, quantity management
-- **Wishlist** - Save favorite products
-- **Checkout** - Cash on Delivery (COD) payment
-- **Order Management** - View order history and status
-- **Address Management** - Multiple shipping/billing addresses
-- **Product Reviews** - Rate and review products
-- **Admin Dashboard** - Manage products, orders, and users
-- **Toast Notifications** - Real-time feedback
-- **Loading States** - Skeleton loaders for better UX
-- **Error Boundaries** - Graceful error handling
+<br />
 
-### Backend
-- **RESTful API** - Express.js with proper routing
-- **Authentication** - JWT-based auth with refresh tokens
-- **Authorization** - Role-based access control (user, admin, super_admin)
-- **Input Validation** - Joi validation middleware
-- **File Upload** - Cloudinary integration for image hosting
-- **Email Service** - SMTP integration for notifications
-- **Payment** - Cash on Delivery (COD) support
-- **Caching** - Redis for session management
-- **Logging** - Winston logger for structured logs
-- **Security** - Helmet, CORS, rate limiting, XSS protection
+## 🌟 About ShopPilot
 
-## Tech Stack
+**ShopPilot** is a complete end-to-end e-commerce platform built to support both buyers and sellers. It features a stunning **Web Application**, a cross-platform **Mobile Application**, and a robust **Node.js/Express Backend** powered by MongoDB. 
 
-### Frontend
-- React 18
-- Vite
-- React Router
-- Redux Toolkit
-- React Query
-- TailwindCSS
-- Lucide Icons
-- Axios
-- Socket.IO Client
+With dedicated Vendor Dashboards, Admin Panels, secure authentication, and a dynamic catalog system, ShopPilot brings a modern shopping experience to life.
 
-### Backend
-- Node.js
-- Express.js
-- MongoDB
-- Redis
-- JWT
-- Joi
-- Multer
-- Cloudinary
-- Nodemailer
-- Winston
-- Socket.IO
-- Elasticsearch
+---
 
-## Project Structure
+## ✨ Key Features
 
-```
-ShopPilot/
-├── backend/
-│   ├── src/
-│   │   ├── config/          # Configuration files
-│   │   ├── controllers/     # Route controllers
-│   │   ├── middleware/      # Custom middleware
-│   │   ├── models/          # MongoDB models
-│   │   ├── routes/          # API routes
-│   │   ├── services/        # Business logic
-│   │   ├── utils/           # Utility functions
-│   │   └── validators/      # Joi validation schemas
-│   ├── .env.example         # Environment variables template
-│   └── package.json
-├── frontend/
-│   ├── src/
-│   │   ├── components/      # Reusable components
-│   │   ├── contexts/        # React contexts
-│   │   ├── pages/           # Page components
-│   │   ├── services/        # API services
-│   │   ├── store/           # Redux store
-│   │   └── utils/           # Utility functions
-│   └── package.json
-├── docs/                    # Documentation
-└── README.md
-```
+### 💻 Web Application (React & Vite)
+- **Beautiful UI/UX:** Built with Tailwind CSS and Framer Motion for smooth animations.
+- **Admin & Vendor Dashboards:** Dedicated panels to manage products, view sales, and handle orders.
+- **Advanced Filtering & Search:** Find products instantly with multi-faceted filtering.
+- **Shopping Cart & Checkout:** Seamless Cart management and secure Cash on Delivery (COD) processing.
+- **Loyalty Program:** Earn points and level up!
 
-## Getting Started
+### 📱 Mobile Application (Expo & React Native)
+- **Cross-Platform:** Runs flawlessly on both iOS and Android.
+- **Native Experience:** Built with React Native New Architecture (Fabric) and Expo SDK 57.
+- **Guest Browsing:** Start shopping immediately without forced logins.
+- **Wishlist & Cart Management:** Add items to cart/wishlist on the go.
+- **Order Tracking:** Track your order history from anywhere.
+
+### ⚙️ Backend API (Node.js & Express)
+- **Secure Authentication:** JWT-based access with refresh tokens and role-based access control.
+- **Scalable Architecture:** Designed for heavy traffic using MongoDB and Redis caching.
+- **Image Management:** Cloudinary integration for lightning-fast image delivery.
+- **Advanced Validations:** Joi-powered input validation.
+
+---
+
+## 🛠️ Technology Stack
+
+| Domain | Technologies |
+| --- | --- |
+| **Frontend Web** | React 18, Vite, React Router, Redux Toolkit, TailwindCSS, Lucide Icons |
+| **Mobile App** | React Native, Expo, Expo Router, Axios, SecureStore |
+| **Backend API** | Node.js, Express.js, JWT, Joi, Cloudinary, Multer, Winston |
+| **Database & Cache** | MongoDB, Mongoose, Redis |
+| **Deployment** | Vercel (Web), Render/Railway (API), EAS Build (Mobile APK/IPA) |
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js (v18 or higher)
-- MongoDB
-- Redis
-- Cloudinary account
-- Razorpay account
-- SMTP service (e.g., Gmail, SendGrid)
+Make sure you have installed:
+- [Node.js](https://nodejs.org/) (v18 or higher)
+- [MongoDB](https://www.mongodb.com/) (Local or Atlas)
+- [Redis](https://redis.io/) (Optional but recommended)
+- [Expo CLI](https://expo.dev/) (For mobile development)
 
-### Installation
-
-1. **Clone the repository**
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/SahilDalvi15/ShopPilot.git
 cd ShopPilot
 ```
 
-2. **Backend Setup**
+### 2. Backend Setup
 ```bash
 cd backend
 npm install
+
+# Copy environment template and fill in your credentials
 cp .env.example .env
-```
 
-3. **Configure Backend Environment Variables**
-Edit `backend/.env` with your credentials:
-```env
-NODE_ENV=development
-PORT=5000
-FRONTEND_URL=http://localhost:5173
-
-MONGODB_URI=mongodb://localhost:27017/shoppilot
-REDIS_URL=redis://localhost:6379
-
-JWT_SECRET=your_jwt_secret_key
-JWT_REFRESH_SECRET=your_refresh_secret_key
-
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your_email@gmail.com
-SMTP_PASSWORD=your_app_password
-EMAIL_FROM=noreply@shoppilot.ai
-
-ELASTICSEARCH_URL=http://localhost:9200
-```
-
-4. **Start Backend Server**
-```bash
+# Start the development server
 npm run dev
 ```
 
-5. **Frontend Setup**
+### 3. Frontend Web Setup
 ```bash
+# Open a new terminal
 cd frontend
 npm install
-```
 
-6. **Start Frontend Development Server**
-```bash
+# Create .env and add: VITE_API_URL=http://localhost:5000/api/v1
 npm run dev
 ```
 
-7. **Access the Application**
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:5000
+### 4. Mobile App Setup
+```bash
+# Open a new terminal
+cd mobile
+npm install
 
-## Environment Variables
+# Create a local env file if needed or use expo directly
+npx expo start
+```
+*Press `a` to open on an Android emulator or `i` for iOS simulator.*
 
-### Backend
-See `backend/.env.example` for all required environment variables.
+---
 
-### Frontend
-Create `frontend/.env`:
-```env
-VITE_API_URL=http://localhost:5000/api/v1
+## 🏗️ Project Architecture
+
+```plaintext
+ShopPilot/
+├── backend/          # Node.js + Express API server
+│   ├── src/models/   # MongoDB Schemas
+│   ├── src/routes/   # API Endpoints
+│   └── src/server.js # Entry point
+├── frontend/         # React + Vite Web Application
+│   ├── src/pages/    # Route components
+│   └── src/store/    # Redux State Management
+├── mobile/           # Expo React Native App
+│   ├── app/          # Expo Router file-based navigation
+│   └── components/   # Reusable UI components
+└── README.md         # You are here!
 ```
 
-## API Documentation
+---
 
-### Authentication
-- `POST /api/v1/auth/register` - Register new user
-- `POST /api/v1/auth/login` - Login user
-- `POST /api/v1/auth/logout` - Logout user
-- `POST /api/v1/auth/refresh` - Refresh access token
-- `POST /api/v1/auth/forgot-password` - Request password reset
-- `POST /api/v1/auth/reset-password` - Reset password
+## 📝 License
 
-### Products
-- `GET /api/v1/products` - Get all products
-- `GET /api/v1/products/:slug` - Get product by slug
-- `POST /api/v1/products` - Create product (admin)
-- `PUT /api/v1/products/:id` - Update product (admin)
-- `DELETE /api/v1/products/:id` - Delete product (admin)
+Distributed under the MIT License. See `LICENSE` for more information.
 
-### Orders
-- `POST /api/v1/orders` - Create order
-- `GET /api/v1/orders` - Get user orders
-- `GET /api/v1/orders/:id` - Get order by ID
-- `PUT /api/v1/orders/:id/cancel` - Cancel order
+---
 
-### Upload
-- `POST /api/v1/upload/images` - Upload multiple images (admin)
-- `POST /api/v1/upload/image` - Upload single image (admin)
-
-## Deployment
-
-### Backend Deployment (e.g., Render, Railway, Vercel)
-1. Set environment variables in the deployment platform
-2. Deploy MongoDB Atlas (if not using local)
-3. Deploy Redis (e.g., Redis Cloud)
-4. Push code to deployment platform
-
-### Frontend Deployment (Vercel)
-1. Build the frontend: `npm run build`
-2. Deploy to Vercel
-3. Set `VITE_API_URL` to production backend URL
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License.
-
-## Contact
-
-For questions or support, please open an issue on GitHub.
+<div align="center">
+  <b>Built with ❤️ by Sahil Dalvi & The ShopPilot Team</b>
+</div>

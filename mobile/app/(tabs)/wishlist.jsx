@@ -1,10 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator, Alert, RefreshControl } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Trash2, ShoppingCart, Heart } from 'lucide-react-native';
 import api, { getImageUrl } from '../../services/api';
+import { AuthContext } from '../../context/AuthContext';
+import LoginRequiredView from '../../components/LoginRequiredView';
 
 export default function WishlistScreen() {
+  const { user } = useContext(AuthContext);
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -12,8 +15,12 @@ export default function WishlistScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      fetchWishlist();
-    }, [])
+      if (user) {
+        fetchWishlist();
+      } else {
+        setLoading(false);
+      }
+    }, [user])
   );
 
   const fetchWishlist = async () => {
@@ -63,6 +70,10 @@ export default function WishlistScreen() {
       </TouchableOpacity>
     </TouchableOpacity>
   );
+
+  if (!user) {
+    return <LoginRequiredView message="Please log in to view your wishlist." />;
+  }
 
   if (loading) {
     return (

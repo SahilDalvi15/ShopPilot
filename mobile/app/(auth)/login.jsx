@@ -58,7 +58,10 @@ export default function LoginScreen() {
           disabled={isLoading}
         >
           {isLoading ? (
-            <ActivityIndicator color="#fff" />
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <ActivityIndicator color="#fff" style={{ marginRight: 8 }} />
+              <Text style={styles.buttonText}>Waking up server...</Text>
+            </View>
           ) : (
             <Text style={styles.buttonText}>Login</Text>
           )}

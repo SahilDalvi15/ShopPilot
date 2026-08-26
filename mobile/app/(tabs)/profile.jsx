@@ -4,6 +4,7 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { User, LogOut, Package as PackageIcon, Shield, MapPin, ChevronRight, Award, Store } from 'lucide-react-native';
 import api from '../../services/api';
 import { AuthContext } from '../../context/AuthContext';
+import LoginRequiredView from '../../components/LoginRequiredView';
 
 export default function ProfileScreen() {
   const { user, logout } = useContext(AuthContext);
@@ -14,8 +15,12 @@ export default function ProfileScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      fetchOrders();
-    }, [])
+      if (user) {
+        fetchOrders();
+      } else {
+        setLoading(false);
+      }
+    }, [user])
   );
 
   const fetchOrders = async () => {
@@ -63,6 +68,10 @@ export default function ProfileScreen() {
       <Text style={styles.itemsCount}>{item.items?.length || 0} items</Text>
     </View>
   );
+
+  if (!user) {
+    return <LoginRequiredView message="Please log in to view your profile and order history." />;
+  }
 
   return (
     <View style={styles.container}>
