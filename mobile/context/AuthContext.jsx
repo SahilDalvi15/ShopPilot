@@ -34,11 +34,12 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await api.post('/auth/login', { email, password });
       if (res.data.success) {
-        const { user: userData, accessToken } = res.data.data;
-        // In the backend, refreshToken is sent in a cookie.
-        // We will need to adjust the backend to return it in the JSON body, or parse the Set-Cookie header.
-        // For now we will save accessToken.
-        await SecureStore.setItemAsync('accessToken', accessToken);
+        const { user: userData, tokens } = res.data.data;
+        const accessToken = tokens?.accessToken || res.data.data.accessToken;
+        
+        if (accessToken) {
+          await SecureStore.setItemAsync('accessToken', accessToken);
+        }
         setUser(userData);
         return { success: true };
       }
