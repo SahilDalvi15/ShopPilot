@@ -31,7 +31,19 @@ export default function RegisterScreen() {
         router.replace('/(auth)/login');
       }
     } catch (error) {
-      Alert.alert('Registration Failed', error.response?.data?.message || 'Something went wrong');
+      const errorData = error.response?.data;
+      let errorMessage = 'Something went wrong';
+      
+      if (errorData) {
+        if (errorData.errors && errorData.errors.length > 0) {
+          // If there are detailed validation errors, show the first one
+          errorMessage = errorData.errors[0].message;
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        }
+      }
+      
+      Alert.alert('Registration Failed', errorMessage);
     } finally {
       setIsLoading(false);
     }
